@@ -68,10 +68,16 @@ from model import build_mesh, download_weights, load_base_model, get_lora_model,
 from rewards import REWARD_FNS
 
 
+def _repo_root() -> str:
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
 def _git_commit() -> str:
     try:
         return subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], stderr=subprocess.DEVNULL).decode().strip()
+            ["git", "-C", _repo_root(), "rev-parse", "HEAD"],
+            stderr=subprocess.DEVNULL,
+        ).decode().strip()
     except Exception:
         return "unknown"
 
@@ -80,6 +86,8 @@ def save_run_metadata(run_id: str | None, ckpt_dir: str) -> str:
     meta = {
         "timestamp": datetime.datetime.utcnow().isoformat() + "Z",
         "tpu2026_commit": _git_commit(),
+        "repo_root": _repo_root(),
+        "launch_cwd": os.getcwd(),
         "wandb_run_id": run_id,
         "advantage_estimator": ADV_ESTIMATOR,
         "run_seed": RUN_SEED,
@@ -87,6 +95,8 @@ def save_run_metadata(run_id: str | None, ckpt_dir: str) -> str:
         "lr_decay_steps": LR_DECAY_STEPS,
         "save_interval_steps": SAVE_INTERVAL_STEPS,
         "data_source": DATA_SOURCE,
+        "train_data_dir": TRAIN_DATA_DIR,
+        "test_data_dir": TEST_DATA_DIR,
         "ckpt_dir": ckpt_dir,
         "intermediate_ckpt_dir": INTERMEDIATE_CKPT_DIR,
         "tensorboard_dir": TENSORBOARD_DIR,

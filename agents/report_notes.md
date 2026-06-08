@@ -2,7 +2,7 @@
 
 ## Current Headline State
 
-The `coursework` branch contains the P0-P6 preparation patches for Part I TPU usage and is aligned with `origin/coursework` at `be631b2`. D1 GRPO and D2 RLOO 50-step debug runs have passed. Full runs remain blocked until Baron reviews the debug outcomes and approves them.
+The `coursework` branch contains the P0-P6 preparation patches for Part I TPU usage and is aligned with `origin/coursework` at `be631b2`. D1 GRPO and D2 RLOO 50-step debug runs have passed. The hygiene patch is validated locally. Full runs remain blocked until Baron reviews the debug outcomes and patch.
 
 ## 2026-06-08: Patch Review
 
@@ -161,4 +161,17 @@ Warnings:
 Decision after D2:
 - D2 passes the RLOO debug gate.
 - D1 and D2 debug gates are both passed.
-- Do not start full runs until Baron reviews these results and explicitly approves.
+- Do not start full runs until Baron reviews these results and the hygiene patch explicitly.
+
+## 2026-06-08: Pre-full-run hygiene patch
+
+Purpose:
+- Make `TRAIN_DATA_DIR` and `TEST_DATA_DIR` environment-overridable so full/debug runs can avoid repo-local TFDS/protobuf cache state.
+- Make `train.py` resolve the git commit from the repository root, even when launched from a run-local cwd.
+- Add `repo_root`, `launch_cwd`, `train_data_dir`, and `test_data_dir` to `run_metadata.json`.
+
+Status:
+- Patch applied locally.
+- `git diff --check` passed.
+- `py_compile` passed for `scripts/config.py`, `scripts/data.py`, `scripts/train.py`, and `scripts/evaluate.py`.
+- Do not start full runs until Baron approves.

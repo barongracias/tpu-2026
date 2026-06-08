@@ -11,8 +11,8 @@ MODEL_ID = "google/gemma-3-1b-it"
 GEMMA_TOKENIZER_PATH = "gs://gemma-data/tokenizers/tokenizer_gemma3.model"
 
 # ====== Data ======
-TRAIN_DATA_DIR = "./data/train"
-TEST_DATA_DIR = "./data/test"
+TRAIN_DATA_DIR = os.environ.get("TRAIN_DATA_DIR", "./data/train")
+TEST_DATA_DIR = os.environ.get("TEST_DATA_DIR", "./data/test")
 TRAIN_FRACTION = 0.9
 DATA_SOURCE = os.environ.get("DATA_SOURCE", "tfds")  # "tfds" or "kaggle"
 

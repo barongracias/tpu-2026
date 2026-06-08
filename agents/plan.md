@@ -39,6 +39,10 @@ Verification:
 - `git diff --check`.
 - `env PYTHONPYCACHEPREFIX=/tmp/tpu2026-pycache python3 -m py_compile scripts/config.py scripts/data.py scripts/train.py scripts/evaluate.py`.
 
+Validation:
+- `git diff --check`: passed.
+- `py_compile` for `scripts/config.py`, `scripts/data.py`, `scripts/train.py`, and `scripts/evaluate.py`: passed.
+
 ## Milestone 3: TPU Day-One Debug
 
 Status: complete — D1 GRPO and D2 RLOO debug runs passed.
@@ -82,9 +86,27 @@ Results:
 - D1 restored step 50 from `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D1-grpo-debug-20260608_142021/ckpts/actor`.
 - D2 restored step 50 from `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D2-rloo-debug-20260608_144102/ckpts/actor`.
 
+
+## Milestone 4.5: Pre-Full-Run Hygiene Patch
+
+Status: complete locally; not committed.
+
+Goal:
+- Avoid repo-local TFDS/protobuf cache issues in future runs by making train/test data dirs env-overridable.
+- Ensure `run_metadata.json` records the real repo commit even when training is launched from a run-local cwd.
+- Record `repo_root`, `launch_cwd`, `train_data_dir`, and `test_data_dir` in metadata for auditability.
+
+Checks:
+- `git diff --check`.
+- `env PYTHONPYCACHEPREFIX=/tmp/tpu2026-pycache python3 -m py_compile scripts/config.py scripts/data.py scripts/train.py scripts/evaluate.py`.
+
+Validation:
+- `git diff --check`: passed.
+- `py_compile` for `scripts/config.py`, `scripts/data.py`, `scripts/train.py`, and `scripts/evaluate.py`: passed.
+
 ## Milestone 5: Full Controlled Runs
 
-Status: blocked until Baron reviews D1/D2 and approves full runs.
+Status: blocked until Baron reviews D1/D2 and the hygiene patch before approving full runs.
 
 Goal:
 - Execute the locked GRPO vs RLOO comparison with fixed data, seed controls, and compute budget.

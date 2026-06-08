@@ -12,7 +12,7 @@ This fork is the Part I practical training/evaluation codebase for the Multi-Age
 - No Tunix source files were edited.
 - D1 GRPO 50-step debug completed successfully: step 50 reached, actor checkpoint restored, TensorBoard/W&B emitted evidence, and greedy eval CSV was written.
 - D2 RLOO 50-step debug completed successfully: step 50 reached, actor checkpoint restored, TensorBoard/W&B emitted evidence, and greedy eval CSV was written.
-- Full runs have not started and remain blocked until Baron reviews the D1/D2 outcomes.
+- Full runs have not started and remain blocked until Baron reviews the D1/D2 outcomes and the validated hygiene patch.
 
 ## What Was Implemented
 
@@ -22,7 +22,7 @@ This fork is the Part I practical training/evaluation codebase for the Multi-Age
 - P3: `MAX_STEPS_OVERRIDE` caps debug runs without changing the intended full-run LR schedule. Use `SAVE_INTERVAL_STEPS=50` with 50-step debug runs so the restore check has a checkpoint.
 - P4: `evaluate.py` can restore trained LoRA checkpoints through `--ckpt-dir`, optional `--step`, and explicit `--no-restore` for base-model sanity checks.
 - P5: `evaluate.py --output-csv` writes per-prompt rows for bootstrap confidence intervals and auditability.
-- P6: `train.py` writes `run_metadata.json` into `CKPT_DIR` at run start.
+- P6: `train.py` writes `run_metadata.json` into `CKPT_DIR` at run start. Hygiene follow-up now records repo root, launch cwd, and train/test data dirs; git commit resolution is repo-root-aware for run-local launches.
 - `bootstrap.sh` pins Tunix to `683256db1a0919b5cfd46cee52cebc96331494fb` to avoid HEAD drift.
 
 ## Current Experiment Intent
@@ -46,6 +46,7 @@ Debug evidence:
 - D2 initial repo-cwd attempt at `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D2-rloo-debug-20260608_143942` failed before training due to the repo-local TFDS/protobuf metadata cache issue; the successful retry ran from run-local cwd.
 - D2 `run_metadata.json` records `tpu2026_commit=unknown` because the successful retry ran outside the git repo; actual synced HEAD before launch was `be631b2`.
 - Both debug runs emitted W&B step-order warnings.
+- Hygiene patch validated locally: `TRAIN_DATA_DIR` and `TEST_DATA_DIR` are env-overridable; metadata records real repo commit from run-local cwd plus repo/data path context.
 
 ## What To Read First
 
