@@ -29,6 +29,7 @@ from config import (
     BETA,
     CKPT_DIR,
     DATA_SOURCE,
+    INTERMEDIATE_CKPT_DIR,
     EPSILON,
     EVAL_EVERY_N_STEPS,
     LEARNING_RATE,
@@ -170,7 +171,13 @@ def main():
     )
     trainer = GRPOLearner(rl_cluster=rl_cluster, reward_fns=REWARD_FNS, algo_config=grpo_cfg)
 
-    print(f"Starting GRPO training. CKPT_DIR={CKPT_DIR}  MAX_STEPS={MAX_STEPS}")
+    print(
+        f"Starting GRPO training.\n"
+        f"  CKPT_DIR={CKPT_DIR}\n"
+        f"  INTERMEDIATE_CKPT_DIR={INTERMEDIATE_CKPT_DIR}\n"
+        f"  TENSORBOARD_DIR={TENSORBOARD_DIR}\n"
+        f"  MAX_STEPS={MAX_STEPS}"
+    )
     trainer.train(train_ds, val_ds)
     print("Training finished.")
 

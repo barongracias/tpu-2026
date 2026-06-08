@@ -65,10 +65,10 @@ WARMUP_STEPS = 0.1 * MAX_STEPS
 MAX_GRAD_NORM = 0.1        # tight clipping keeps KL well-behaved
 
 # ====== Checkpointing ======
-# NOTE: /tmp is volatile. For long runs, point this at persistent storage.
-INTERMEDIATE_CKPT_DIR = "/tmp/content/intermediate_ckpt/"
-CKPT_DIR = "/tmp/content/ckpts/"
-TENSORBOARD_DIR = "/tmp/content/tmp/tensorboard/grpo"
+# Override with env vars to keep checkpoints + TensorBoard on persistent storage (/tmp is volatile).
+INTERMEDIATE_CKPT_DIR = os.environ.get("INTERMEDIATE_CKPT_DIR", "/tmp/content/intermediate_ckpt/")
+CKPT_DIR = os.environ.get("CKPT_DIR", "/tmp/content/ckpts/")
+TENSORBOARD_DIR = os.environ.get("TENSORBOARD_DIR", "/tmp/content/tmp/tensorboard/grpo")
 SAVE_INTERVAL_STEPS = 500
 MAX_TO_KEEP = 4
 
