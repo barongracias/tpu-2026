@@ -56,8 +56,9 @@ pip install -r "$REPO_DIR/requirements.txt"
 
 echo "==> Installing jax / tunix / qwix / flax from GitHub HEAD"
 # Order matters: tunix pulls flax from PyPI, so we replace flax last.
+# tunix pinned to 683256d (our citation commit) to prevent HEAD-drift breaking reproducibility.
 pip install git+https://github.com/jax-ml/jax
-pip install git+https://github.com/google/tunix git+https://github.com/google/qwix
+pip install git+https://github.com/google/tunix@683256db1a0919b5cfd46cee52cebc96331494fb git+https://github.com/google/qwix
 pip uninstall -y flax
 pip install git+https://github.com/google/flax
 
