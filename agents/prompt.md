@@ -5,9 +5,9 @@ You are working in the `tpu-2026` fork for the Multi-Agent Systems and Agentic A
 1. `agents/context.md`.
 2. `agents/plan.md`.
 3. `agents/report_notes.md`.
-4. Main coursework repo: `../Mutli-Agentic-Systems-and-Agentic-AI/agents/context.md`.
-5. Main coursework repo: `../Mutli-Agentic-Systems-and-Agentic-AI/experiments/runbooks/tpu_day1_runbook.md`.
-6. Main coursework repo: `../Mutli-Agentic-Systems-and-Agentic-AI/experiments/manifests/baseline_patch_plan.md`.
+4. Main coursework repo: `../agentic-ai-coursework/agents/context.md`.
+5. Main coursework repo: `../agentic-ai-coursework/experiments/runbooks/tpu_day1_runbook.md`.
+6. Main coursework repo: `../agentic-ai-coursework/experiments/manifests/baseline_patch_plan.md`.
 7. Patched files: `bootstrap.sh`, `scripts/config.py`, `scripts/data.py`, `scripts/train.py`, `scripts/evaluate.py`.
 
 Workflow rules:
@@ -25,5 +25,5 @@ Current branch facts:
 
 - Branch: `coursework`.
 - Upstream baseline: `324abbe4b4e229ea812223856393547db4fbb53e`.
-- Committed patch head before local edits: `35faf3241f9a9b424e805e9f0e1ca97cf60f8101`.
-- Local uncommitted follow-up edits may exist in `scripts/config.py` and `scripts/train.py`; inspect `git status --short --branch` first.
+- Committed head before local Fred-review edits: `6a2aef7`.
+- Local uncommitted Fred-review follow-up edits may exist in `scripts/config.py`, `scripts/train.py`, `scripts/evaluate.py`, and `agents/`; inspect `git status --short --branch` first.

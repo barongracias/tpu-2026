@@ -7,7 +7,7 @@ Reports three numbers:
 
 Run as:
     python evaluate.py --ckpt-dir $CKPT_DIR --output-csv eval_out.csv
-    python evaluate.py --ckpt-dir $CKPT_DIR --step 500
+    python evaluate.py --ckpt-dir $CKPT_DIR/actor --step 500
     python evaluate.py --no-restore          # base model sanity check
 """
 import argparse
@@ -39,16 +39,25 @@ from model import build_mesh, download_weights, load_base_model, get_lora_model,
 from rewards import match_format, match_numbers
 
 
-def restore_lora(lora_model, ckpt_root: str, step: int | None) -> int:
-    mgr = CheckpointManager(root_directory=ckpt_root)
+def resolve_lora_ckpt_root(ckpt_root: str) -> str:
+    actor_root = os.path.join(ckpt_root, "actor")
+    if os.path.isdir(actor_root):
+        print(f"Using actor checkpoint subdirectory: {actor_root}")
+        return actor_root
+    return ckpt_root
+
+
+def restore_lora(lora_model, ckpt_root: str, step: int | None) -> tuple[int, str]:
+    resolved_root = resolve_lora_ckpt_root(ckpt_root)
+    mgr = CheckpointManager(root_directory=resolved_root)
     n, _ = mgr.maybe_restore(model=lora_model, step=step, restore_only_lora_params=True)
     if n == 0:
         raise RuntimeError(
-            f"No checkpoint found under {ckpt_root}. "
-            f"Pass --ckpt-dir or check `ls {ckpt_root}`."
+            f"No checkpoint found under {resolved_root}. "
+            f"Pass --ckpt-dir or check `ls {resolved_root}`."
         )
-    print(f"Restored LoRA params from {ckpt_root} at step {n}")
-    return n
+    print(f"Restored LoRA params from {resolved_root} at step {n}")
+    return n, resolved_root
 
 
 def generate(question, sampler, eos_tokens, temperature=0.7, top_k=50, top_p=0.95, seed=None):
@@ -142,8 +151,9 @@ def main():
     if args.no_restore:
         print("Skipping checkpoint restore — evaluating base model.")
         restored_step = None
+        resolved_ckpt_dir = args.ckpt_dir
     else:
-        restored_step = restore_lora(lora, args.ckpt_dir, args.step)
+        restored_step, resolved_ckpt_dir = restore_lora(lora, args.ckpt_dir, args.step)
 
     _, _, test_ds = build_train_val_test(
         NUM_BATCHES, NUM_TEST_BATCHES, TRAIN_MICRO_BATCH_SIZE, TRAIN_FRACTION,
@@ -164,16 +174,19 @@ def main():
     n, t, acc, pacc, facc, rows = evaluate(
         test_ds, sampler, eos_tokens, **GENERATION_CONFIGS[args.preset])
     print(f"\nFINAL: correct={n}/{t}  acc={acc:.2f}%  partial={pacc:.2f}%  format={facc:.2f}%")
-    print(f"  ckpt_dir={args.ckpt_dir}  restored_step={restored_step}  preset={args.preset}")
+    print(
+        f"  requested_ckpt_dir={args.ckpt_dir}  resolved_ckpt_dir={resolved_ckpt_dir}  "
+        f"restored_step={restored_step}  preset={args.preset}"
+    )
 
     if args.output_csv:
         os.makedirs(os.path.dirname(os.path.abspath(args.output_csv)), exist_ok=True)
         with open(args.output_csv, "w", newline="", encoding="utf-8") as fh:
             writer = csv_mod.DictWriter(fh, fieldnames=list(rows[0].keys()) + [
-                "ckpt_dir", "restored_step", "preset", "run_seed"])
+                "requested_ckpt_dir", "resolved_ckpt_dir", "restored_step", "preset", "run_seed"])
             writer.writeheader()
-            meta = {"ckpt_dir": args.ckpt_dir, "restored_step": restored_step,
-                    "preset": args.preset, "run_seed": RUN_SEED}
+            meta = {"requested_ckpt_dir": args.ckpt_dir, "resolved_ckpt_dir": resolved_ckpt_dir,
+                    "restored_step": restored_step, "preset": args.preset, "run_seed": RUN_SEED}
             for row in rows:
                 writer.writerow({**row, **meta})
         print(f"Per-prompt results written to {args.output_csv}")

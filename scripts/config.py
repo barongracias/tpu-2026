@@ -80,7 +80,7 @@ if _override:
 INTERMEDIATE_CKPT_DIR = os.environ.get("INTERMEDIATE_CKPT_DIR", "/tmp/content/intermediate_ckpt/")
 CKPT_DIR = os.environ.get("CKPT_DIR", "/tmp/content/ckpts/")
 TENSORBOARD_DIR = os.environ.get("TENSORBOARD_DIR", "/tmp/content/tmp/tensorboard/grpo")
-SAVE_INTERVAL_STEPS = 500
+SAVE_INTERVAL_STEPS = int(os.environ.get("SAVE_INTERVAL_STEPS", "500"))
 MAX_TO_KEEP = 4
 
 # ====== Inference presets ======

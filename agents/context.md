@@ -1,23 +1,23 @@
 # TPU-2026 Coursework Branch Context
 
-This fork is the Part I practical training/evaluation codebase for the Multi-Agent Systems and Agentic AI coursework. It starts from upstream `borisbolliet/tpu-2026` commit `324abbe4b4e229ea812223856393547db4fbb53e` and the local `coursework` branch currently contains the P0-P6 preparation patches needed for reproducible GRPO/RLOO TPU runs. The main coursework/report repository is the sibling directory `../Mutli-Agentic-Systems-and-Agentic-AI`.
+This fork is the Part I practical training/evaluation codebase for the Multi-Agent Systems and Agentic AI coursework. It starts from upstream `borisbolliet/tpu-2026` commit `324abbe4b4e229ea812223856393547db4fbb53e` and the local `coursework` branch currently contains the P0-P6 preparation patches needed for reproducible GRPO/RLOO TPU runs. The main coursework/report repository is the sibling directory `../agentic-ai-coursework`.
 
 ## Current Status
 
 - Branch: `coursework`.
 - Upstream baseline: `324abbe4b4e229ea812223856393547db4fbb53e`.
-- Current patch head before local follow-up edits: `35faf3241f9a9b424e805e9f0e1ca97cf60f8101`.
-- Branch is ahead of `origin/coursework` by 8 commits.
+- Current committed head: `6a2aef7` (`Add TPU handoff docs and preserve debug LR schedule`).
+- Branch is aligned with `origin/coursework` before the local Fred-review follow-up edits.
 - Only baseline-owned files were touched in the 8 commits: `bootstrap.sh`, `scripts/config.py`, `scripts/data.py`, `scripts/train.py`, and `scripts/evaluate.py`.
 - No Tunix source files were edited.
-- Local follow-up edits after `35faf32`: `scripts/config.py` and `scripts/train.py` preserve the full-run learning-rate schedule under `MAX_STEPS_OVERRIDE` and record the resolved W&B run id in metadata. These edits are not committed yet.
+- Local follow-up edits after Fred's review: `scripts/config.py` makes `SAVE_INTERVAL_STEPS` environment-overridable; `scripts/train.py` records `lr_decay_steps` and `save_interval_steps`; `scripts/evaluate.py` auto-resolves `$CKPT_DIR/actor` when present and records requested/resolved checkpoint paths. These edits are not committed yet.
 
 ## What Was Implemented
 
 - P0: `CKPT_DIR`, `INTERMEDIATE_CKPT_DIR`, and `TENSORBOARD_DIR` are environment-overridable.
 - P1: `ADV_ESTIMATOR` is passed to `GRPOConfig(advantage_estimator=...)` for `grpo`, `rloo`, or `drgrpo`.
 - P2: `RUN_SEED` is threaded into Grain shuffle, rollout config, and `GRPOLearner.data_shuffle_seed`.
-- P3: `MAX_STEPS_OVERRIDE` caps debug runs without changing the intended full-run LR schedule after the local follow-up fix.
+- P3: `MAX_STEPS_OVERRIDE` caps debug runs without changing the intended full-run LR schedule. Use `SAVE_INTERVAL_STEPS=50` with 50-step debug runs so the restore check has a checkpoint.
 - P4: `evaluate.py` can restore trained LoRA checkpoints through `--ckpt-dir`, optional `--step`, and explicit `--no-restore` for base-model sanity checks.
 - P5: `evaluate.py --output-csv` writes per-prompt rows for bootstrap confidence intervals and auditability.
 - P6: `train.py` writes `run_metadata.json` into `CKPT_DIR` at run start.
@@ -43,8 +43,8 @@ Target matrix:
 1. `agents/context.md` in this repository.
 2. `agents/plan.md` in this repository.
 3. `agents/report_notes.md` in this repository.
-4. Main coursework repo: `../Mutli-Agentic-Systems-and-Agentic-AI/agents/context.md`.
-5. Main coursework repo: `../Mutli-Agentic-Systems-and-Agentic-AI/experiments/runbooks/tpu_day1_runbook.md`.
+4. Main coursework repo: `../agentic-ai-coursework/agents/context.md`.
+5. Main coursework repo: `../agentic-ai-coursework/experiments/runbooks/tpu_day1_runbook.md`.
 6. Patched code: `scripts/config.py`, `scripts/train.py`, `scripts/evaluate.py`, `scripts/data.py`, `bootstrap.sh`.
 
 ## Safe Useful Commands
@@ -72,5 +72,6 @@ On a TPU VM after setup, use the main coursework runbook before any full run.
 - Confirm `ADV_ESTIMATOR=rloo` is accepted by the pinned Tunix commit on the TPU VM.
 - Confirm `MAX_STEPS_OVERRIDE=50` stops debug training at 50 steps while `LR_DECAY_STEPS` remains the full-run value.
 - Confirm checkpoints and TensorBoard files are written to persistent `$HOME/tpu-runs/...` paths.
-- Confirm `evaluate.py --ckpt-dir ... --output-csv ...` restores a trained checkpoint and writes per-prompt rows.
+- Confirm a 50-step debug run writes a checkpoint when `SAVE_INTERVAL_STEPS=50`.
+- Confirm `evaluate.py --ckpt-dir ... --output-csv ...` restores a trained checkpoint, resolves the actor checkpoint root, and writes per-prompt rows.
 - Confirm W&B logs to the intended team/entity project, not the upstream default.

@@ -6,14 +6,14 @@ Prepare the `tpu-2026` baseline for reproducible Part I practical runs: baseline
 
 ## Source Of Truth
 
-- Coursework PDF and report planning live in `../Mutli-Agentic-Systems-and-Agentic-AI`.
-- Main runbook: `../Mutli-Agentic-Systems-and-Agentic-AI/experiments/runbooks/tpu_day1_runbook.md`.
-- Main patch plan: `../Mutli-Agentic-Systems-and-Agentic-AI/experiments/manifests/baseline_patch_plan.md`.
+- Coursework PDF and report planning live in `../agentic-ai-coursework`.
+- Main runbook: `../agentic-ai-coursework/experiments/runbooks/tpu_day1_runbook.md`.
+- Main patch plan: `../agentic-ai-coursework/experiments/manifests/baseline_patch_plan.md`.
 - This repository contains the actual training/evaluation patches for the TPU code.
 
 ## Milestone 1: Verify Patch Scope
 
-Status: complete, with one local follow-up fix pending commit.
+Status: complete for committed P0-P6 plus debug LR/W&B fix at `6a2aef7`; Fred-review follow-up edits pending commit.
 
 Goal:
 - Confirm P0-P6 are implemented without changing Tunix.
@@ -28,11 +28,12 @@ Checks:
 Status: pending user action.
 
 Goal:
-- Preserve the full-run learning-rate schedule during short debug runs and record the resolved W&B run id.
+- Preserve the full-run learning-rate schedule during short debug runs, record the resolved W&B run id, and incorporate Fred's debug-checkpoint review.
 
 Files:
-- `scripts/config.py`: add `FULL_MAX_STEPS` and `LR_DECAY_STEPS`; make `WARMUP_STEPS` integer and based on the full schedule.
-- `scripts/train.py`: use `LR_DECAY_STEPS` for the optimizer schedule and save the actual W&B run id when W&B creates one.
+- `scripts/config.py`: `FULL_MAX_STEPS`/`LR_DECAY_STEPS` are committed; local follow-up makes `SAVE_INTERVAL_STEPS` env-overridable.
+- `scripts/train.py`: `LR_DECAY_STEPS` and resolved W&B id are committed; local follow-up records `lr_decay_steps` and `save_interval_steps` in metadata.
+- `scripts/evaluate.py`: local follow-up auto-resolves an `actor/` checkpoint child and records requested/resolved checkpoint paths.
 
 Verification:
 - `git diff --check`.
@@ -47,7 +48,7 @@ Goal:
 
 Steps:
 - Create persistent `$RUN_ROOT` under `$HOME/tpu-runs/...`.
-- Export `CKPT_DIR`, `INTERMEDIATE_CKPT_DIR`, `TENSORBOARD_DIR`, `RUN_SEED=0`, and `MAX_STEPS_OVERRIDE=50`.
+- Export `CKPT_DIR`, `INTERMEDIATE_CKPT_DIR`, `TENSORBOARD_DIR`, `RUN_SEED=0`, `MAX_STEPS_OVERRIDE=50`, and `SAVE_INTERVAL_STEPS=50`.
 - Run D1 with `ADV_ESTIMATOR=grpo`.
 - Run D2 with `ADV_ESTIMATOR=rloo`.
 - Record each run in an iteration log.
@@ -73,7 +74,7 @@ python -u scripts/evaluate.py --preset greedy --source tfds --ckpt-dir "$CKPT_DI
 ```
 
 Checks:
-- `restored_step` is printed.
+- `restored_step` and the resolved actor checkpoint root are printed.
 - CSV contains one row per prompt.
 - Aggregate accuracy can be recomputed from the CSV.
 

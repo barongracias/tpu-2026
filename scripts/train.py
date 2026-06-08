@@ -84,6 +84,8 @@ def save_run_metadata(run_id: str | None, ckpt_dir: str) -> str:
         "advantage_estimator": ADV_ESTIMATOR,
         "run_seed": RUN_SEED,
         "max_steps": MAX_STEPS,
+        "lr_decay_steps": LR_DECAY_STEPS,
+        "save_interval_steps": SAVE_INTERVAL_STEPS,
         "data_source": DATA_SOURCE,
         "ckpt_dir": ckpt_dir,
         "intermediate_ckpt_dir": INTERMEDIATE_CKPT_DIR,
