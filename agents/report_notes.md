@@ -2,7 +2,7 @@
 
 ## Current Headline State
 
-The `coursework` branch contains the P0-P6 preparation patches for Part I TPU usage and is aligned with `origin/coursework` at `be631b2`. D1 GRPO and D2 RLOO 50-step debug runs have passed. The hygiene patch is validated locally. Full runs remain blocked until Baron reviews the debug outcomes and patch.
+The `coursework` branch contains the P0-P6 preparation patches for Part I TPU usage and is aligned with `origin/coursework` at `4339ba8`. D1 GRPO and D2 RLOO 50-step debug runs have passed. The hygiene patch is committed, pushed, pulled, and validated. R1 GRPO seed 0 training completed; R1 evaluation/review is pending; other full runs remain blocked.
 
 ## 2026-06-08: Patch Review
 
@@ -161,7 +161,7 @@ Warnings:
 Decision after D2:
 - D2 passes the RLOO debug gate.
 - D1 and D2 debug gates are both passed.
-- Do not start full runs until Baron reviews these results and the hygiene patch explicitly.
+- R1 GRPO seed 0 is approved to start after the hygiene patch; do not start R3/R4/R2 yet.
 
 ## 2026-06-08: Pre-full-run hygiene patch
 
@@ -171,7 +171,36 @@ Purpose:
 - Add `repo_root`, `launch_cwd`, `train_data_dir`, and `test_data_dir` to `run_metadata.json`.
 
 Status:
-- Patch applied locally.
+- Patch committed, pushed, pulled, and validated at `4339ba8`.
 - `git diff --check` passed.
 - `py_compile` passed for `scripts/config.py`, `scripts/data.py`, `scripts/train.py`, and `scripts/evaluate.py`.
-- Do not start full runs until Baron approves.
+- R1 GRPO seed 0 is approved to start; do not start R3/R4/R2 yet.
+
+R1 launch requirements:
+- Launch from repo cwd so `run_metadata.json` records the real git commit.
+- Set `TRAIN_DATA_DIR=$RUN_ROOT/data/train` and `TEST_DATA_DIR=$RUN_ROOT/data/test` to avoid repo-local TFDS/protobuf cache issues.
+- Keep all run artefacts under persistent `$HOME/tpu-runs/part-i/...`.
+
+## 2026-06-08: R1 GRPO full seed 0 training complete
+
+Run root:
+- `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R1-grpo-full-s0-20260608_165231`
+
+Launch state:
+- tmux session: `r1-grpo-full-s0` exited after completion
+- Repo HEAD: `4339ba8`
+- Launch cwd: repo root `~/tpu-2026`
+- Estimator: `grpo`
+- Seed: `0`
+- `MAX_STEPS_OVERRIDE` unset for full training.
+- `TRAIN_DATA_DIR=/home/ext_barongracias_gmail_com/tpu-runs/part-i/R1-grpo-full-s0-20260608_165231/data/train`
+- `TEST_DATA_DIR=/home/ext_barongracias_gmail_com/tpu-runs/part-i/R1-grpo-full-s0-20260608_165231/data/test`
+- Artefacts are under persistent `$HOME/tpu-runs`.
+- W&B run: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R1-grpo-full-s0`
+- Final monitor: tmux exited; `Training finished.` present; final checkpoint `ckpts/actor/3364` exists; TensorBoard event file exists.
+- Metadata records commit `4339ba84ba3396d9e6defaef218ecded435fc787`, estimator `grpo`, seed `0`, `max_steps=3364`, and run-local train/test data dirs.
+- W&B emitted repeated step-order warnings at final step `3364`; plots should be inspected with care.
+- R1 evaluation is pending; do not start R3/R4/R2 yet.
+
+Restrictions:
+- Do not start R3/R4/R2 until Baron approves after R1 review.

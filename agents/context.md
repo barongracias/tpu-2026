@@ -6,13 +6,13 @@ This fork is the Part I practical training/evaluation codebase for the Multi-Age
 
 - Branch: `coursework`.
 - Upstream baseline: `324abbe4b4e229ea812223856393547db4fbb53e`.
-- Current pulled head: `be631b2` on `coursework` / `origin/coursework`.
+- Current pulled head: `4339ba8` on `coursework` / `origin/coursework`.
 - Branch is aligned with `origin/coursework`.
 - Only baseline-owned files were touched in the 8 commits: `bootstrap.sh`, `scripts/config.py`, `scripts/data.py`, `scripts/train.py`, and `scripts/evaluate.py`.
 - No Tunix source files were edited.
 - D1 GRPO 50-step debug completed successfully: step 50 reached, actor checkpoint restored, TensorBoard/W&B emitted evidence, and greedy eval CSV was written.
 - D2 RLOO 50-step debug completed successfully: step 50 reached, actor checkpoint restored, TensorBoard/W&B emitted evidence, and greedy eval CSV was written.
-- Full runs have not started and remain blocked until Baron reviews the D1/D2 outcomes and the validated hygiene patch.
+- R1 GRPO seed 0 full training completed; do not start R3/R4/R2 until Baron approves after R1 evaluation/review.
 
 ## What Was Implemented
 
@@ -35,10 +35,18 @@ Target matrix:
 | --- | --- | ---: | --- |
 | D1 | grpo | 0 | complete: 50-step debug baseline passed. |
 | D2 | rloo | 0 | complete: 50-step debug variant passed. |
-| R1 | grpo | 0 | Full baseline reproduction. |
+| R1 | grpo | 0 | complete: full baseline training finished; eval pending. |
 | R3 | rloo | 0 | Full controlled variant. |
 | R4 | rloo | 1 | Second-seed variant if TPU time permits. |
 | R2 | grpo | 1 | Second-seed baseline if TPU time permits. |
+
+R1 completed training:
+- Session: `r1-grpo-full-s0` exited after training completion
+- Run root: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R1-grpo-full-s0-20260608_165231`
+- Launched from repo cwd at HEAD `4339ba8` with `ADV_ESTIMATOR=grpo`, `RUN_SEED=0`, and no `MAX_STEPS_OVERRIDE`.
+- Uses `TRAIN_DATA_DIR=/home/ext_barongracias_gmail_com/tpu-runs/part-i/R1-grpo-full-s0-20260608_165231/data/train` and `TEST_DATA_DIR=/home/ext_barongracias_gmail_com/tpu-runs/part-i/R1-grpo-full-s0-20260608_165231/data/test`.
+- W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R1-grpo-full-s0`
+- Final monitor: tmux exited; `Training finished.` present; final checkpoint `ckpts/actor/3364` exists; TensorBoard event file exists; W&B emitted step-order warnings.
 
 Debug evidence:
 - D1 run root: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D1-grpo-debug-20260608_142021`; restored step 50; eval `correct=30/64`, `acc=46.88%`, `partial=50.00%`, `format=6.25%`.
@@ -46,7 +54,7 @@ Debug evidence:
 - D2 initial repo-cwd attempt at `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D2-rloo-debug-20260608_143942` failed before training due to the repo-local TFDS/protobuf metadata cache issue; the successful retry ran from run-local cwd.
 - D2 `run_metadata.json` records `tpu2026_commit=unknown` because the successful retry ran outside the git repo; actual synced HEAD before launch was `be631b2`.
 - Both debug runs emitted W&B step-order warnings.
-- Hygiene patch validated locally: `TRAIN_DATA_DIR` and `TEST_DATA_DIR` are env-overridable; metadata records real repo commit from run-local cwd plus repo/data path context.
+- Hygiene patch is committed, pushed, pulled, and validated at `4339ba8`: `TRAIN_DATA_DIR` and `TEST_DATA_DIR` are env-overridable; metadata records repo root, launch cwd, data dirs, and the real git commit.
 
 ## What To Read First
 
@@ -72,7 +80,7 @@ On a TPU VM after setup, use the main coursework runbook before any full run.
 
 - Do not push from an automated session.
 - Do not edit Tunix unless a TPU/debug failure proves the pinned Tunix API itself is wrong.
-- Do not start a full 5 hour run until the debug gates pass.
+- Do not start any full run other than approved R1 GRPO seed 0.
 - Do not store checkpoints or TensorBoard logs only under `/tmp`.
 - Do not claim numerical results until there are saved logs and per-prompt evaluation outputs.
 
@@ -85,4 +93,4 @@ On a TPU VM after setup, use the main coursework runbook before any full run.
 - A 50-step debug run writes a checkpoint when `SAVE_INTERVAL_STEPS=50`.
 - `evaluate.py --ckpt-dir ... --output-csv ...` restores trained checkpoints, resolves the actor checkpoint root, and writes per-prompt rows for both D1 and D2.
 - W&B logs to the intended team/entity project, not the upstream default.
-- Remaining gate: Baron review and explicit approval before full runs.
+- R1 launch requirement: start from repo cwd so metadata records the real commit, and set `TRAIN_DATA_DIR`/`TEST_DATA_DIR` to `$RUN_ROOT/data/train` and `$RUN_ROOT/data/test` to avoid repo-local TFDS/protobuf cache issues.

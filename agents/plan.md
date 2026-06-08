@@ -13,7 +13,7 @@ Prepare the `tpu-2026` baseline for reproducible Part I practical runs: baseline
 
 ## Milestone 1: Verify Patch Scope
 
-Status: complete; latest pulled workflow head is `be631b2`.
+Status: complete; latest pulled workflow head is `4339ba8`.
 
 Goal:
 - Confirm P0-P6 are implemented without changing Tunix.
@@ -89,7 +89,7 @@ Results:
 
 ## Milestone 4.5: Pre-Full-Run Hygiene Patch
 
-Status: complete locally; not committed.
+Status: complete; committed, pushed, and pulled at `4339ba8`.
 
 Goal:
 - Avoid repo-local TFDS/protobuf cache issues in future runs by making train/test data dirs env-overridable.
@@ -106,7 +106,7 @@ Validation:
 
 ## Milestone 5: Full Controlled Runs
 
-Status: blocked until Baron reviews D1/D2 and the hygiene patch before approving full runs.
+Status: R1 GRPO seed 0 training complete; R1 eval/review pending; R3/R4/R2 remain blocked.
 
 Goal:
 - Execute the locked GRPO vs RLOO comparison with fixed data, seed controls, and compute budget.
@@ -115,6 +115,27 @@ Checks:
 - Same held-out split and evaluation preset.
 - Same total training step budget unless explicitly justified.
 - Per-run metadata, logs, checkpoints, and eval CSVs preserved.
+
+Completed run:
+- R1 session: `r1-grpo-full-s0` exited
+- R1 run root: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R1-grpo-full-s0-20260608_165231`
+- Launched from repo cwd at HEAD `4339ba8` with run-local train/test data dirs and no `MAX_STEPS_OVERRIDE`.
+- W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R1-grpo-full-s0`
+- Final monitor: tmux exited; `Training finished.` present; final checkpoint `ckpts/actor/3364` exists; TensorBoard event file exists; W&B emitted step-order warnings.
+
+Launch requirements:
+- Launch R1 from repo cwd so `run_metadata.json` records the real git commit.
+- Set `TRAIN_DATA_DIR=$RUN_ROOT/data/train` and `TEST_DATA_DIR=$RUN_ROOT/data/test` to avoid repo-local TFDS/protobuf cache issues.
+- Keep all run artefacts under `$HOME/tpu-runs/part-i/...`.
+- Do not start R3/R4/R2 until Baron approves after R1 review.
+
+## Milestone 5.5: R1 Evaluation
+
+Status: pending.
+
+Goal:
+- Restore R1 final checkpoint from `ckpts/actor/3364` and write run-local eval CSV under `$RUN_ROOT/eval`.
+- Do not start additional full runs until R1 evaluation/review is complete and Baron approves.
 
 ## Milestone 6: Evidence Extraction
 
