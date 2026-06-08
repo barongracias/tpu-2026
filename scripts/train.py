@@ -12,7 +12,10 @@ Resuming from checkpoint: just point CKPT_DIR at the existing directory.
 Tunix's RLCluster uses Orbax and will pick up the latest step in CKPT_DIR.
 """
 import argparse
+import datetime
+import json
 import os
+import subprocess
 
 import nest_asyncio
 import optax
@@ -62,6 +65,37 @@ from config import (
 from data import build_train_val_test
 from model import build_mesh, download_weights, load_base_model, get_lora_model, load_tokenizer
 from rewards import REWARD_FNS
+
+
+def _git_commit() -> str:
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], stderr=subprocess.DEVNULL).decode().strip()
+    except Exception:
+        return "unknown"
+
+
+def save_run_metadata(run_id: str | None, ckpt_dir: str) -> str:
+    meta = {
+        "timestamp": datetime.datetime.utcnow().isoformat() + "Z",
+        "tpu2026_commit": _git_commit(),
+        "wandb_run_id": run_id,
+        "advantage_estimator": ADV_ESTIMATOR,
+        "run_seed": RUN_SEED,
+        "max_steps": MAX_STEPS,
+        "data_source": DATA_SOURCE,
+        "ckpt_dir": ckpt_dir,
+        "intermediate_ckpt_dir": INTERMEDIATE_CKPT_DIR,
+        "tensorboard_dir": TENSORBOARD_DIR,
+        "wandb_project": WANDB_PROJECT,
+        "wandb_entity": WANDB_ENTITY,
+    }
+    os.makedirs(ckpt_dir, exist_ok=True)
+    path = os.path.join(ckpt_dir, "run_metadata.json")
+    with open(path, "w") as fh:
+        json.dump(meta, fh, indent=2)
+    print(f"Run metadata saved to {path}")
+    return path
 
 
 def login_services():
@@ -147,6 +181,7 @@ def main():
     # init wandb BEFORE the trainer because tunix sometimes hangs if wandb is
     # initialised mid-RLCluster construction (known bug).
     maybe_init_wandb(args.wandb_run_id)
+    save_run_metadata(args.wandb_run_id, CKPT_DIR)
 
     mesh = build_mesh()
     local_path, eos_tokens = download_weights()
