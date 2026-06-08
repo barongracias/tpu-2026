@@ -47,6 +47,7 @@ NUM_GENERATIONS = 2        # G in the GRPO paper — group size for advantage no
 NUM_ITERATIONS = 1         # mu — PPO-style inner optimisation passes per batch
 BETA = 0.08                # KL penalty coefficient (anchors to reference model)
 EPSILON = 0.2              # PPO-style clip range
+ADV_ESTIMATOR = os.environ.get("ADV_ESTIMATOR", "grpo")  # grpo | rloo | drgrpo
 
 # ====== Training ======
 TRAIN_MICRO_BATCH_SIZE = 1

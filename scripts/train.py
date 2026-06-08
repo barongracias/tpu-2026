@@ -25,12 +25,13 @@ from tunix.rl.rollout import base_rollout
 from tunix.sft import metrics_logger
 
 from config import (
+    ADV_ESTIMATOR,
     B1, B2,
     BETA,
     CKPT_DIR,
     DATA_SOURCE,
-    INTERMEDIATE_CKPT_DIR,
     EPSILON,
+    INTERMEDIATE_CKPT_DIR,
     EVAL_EVERY_N_STEPS,
     LEARNING_RATE,
     MAX_GRAD_NORM,
@@ -159,11 +160,13 @@ def main():
 
     optimizer = build_optimizer()
     cluster_cfg = build_cluster_config(mesh, optimizer, eos_tokens)
+    print(f"  ADV_ESTIMATOR={ADV_ESTIMATOR}")
     grpo_cfg = GRPOConfig(
         num_generations=NUM_GENERATIONS,
         num_iterations=NUM_ITERATIONS,
         beta=BETA,
         epsilon=EPSILON,
+        advantage_estimator=ADV_ESTIMATOR,
     )
 
     rl_cluster = rl_cluster_lib.RLCluster(
