@@ -68,6 +68,11 @@ WEIGHT_DECAY = 0.1
 WARMUP_STEPS = 0.1 * MAX_STEPS
 MAX_GRAD_NORM = 0.1        # tight clipping keeps KL well-behaved
 
+# Debug: cap training steps without touching the full schedule shape.
+_override = os.environ.get("MAX_STEPS_OVERRIDE")
+if _override:
+    MAX_STEPS = int(_override)
+
 # ====== Checkpointing ======
 # Override with env vars to keep checkpoints + TensorBoard on persistent storage (/tmp is volatile).
 INTERMEDIATE_CKPT_DIR = os.environ.get("INTERMEDIATE_CKPT_DIR", "/tmp/content/intermediate_ckpt/")
