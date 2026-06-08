@@ -13,7 +13,7 @@ Prepare the `tpu-2026` baseline for reproducible Part I practical runs: baseline
 
 ## Milestone 1: Verify Patch Scope
 
-Status: complete for committed P0-P6 plus debug LR/W&B fix at `6a2aef7`; Fred-review follow-up edits pending commit.
+Status: complete at `e3ebeef`.
 
 Goal:
 - Confirm P0-P6 are implemented without changing Tunix.
@@ -25,7 +25,7 @@ Checks:
 
 ## Milestone 2: Commit/Share Local Follow-Up Fix
 
-Status: pending user action.
+Status: complete at `e3ebeef`.
 
 Goal:
 - Preserve the full-run learning-rate schedule during short debug runs, record the resolved W&B run id, and incorporate Fred's debug-checkpoint review.
@@ -41,7 +41,7 @@ Verification:
 
 ## Milestone 3: TPU Day-One Debug
 
-Status: pending TPU access.
+Status: in_progress — D1 GRPO debug passed; D2 RLOO debug pending.
 
 Goal:
 - Run short GRPO and RLOO jobs before committing full TPU time.
@@ -49,8 +49,8 @@ Goal:
 Steps:
 - Create persistent `$RUN_ROOT` under `$HOME/tpu-runs/...`.
 - Export `CKPT_DIR`, `INTERMEDIATE_CKPT_DIR`, `TENSORBOARD_DIR`, `RUN_SEED=0`, `MAX_STEPS_OVERRIDE=50`, and `SAVE_INTERVAL_STEPS=50`.
-- Run D1 with `ADV_ESTIMATOR=grpo`.
-- Run D2 with `ADV_ESTIMATOR=rloo`.
+- D1 with `ADV_ESTIMATOR=grpo`: complete.
+- D2 with `ADV_ESTIMATOR=rloo`: pending next.
 - Record each run in an iteration log.
 
 Checks:
@@ -62,7 +62,7 @@ Checks:
 
 ## Milestone 4: Evaluation Restore Check
 
-Status: pending debug checkpoint.
+Status: D1 restore check complete; repeat for D2 after RLOO debug.
 
 Goal:
 - Confirm evaluation uses trained LoRA parameters, not an un-restored LoRA wrapper.
@@ -80,7 +80,7 @@ Checks:
 
 ## Milestone 5: Full Controlled Runs
 
-Status: blocked until debug/evaluation gates pass.
+Status: blocked until D2 debug/evaluation gates pass.
 
 Goal:
 - Execute the locked GRPO vs RLOO comparison with fixed data, seed controls, and compute budget.

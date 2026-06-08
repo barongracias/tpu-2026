@@ -25,5 +25,5 @@ Current branch facts:
 
 - Branch: `coursework`.
 - Upstream baseline: `324abbe4b4e229ea812223856393547db4fbb53e`.
-- Committed head before local Fred-review edits: `6a2aef7`.
-- Local uncommitted Fred-review follow-up edits may exist in `scripts/config.py`, `scripts/train.py`, `scripts/evaluate.py`, and `agents/`; inspect `git status --short --branch` first.
+- Current committed head: `e3ebeef`.
+- D1 GRPO debug passed. D2 RLOO debug is pending; inspect `git status --short --branch` first.

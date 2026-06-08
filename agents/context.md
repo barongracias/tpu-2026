@@ -6,11 +6,11 @@ This fork is the Part I practical training/evaluation codebase for the Multi-Age
 
 - Branch: `coursework`.
 - Upstream baseline: `324abbe4b4e229ea812223856393547db4fbb53e`.
-- Current committed head: `6a2aef7` (`Add TPU handoff docs and preserve debug LR schedule`).
-- Branch is aligned with `origin/coursework` before the local Fred-review follow-up edits.
+- Current committed head: `e3ebeef` (`Address TPU debug checkpoint and eval restore review`).
+- Branch is aligned with `origin/coursework`.
 - Only baseline-owned files were touched in the 8 commits: `bootstrap.sh`, `scripts/config.py`, `scripts/data.py`, `scripts/train.py`, and `scripts/evaluate.py`.
 - No Tunix source files were edited.
-- Local follow-up edits after Fred's review: `scripts/config.py` makes `SAVE_INTERVAL_STEPS` environment-overridable; `scripts/train.py` records `lr_decay_steps` and `save_interval_steps`; `scripts/evaluate.py` auto-resolves `$CKPT_DIR/actor` when present and records requested/resolved checkpoint paths. These edits are not committed yet.
+- D1 GRPO 50-step debug completed successfully at `{run_root}`: step 50 reached, actor checkpoint restored, TensorBoard/W&B emitted evidence, and greedy eval CSV was written. D2 RLOO debug is next.
 
 ## What Was Implemented
 
@@ -31,8 +31,8 @@ Target matrix:
 
 | Run | Estimator | Seed | Purpose |
 | --- | --- | ---: | --- |
-| D1 | grpo | 0 | 50-step debug baseline. |
-| D2 | rloo | 0 | 50-step debug estimator-switch check. |
+| D1 | grpo | 0 | complete: 50-step debug baseline passed. |
+| D2 | rloo | 0 | pending: next run. |
 | R1 | grpo | 0 | Full baseline reproduction. |
 | R3 | rloo | 0 | Full controlled variant. |
 | R4 | rloo | 1 | Second-seed variant if TPU time permits. |
@@ -69,7 +69,7 @@ On a TPU VM after setup, use the main coursework runbook before any full run.
 ## Open Checks Before Full Runs
 
 - Confirm JAX backend reports TPU.
-- Confirm `ADV_ESTIMATOR=rloo` is accepted by the pinned Tunix commit on the TPU VM.
+- Confirm `ADV_ESTIMATOR=rloo` is accepted by the pinned Tunix commit on the TPU VM during D2.
 - Confirm `MAX_STEPS_OVERRIDE=50` stops debug training at 50 steps while `LR_DECAY_STEPS` remains the full-run value.
 - Confirm checkpoints and TensorBoard files are written to persistent `$HOME/tpu-runs/...` paths.
 - Confirm a 50-step debug run writes a checkpoint when `SAVE_INTERVAL_STEPS=50`.
