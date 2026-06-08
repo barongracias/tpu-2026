@@ -6,11 +6,14 @@ Reports three numbers:
   * format_accuracy    — fraction of completions whose template parses
 
 Run as:
-    python evaluate.py --ckpt-dir $CKPT_DIR
+    python evaluate.py --ckpt-dir $CKPT_DIR --output-csv eval_out.csv
     python evaluate.py --ckpt-dir $CKPT_DIR --step 500
     python evaluate.py --no-restore          # base model sanity check
 """
 import argparse
+import csv as csv_mod
+import json
+import os
 
 from tqdm.auto import tqdm
 from tunix.generate import sampler as sampler_lib
@@ -65,6 +68,7 @@ def generate(question, sampler, eos_tokens, temperature=0.7, top_k=50, top_p=0.9
 
 def evaluate(dataset, sampler, eos_tokens, temperature=0.7, top_k=50, top_p=0.95, num_passes=1):
     corr = partially_corr = corr_format = total = 0
+    rows = []  # per-prompt records for P5 CSV export
 
     for batch in tqdm(dataset):
         answers = batch["answer"]
@@ -77,11 +81,13 @@ def evaluate(dataset, sampler, eos_tokens, temperature=0.7, top_k=50, top_p=0.95
 
         for q, responses, ans in zip(questions, per_q, answers):
             got_corr = got_partial = got_format = False
+            best_response = responses[0] if responses else ""
             for r in responses:
                 ext = guess.group(1) if (guess := match_numbers.search(r)) is not None else "-1e9"
                 try:
                     if float(ext.strip()) == float(ans.strip()):
                         got_corr = True
+                        best_response = r
                     ratio = float(ext.strip()) / float(ans.strip())
                     if 0.9 <= ratio <= 1.1:
                         got_partial = True
@@ -90,17 +96,27 @@ def evaluate(dataset, sampler, eos_tokens, temperature=0.7, top_k=50, top_p=0.95
                 if match_format.search(r) is not None:
                     got_format = True
                 if got_corr and got_partial and got_format:
+                    best_response = r
                     break
 
             corr += int(got_corr)
             partially_corr += int(got_partial)
             corr_format += int(got_format)
             total += 1
+            rows.append({
+                "prompt_id": total,
+                "question": q if isinstance(q, str) else q.decode("utf-8"),
+                "expected_answer": ans if isinstance(ans, str) else (ans.decode("utf-8") if ans else ""),
+                "model_response": best_response,
+                "correct": int(got_corr),
+                "partial_correct": int(got_partial),
+                "format_correct": int(got_format),
+            })
             if total % 10 == 0:
                 print(f"===> corr={corr} total={total} acc={corr/total*100:.2f}% "
                       f"partial={partially_corr/total*100:.2f}% fmt={corr_format/total*100:.2f}%")
 
-    return corr, total, corr/total*100, partially_corr/total*100, corr_format/total*100
+    return corr, total, corr/total*100, partially_corr/total*100, corr_format/total*100, rows
 
 
 def main():
@@ -113,6 +129,8 @@ def main():
                     help="Checkpoint step to restore. Omit for latest.")
     ap.add_argument("--no-restore", action="store_true",
                     help="Skip LoRA restore — evaluates the base model only.")
+    ap.add_argument("--output-csv", default=None,
+                    help="Write per-prompt results to this CSV path (for bootstrap CI).")
     args = ap.parse_args()
 
     mesh = build_mesh()
@@ -143,9 +161,22 @@ def main():
             head_dim=cfg.head_dim,
         ),
     )
-    n, t, acc, pacc, facc = evaluate(test_ds, sampler, eos_tokens, **GENERATION_CONFIGS[args.preset])
+    n, t, acc, pacc, facc, rows = evaluate(
+        test_ds, sampler, eos_tokens, **GENERATION_CONFIGS[args.preset])
     print(f"\nFINAL: correct={n}/{t}  acc={acc:.2f}%  partial={pacc:.2f}%  format={facc:.2f}%")
     print(f"  ckpt_dir={args.ckpt_dir}  restored_step={restored_step}  preset={args.preset}")
+
+    if args.output_csv:
+        os.makedirs(os.path.dirname(os.path.abspath(args.output_csv)), exist_ok=True)
+        with open(args.output_csv, "w", newline="", encoding="utf-8") as fh:
+            writer = csv_mod.DictWriter(fh, fieldnames=list(rows[0].keys()) + [
+                "ckpt_dir", "restored_step", "preset", "run_seed"])
+            writer.writeheader()
+            meta = {"ckpt_dir": args.ckpt_dir, "restored_step": restored_step,
+                    "preset": args.preset, "run_seed": RUN_SEED}
+            for row in rows:
+                writer.writerow({**row, **meta})
+        print(f"Per-prompt results written to {args.output_csv}")
 
 
 if __name__ == "__main__":
