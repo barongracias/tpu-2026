@@ -6,11 +6,13 @@ This fork is the Part I practical training/evaluation codebase for the Multi-Age
 
 - Branch: `coursework`.
 - Upstream baseline: `324abbe4b4e229ea812223856393547db4fbb53e`.
-- Current committed head: `e3ebeef` (`Address TPU debug checkpoint and eval restore review`).
+- Current pulled head: `be631b2` on `coursework` / `origin/coursework`.
 - Branch is aligned with `origin/coursework`.
 - Only baseline-owned files were touched in the 8 commits: `bootstrap.sh`, `scripts/config.py`, `scripts/data.py`, `scripts/train.py`, and `scripts/evaluate.py`.
 - No Tunix source files were edited.
-- D1 GRPO 50-step debug completed successfully at `{run_root}`: step 50 reached, actor checkpoint restored, TensorBoard/W&B emitted evidence, and greedy eval CSV was written. D2 RLOO debug is next.
+- D1 GRPO 50-step debug completed successfully: step 50 reached, actor checkpoint restored, TensorBoard/W&B emitted evidence, and greedy eval CSV was written.
+- D2 RLOO 50-step debug completed successfully: step 50 reached, actor checkpoint restored, TensorBoard/W&B emitted evidence, and greedy eval CSV was written.
+- Full runs have not started and remain blocked until Baron reviews the D1/D2 outcomes.
 
 ## What Was Implemented
 
@@ -32,11 +34,18 @@ Target matrix:
 | Run | Estimator | Seed | Purpose |
 | --- | --- | ---: | --- |
 | D1 | grpo | 0 | complete: 50-step debug baseline passed. |
-| D2 | rloo | 0 | pending: next run. |
+| D2 | rloo | 0 | complete: 50-step debug variant passed. |
 | R1 | grpo | 0 | Full baseline reproduction. |
 | R3 | rloo | 0 | Full controlled variant. |
 | R4 | rloo | 1 | Second-seed variant if TPU time permits. |
 | R2 | grpo | 1 | Second-seed baseline if TPU time permits. |
+
+Debug evidence:
+- D1 run root: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D1-grpo-debug-20260608_142021`; restored step 50; eval `correct=30/64`, `acc=46.88%`, `partial=50.00%`, `format=6.25%`.
+- D2 run root: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D2-rloo-debug-20260608_144102`; restored step 50; eval `correct=30/64`, `acc=46.88%`, `partial=46.88%`, `format=4.69%`.
+- D2 initial repo-cwd attempt at `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D2-rloo-debug-20260608_143942` failed before training due to the repo-local TFDS/protobuf metadata cache issue; the successful retry ran from run-local cwd.
+- D2 `run_metadata.json` records `tpu2026_commit=unknown` because the successful retry ran outside the git repo; actual synced HEAD before launch was `be631b2`.
+- Both debug runs emitted W&B step-order warnings.
 
 ## What To Read First
 
@@ -68,10 +77,11 @@ On a TPU VM after setup, use the main coursework runbook before any full run.
 
 ## Open Checks Before Full Runs
 
-- Confirm JAX backend reports TPU.
-- Confirm `ADV_ESTIMATOR=rloo` is accepted by the pinned Tunix commit on the TPU VM during D2.
-- Confirm `MAX_STEPS_OVERRIDE=50` stops debug training at 50 steps while `LR_DECAY_STEPS` remains the full-run value.
-- Confirm checkpoints and TensorBoard files are written to persistent `$HOME/tpu-runs/...` paths.
-- Confirm a 50-step debug run writes a checkpoint when `SAVE_INTERVAL_STEPS=50`.
-- Confirm `evaluate.py --ckpt-dir ... --output-csv ...` restores a trained checkpoint, resolves the actor checkpoint root, and writes per-prompt rows.
-- Confirm W&B logs to the intended team/entity project, not the upstream default.
+- JAX backend reports TPU.
+- `ADV_ESTIMATOR=rloo` is accepted by the pinned Tunix commit on the TPU VM.
+- `MAX_STEPS_OVERRIDE=50` stops debug training at 50 steps while `LR_DECAY_STEPS` remains the full-run value.
+- Checkpoints and TensorBoard files are written to persistent `$HOME/tpu-runs/...` paths.
+- A 50-step debug run writes a checkpoint when `SAVE_INTERVAL_STEPS=50`.
+- `evaluate.py --ckpt-dir ... --output-csv ...` restores trained checkpoints, resolves the actor checkpoint root, and writes per-prompt rows for both D1 and D2.
+- W&B logs to the intended team/entity project, not the upstream default.
+- Remaining gate: Baron review and explicit approval before full runs.

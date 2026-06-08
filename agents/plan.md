@@ -13,7 +13,7 @@ Prepare the `tpu-2026` baseline for reproducible Part I practical runs: baseline
 
 ## Milestone 1: Verify Patch Scope
 
-Status: complete at `e3ebeef`.
+Status: complete; latest pulled workflow head is `be631b2`.
 
 Goal:
 - Confirm P0-P6 are implemented without changing Tunix.
@@ -25,7 +25,7 @@ Checks:
 
 ## Milestone 2: Commit/Share Local Follow-Up Fix
 
-Status: complete at `e3ebeef`.
+Status: complete at latest pulled coursework head.
 
 Goal:
 - Preserve the full-run learning-rate schedule during short debug runs, record the resolved W&B run id, and incorporate Fred's debug-checkpoint review.
@@ -41,7 +41,7 @@ Verification:
 
 ## Milestone 3: TPU Day-One Debug
 
-Status: in_progress — D1 GRPO debug passed; D2 RLOO debug pending.
+Status: complete — D1 GRPO and D2 RLOO debug runs passed.
 
 Goal:
 - Run short GRPO and RLOO jobs before committing full TPU time.
@@ -50,7 +50,7 @@ Steps:
 - Create persistent `$RUN_ROOT` under `$HOME/tpu-runs/...`.
 - Export `CKPT_DIR`, `INTERMEDIATE_CKPT_DIR`, `TENSORBOARD_DIR`, `RUN_SEED=0`, `MAX_STEPS_OVERRIDE=50`, and `SAVE_INTERVAL_STEPS=50`.
 - D1 with `ADV_ESTIMATOR=grpo`: complete.
-- D2 with `ADV_ESTIMATOR=rloo`: pending next.
+- D2 with `ADV_ESTIMATOR=rloo`: complete.
 - Record each run in an iteration log.
 
 Checks:
@@ -62,7 +62,7 @@ Checks:
 
 ## Milestone 4: Evaluation Restore Check
 
-Status: D1 restore check complete; repeat for D2 after RLOO debug.
+Status: complete for D1 and D2.
 
 Goal:
 - Confirm evaluation uses trained LoRA parameters, not an un-restored LoRA wrapper.
@@ -78,9 +78,13 @@ Checks:
 - CSV contains one row per prompt.
 - Aggregate accuracy can be recomputed from the CSV.
 
+Results:
+- D1 restored step 50 from `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D1-grpo-debug-20260608_142021/ckpts/actor`.
+- D2 restored step 50 from `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D2-rloo-debug-20260608_144102/ckpts/actor`.
+
 ## Milestone 5: Full Controlled Runs
 
-Status: blocked until D2 debug/evaluation gates pass.
+Status: blocked until Baron reviews D1/D2 and approves full runs.
 
 Goal:
 - Execute the locked GRPO vs RLOO comparison with fixed data, seed controls, and compute budget.

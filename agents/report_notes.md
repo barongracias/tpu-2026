@@ -2,7 +2,7 @@
 
 ## Current Headline State
 
-The `coursework` branch contains the P0-P6 preparation patches for Part I TPU usage and is aligned with `origin/coursework` at `e3ebeef`. D1 GRPO 50-step debug has passed; D2 RLOO debug is next. Full 5h runs remain blocked until D2 passes.
+The `coursework` branch contains the P0-P6 preparation patches for Part I TPU usage and is aligned with `origin/coursework` at `be631b2`. D1 GRPO and D2 RLOO 50-step debug runs have passed. Full runs remain blocked until Baron reviews the debug outcomes and approves them.
 
 ## 2026-06-08: Patch Review
 
@@ -32,8 +32,8 @@ Verification run locally:
 Caveats:
 - D1 GRPO TPU debug passed on 2026-06-08.
 - Final training/evaluation metrics do not exist yet; D1 numbers are debug-only.
-- The `ADV_ESTIMATOR=rloo` path still needs a day-one TPU debug run against the pinned Tunix commit.
-- The evaluation restore path still needs a real checkpoint to prove it restores the intended step.
+- The `ADV_ESTIMATOR=rloo` path passed a day-one TPU debug run against the pinned Tunix commit.
+- The evaluation restore path restored real step-50 checkpoints for both D1 and D2.
 - No Tunix edits are currently justified.
 
 ## Push Readiness
@@ -105,7 +105,60 @@ Caveats:
 - Eval from repo cwd hit a TFDS metadata/protobuf issue; rerun from `RUN_ROOT/eval` completed.
 - W&B emitted step-order warnings near the end; inspect scalar traces before using plots.
 
-Decision:
-- D2 RLOO 50-step debug is operationally safe to run next.
-- Keep all controls identical except `ADV_ESTIMATOR=rloo` and run id/root.
-- Full runs remain blocked until D2 passes.
+Decision after D1:
+- D1 passed the GRPO debug gate.
+- D2 RLOO 50-step debug was operationally safe to run next.
+- Full runs remained blocked until D2 passed.
+
+## 2026-06-08: D2 RLOO debug passed
+
+Repo state:
+- Synced with `git pull --ff-only origin coursework` before D2.
+- Clean status before launch.
+- HEAD before launch: `be631b2`.
+
+Initial D2 attempt:
+- Run root: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D2-rloo-debug-20260608_143942`
+- Failed before training due to the repo-local TFDS/protobuf metadata cache issue.
+- No actor checkpoint was produced.
+
+Successful D2 retry:
+- Run root: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D2-rloo-debug-20260608_144102`
+- Estimator: `rloo`
+- Seed: `0`
+- Max steps: `50`
+- Save interval: `50`
+- Training reached step 50 and logged `Training finished.`
+- Persistent checkpoints: `ckpts/actor/1` and `ckpts/actor/50`
+- TensorBoard event file: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D2-rloo-debug-20260608_144102/tensorboard/events.out.tfevents.1780929695.t1v-n-0339f27d-w-0`
+- W&B run: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/D2-rloo-debug-seed0`
+
+Metadata:
+- `advantage_estimator`: `rloo`
+- `run_seed`: `0`
+- `max_steps`: `50`
+- `lr_decay_steps`: `3364`
+- `save_interval_steps`: `50`
+- `data_source`: `tfds`
+- `ckpt_dir`: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D2-rloo-debug-20260608_144102/ckpts`
+- `intermediate_ckpt_dir`: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D2-rloo-debug-20260608_144102/intermediate_ckpt`
+- `tensorboard_dir`: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D2-rloo-debug-20260608_144102/tensorboard`
+- `wandb_project`: `agentic-ai-coursework`
+- `wandb_entity`: `barongracias-university-of-cambridge`
+- Caveat: `tpu2026_commit` is `unknown` because the successful retry ran from the run-local cwd to avoid the TFDS cache issue; the synced repo HEAD before launch was `be631b2`.
+
+Evaluation:
+- Launched from `$RUN_ROOT/eval`.
+- Restored step: `50`
+- Resolved checkpoint dir: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D2-rloo-debug-20260608_144102/ckpts/actor`
+- Output CSV: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D2-rloo-debug-20260608_144102/eval/eval_greedy.csv`
+- Final metrics: `correct=30/64`, `acc=46.88%`, `partial=46.88%`, `format=4.69%`
+
+Warnings:
+- W&B emitted step-order warnings such as attempts to log step 0 after current step 49 or 50.
+- Successful W&B run reused the run id from the initial failed D2 attempt.
+
+Decision after D2:
+- D2 passes the RLOO debug gate.
+- D1 and D2 debug gates are both passed.
+- Do not start full runs until Baron reviews these results and explicitly approves.
