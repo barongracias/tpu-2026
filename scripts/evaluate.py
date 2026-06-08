@@ -6,29 +6,46 @@ Reports three numbers:
   * format_accuracy    — fraction of completions whose template parses
 
 Run as:
-    python evaluate.py
+    python evaluate.py --ckpt-dir $CKPT_DIR
+    python evaluate.py --ckpt-dir $CKPT_DIR --step 500
+    python evaluate.py --no-restore          # base model sanity check
 """
 import argparse
 
 from tqdm.auto import tqdm
 from tunix.generate import sampler as sampler_lib
+from tunix.sft.checkpoint_manager import CheckpointManager
 
 from config import (
+    CKPT_DIR,
+    DATA_SOURCE,
     GENERATION_CONFIGS,
     MAX_PROMPT_LENGTH,
+    NUM_BATCHES,
+    NUM_EPOCHS,
     NUM_TEST_BATCHES,
+    RUN_SEED,
     TEST_DATA_DIR,
     TOTAL_GENERATION_STEPS,
     TRAIN_DATA_DIR,
     TRAIN_FRACTION,
     TRAIN_MICRO_BATCH_SIZE,
-    NUM_BATCHES,
-    NUM_EPOCHS,
-    DATA_SOURCE,
 )
 from data import SYSTEM_PROMPT, TEMPLATE, build_train_val_test
 from model import build_mesh, download_weights, load_base_model, get_lora_model, load_tokenizer, model_config_for
 from rewards import match_format, match_numbers
+
+
+def restore_lora(lora_model, ckpt_root: str, step: int | None) -> int:
+    mgr = CheckpointManager(root_directory=ckpt_root)
+    n, _ = mgr.maybe_restore(model=lora_model, step=step, restore_only_lora_params=True)
+    if n == 0:
+        raise RuntimeError(
+            f"No checkpoint found under {ckpt_root}. "
+            f"Pass --ckpt-dir or check `ls {ckpt_root}`."
+        )
+    print(f"Restored LoRA params from {ckpt_root} at step {n}")
+    return n
 
 
 def generate(question, sampler, eos_tokens, temperature=0.7, top_k=50, top_p=0.95, seed=None):
@@ -90,6 +107,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--preset", default="greedy", choices=list(GENERATION_CONFIGS))
     ap.add_argument("--source", default=DATA_SOURCE, choices=["tfds", "kaggle"])
+    ap.add_argument("--ckpt-dir", default=CKPT_DIR,
+                    help="Orbax checkpoint root (per-step subdirs live here).")
+    ap.add_argument("--step", type=int, default=None,
+                    help="Checkpoint step to restore. Omit for latest.")
+    ap.add_argument("--no-restore", action="store_true",
+                    help="Skip LoRA restore — evaluates the base model only.")
     args = ap.parse_args()
 
     mesh = build_mesh()
@@ -98,9 +121,16 @@ def main():
     lora = get_lora_model(base, mesh)
     tokenizer, eos_tokens = load_tokenizer(eos_tokens)
 
+    if args.no_restore:
+        print("Skipping checkpoint restore — evaluating base model.")
+        restored_step = None
+    else:
+        restored_step = restore_lora(lora, args.ckpt_dir, args.step)
+
     _, _, test_ds = build_train_val_test(
         NUM_BATCHES, NUM_TEST_BATCHES, TRAIN_MICRO_BATCH_SIZE, TRAIN_FRACTION,
         NUM_EPOCHS, TRAIN_DATA_DIR, TEST_DATA_DIR, source=args.source,
+        shuffle_seed=RUN_SEED,
     )
 
     sampler = sampler_lib.Sampler(
@@ -115,6 +145,7 @@ def main():
     )
     n, t, acc, pacc, facc = evaluate(test_ds, sampler, eos_tokens, **GENERATION_CONFIGS[args.preset])
     print(f"\nFINAL: correct={n}/{t}  acc={acc:.2f}%  partial={pacc:.2f}%  format={facc:.2f}%")
+    print(f"  ckpt_dir={args.ckpt_dir}  restored_step={restored_step}  preset={args.preset}")
 
 
 if __name__ == "__main__":
