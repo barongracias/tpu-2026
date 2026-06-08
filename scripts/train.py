@@ -36,6 +36,7 @@ from config import (
     EPSILON,
     INTERMEDIATE_CKPT_DIR,
     EVAL_EVERY_N_STEPS,
+    LR_DECAY_STEPS,
     LEARNING_RATE,
     MAX_GRAD_NORM,
     MAX_PROMPT_LENGTH,
@@ -127,7 +128,7 @@ def build_optimizer():
         init_value=0.0,
         peak_value=LEARNING_RATE,
         warmup_steps=WARMUP_STEPS,
-        decay_steps=MAX_STEPS,
+        decay_steps=LR_DECAY_STEPS,
         end_value=0.0,
     )
     opt = optax.adamw(learning_rate=schedule, b1=B1, b2=B2, weight_decay=WEIGHT_DECAY)
@@ -180,8 +181,9 @@ def main():
     login_services()
     # init wandb BEFORE the trainer because tunix sometimes hangs if wandb is
     # initialised mid-RLCluster construction (known bug).
-    maybe_init_wandb(args.wandb_run_id)
-    save_run_metadata(args.wandb_run_id, CKPT_DIR)
+    wandb_run = maybe_init_wandb(args.wandb_run_id)
+    resolved_wandb_run_id = wandb_run.id if wandb_run is not None else args.wandb_run_id
+    save_run_metadata(resolved_wandb_run_id, CKPT_DIR)
 
     mesh = build_mesh()
     local_path, eos_tokens = download_weights()
@@ -221,6 +223,7 @@ def main():
         f"  INTERMEDIATE_CKPT_DIR={INTERMEDIATE_CKPT_DIR}\n"
         f"  TENSORBOARD_DIR={TENSORBOARD_DIR}\n"
         f"  MAX_STEPS={MAX_STEPS}\n"
+        f"  LR_DECAY_STEPS={LR_DECAY_STEPS}\n"
         f"  RUN_SEED={RUN_SEED}"
     )
     trainer.train(train_ds, val_ds)
