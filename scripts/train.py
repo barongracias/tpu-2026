@@ -43,6 +43,7 @@ from config import (
     NUM_GENERATIONS,
     NUM_ITERATIONS,
     NUM_TEST_BATCHES,
+    RUN_SEED,
     SAVE_INTERVAL_STEPS,
     TEMPERATURE,
     TENSORBOARD_DIR,
@@ -130,6 +131,7 @@ def build_cluster_config(mesh, optimizer, eos_tokens):
             kv_cache_size=MAX_PROMPT_LENGTH + TOTAL_GENERATION_STEPS + 256,
             temperature=TEMPERATURE, top_p=TOP_P, top_k=TOP_K,
             eos_tokens=eos_tokens,
+            seed=RUN_SEED,
         ),
     )
 
@@ -155,6 +157,7 @@ def main():
     train_ds, val_ds, _ = build_train_val_test(
         NUM_BATCHES, NUM_TEST_BATCHES, TRAIN_MICRO_BATCH_SIZE, TRAIN_FRACTION,
         NUM_EPOCHS, TRAIN_DATA_DIR, TEST_DATA_DIR, source=args.source,
+        shuffle_seed=RUN_SEED,
     )
     print(f"Datasets: train={len(train_ds)} val={len(val_ds) if val_ds else 0}")
 
@@ -172,14 +175,18 @@ def main():
     rl_cluster = rl_cluster_lib.RLCluster(
         actor=lora, reference=base, tokenizer=tokenizer, cluster_config=cluster_cfg,
     )
-    trainer = GRPOLearner(rl_cluster=rl_cluster, reward_fns=REWARD_FNS, algo_config=grpo_cfg)
+    trainer = GRPOLearner(
+        rl_cluster=rl_cluster, reward_fns=REWARD_FNS, algo_config=grpo_cfg,
+        data_shuffle_seed=RUN_SEED,
+    )
 
     print(
         f"Starting GRPO training.\n"
         f"  CKPT_DIR={CKPT_DIR}\n"
         f"  INTERMEDIATE_CKPT_DIR={INTERMEDIATE_CKPT_DIR}\n"
         f"  TENSORBOARD_DIR={TENSORBOARD_DIR}\n"
-        f"  MAX_STEPS={MAX_STEPS}"
+        f"  MAX_STEPS={MAX_STEPS}\n"
+        f"  RUN_SEED={RUN_SEED}"
     )
     trainer.train(train_ds, val_ds)
     print("Training finished.")

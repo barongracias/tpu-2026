@@ -54,7 +54,8 @@ def _download_kaggle_dataset(target_dir: str = "./data/gsm8k") -> str:
     return target_dir
 
 
-def get_dataset(data_dir: str, split: str = "train", source: str = "tfds") -> grain.MapDataset:
+def get_dataset(data_dir: str, split: str = "train", source: str = "tfds",
+                shuffle_seed: int = 0) -> grain.MapDataset:
     """Return a grain.MapDataset of {prompts, question, answer} dicts."""
     os.makedirs(data_dir, exist_ok=True)
 
@@ -83,7 +84,7 @@ def get_dataset(data_dir: str, split: str = "train", source: str = "tfds") -> gr
 
     return (
         grain.MapDataset.source(data)
-        .shuffle(seed=42)
+        .shuffle(seed=shuffle_seed)
         .map(lambda x: {
             "prompts": TEMPLATE.format(
                 system_prompt=SYSTEM_PROMPT,
@@ -102,9 +103,11 @@ def build_train_val_test(num_batches: int,
                          num_epochs: int,
                          train_dir: str,
                          test_dir: str,
-                         source: str = "tfds"):
+                         source: str = "tfds",
+                         shuffle_seed: int = 0):
     """Materialise (train, val, test) datasets with batching applied."""
-    full = get_dataset(train_dir, "train", source).batch(train_micro_batch_size)[:num_batches]
+    full = get_dataset(train_dir, "train", source, shuffle_seed=shuffle_seed).batch(
+        train_micro_batch_size)[:num_batches]
 
     if train_fraction == 1.0:
         train_ds = full.repeat(num_epochs)
@@ -114,5 +117,6 @@ def build_train_val_test(num_batches: int,
         train_ds = full[:cut].repeat(num_epochs)
         val_ds = full[cut:].repeat(num_epochs)
 
-    test_ds = get_dataset(test_dir, "test", source).batch(train_micro_batch_size)[:num_test_batches]
+    test_ds = get_dataset(test_dir, "test", source, shuffle_seed=shuffle_seed).batch(
+        train_micro_batch_size)[:num_test_batches]
     return train_ds, val_ds, test_ds

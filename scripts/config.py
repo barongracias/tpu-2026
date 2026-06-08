@@ -49,6 +49,9 @@ BETA = 0.08                # KL penalty coefficient (anchors to reference model)
 EPSILON = 0.2              # PPO-style clip range
 ADV_ESTIMATOR = os.environ.get("ADV_ESTIMATOR", "grpo")  # grpo | rloo | drgrpo
 
+# ====== Reproducibility ======
+RUN_SEED = int(os.environ.get("RUN_SEED", "0"))
+
 # ====== Training ======
 TRAIN_MICRO_BATCH_SIZE = 1
 NUM_BATCHES = 3738
