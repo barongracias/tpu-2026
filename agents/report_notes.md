@@ -2,7 +2,7 @@
 
 ## Current Headline State
 
-The `coursework` branch contains the P0-P6 preparation patches for Part I TPU usage and is aligned with `origin/coursework` at `4339ba8`. D1 GRPO and D2 RLOO 50-step debug runs have passed. The hygiene patch is committed, pushed, pulled, and validated. R1 GRPO seed 0 training and greedy eval completed; R1 review is pending; other full runs remain blocked.
+The `coursework` branch contains the P0-P6 preparation patches for Part I TPU usage and is aligned with `origin/coursework` at `820fad6`. D1/D2, R1/R3, D3/D4, and R5 have completed. R5 GRPO K=8 seed 0 is the strongest trained run so far; R4/R2 and any new run remain blocked pending review.
 
 ## 2026-06-08: Patch Review
 
@@ -434,3 +434,56 @@ R5 approval and cautions:
 - R5 should retain enough checkpoints for early-selection review with `SAVE_INTERVAL_STEPS=250` and `MAX_TO_KEEP=20`.
 - Do not start R4/R2 and do not change reward weights yet.
 - Reward sanity still suggests format-heavy reward can pay wrong answers, so final checkpoint quality should not be assumed; compare retained checkpoints against base/R1/R3/D4.
+
+## 2026-06-09: R5 GRPO K=8 full seed 0 result
+
+Run root:
+- `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R5-grpo-k8-full-s0-20260609_114832`
+
+Training:
+- Commit: `820fad61060a4260184e71066568af7b28d3109e`
+- Config: `ADV_ESTIMATOR=grpo`, `NUM_GENERATIONS=8`, `RUN_SEED=0`, `MAX_STEPS=3364`, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, no `MAX_STEPS_OVERRIDE`.
+- Training completed successfully with retained checkpoints at `250`, `500`, `750`, `1000`, `1250`, `1500`, `1750`, `2000`, `2250`, `2500`, `2750`, `3000`, `3250`, and `3364`.
+- Metadata records the launch commit, run-local data dirs, `num_generations=8`, and `max_to_keep=20`.
+- W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R5-grpo-k8-full-s0-20260609_114832`
+- TensorBoard: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R5-grpo-k8-full-s0-20260609_114832/tensorboard/events.out.tfevents.1781005731.t1v-n-0339f27d-w-0`
+- Warnings: repeated W&B step-order warnings; no fatal/OOM/traceback markers found.
+
+Eval summary:
+| Step | Exact | Partial | Format | Empty |
+| ---: | ---: | ---: | ---: | ---: |
+| 250 | 29/64 (45.31%) | 30/64 (46.88%) | 58/64 (90.62%) | 0/64 |
+| 500 | 34/64 (53.12%) | 35/64 (54.69%) | 54/64 (84.38%) | 0/64 |
+| 750 | 31/64 (48.44%) | 34/64 (53.12%) | 60/64 (93.75%) | 0/64 |
+| 1000 | 32/64 (50.00%) | 34/64 (53.12%) | 60/64 (93.75%) | 0/64 |
+| 1250 | 30/64 (46.88%) | 35/64 (54.69%) | 59/64 (92.19%) | 0/64 |
+| 1500 | 29/64 (45.31%) | 31/64 (48.44%) | 57/64 (89.06%) | 0/64 |
+| 1750 | 32/64 (50.00%) | 34/64 (53.12%) | 56/64 (87.50%) | 0/64 |
+| 2000 | 31/64 (48.44%) | 33/64 (51.56%) | 57/64 (89.06%) | 0/64 |
+| 2250 | 30/64 (46.88%) | 31/64 (48.44%) | 58/64 (90.62%) | 0/64 |
+| 2500 | 33/64 (51.56%) | 34/64 (53.12%) | 58/64 (90.62%) | 0/64 |
+| 2750 | 31/64 (48.44%) | 32/64 (50.00%) | 63/64 (98.44%) | 0/64 |
+| 3000 | 31/64 (48.44%) | 32/64 (50.00%) | 56/64 (87.50%) | 0/64 |
+| 3250 | 35/64 (54.69%) | 36/64 (56.25%) | 55/64 (85.94%) | 0/64 |
+| 3364 | 32/64 (50.00%) | 33/64 (51.56%) | 56/64 (87.50%) | 0/64 |
+
+Comparison for report:
+- Base greedy: `31/64` exact.
+- R1 best retained checkpoint: step 2000, `24/64`; R1 final: `12/64`.
+- R3 best retained checkpoint: step 2500, `6/64`.
+- D4 K=8 medium step 500: `34/64`.
+- R5 best retained checkpoint: step 3250, `35/64`; R5 final: `32/64`.
+
+Interpretation:
+- K=8 full GRPO is stable operationally: no empty-output collapse and no OOM.
+- R5 improves over base by `4/64` at the best retained checkpoint and over D4 by `1/64`, but the sample is small and final checkpoint is weaker than the best checkpoint.
+- For the report, use R5 as the strongest trained K=8 result only with caveats: retained checkpoint selection matters, reward-format pressure remains high, and paired/bootstrap uncertainty should be computed before making strong claims.
+
+Evidence paths:
+- All-checkpoint summary: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R5-grpo-k8-full-s0-20260609_114832/eval/r5_all_retained_eval_summary.txt`
+- CSVs: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R5-grpo-k8-full-s0-20260609_114832/eval/r5_grpo_k8_step*_greedy.csv`
+- Logs: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R5-grpo-k8-full-s0-20260609_114832/logs/`
+
+Recommendation:
+- Do not start R4/R2 or another training run yet.
+- Next local work: pull this notes commit if pushed, review R5 W&B/TensorBoard curves, compute confidence intervals/paired bootstrap against base and D4/R1/R3, and decide whether the final report should present best-checkpoint R5 or a fixed-step comparison.

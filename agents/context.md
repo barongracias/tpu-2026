@@ -6,13 +6,13 @@ This fork is the Part I practical training/evaluation codebase for the Multi-Age
 
 - Branch: `coursework`.
 - Upstream baseline: `324abbe4b4e229ea812223856393547db4fbb53e`.
-- Current pulled head: `4339ba8` on `coursework` / `origin/coursework`.
+- Current pulled head: `820fad6` on `coursework` / `origin/coursework`.
 - Branch is aligned with `origin/coursework`.
 - Only baseline-owned files were touched in the 8 commits: `bootstrap.sh`, `scripts/config.py`, `scripts/data.py`, `scripts/train.py`, and `scripts/evaluate.py`.
 - No Tunix source files were edited.
 - D1 GRPO 50-step debug completed successfully: step 50 reached, actor checkpoint restored, TensorBoard/W&B emitted evidence, and greedy eval CSV was written.
 - D2 RLOO 50-step debug completed successfully: step 50 reached, actor checkpoint restored, TensorBoard/W&B emitted evidence, and greedy eval CSV was written.
-- R1 GRPO seed 0 full training and greedy eval completed; do not start R3/R4/R2 until Baron approves after R1 review.
+- R5 GRPO K=8 seed 0 full training and retained-checkpoint eval completed; do not start R4/R2 or any new run until Baron/local Codex reviews R5.
 
 ## What Was Implemented
 
@@ -152,9 +152,9 @@ On a TPU VM after setup, use the main coursework runbook before any full run.
 
 ## Things Not To Do
 
-- Do not push from an automated session.
+- Do not push from an automated session unless Baron explicitly asks for a notes/code handoff commit.
 - Do not edit Tunix unless a TPU/debug failure proves the pinned Tunix API itself is wrong.
-- Do not start any full run other than approved R1 GRPO seed 0.
+- Do not start R4/R2 or any new full/debug run without explicit approval.
 - Do not store checkpoints or TensorBoard logs only under `/tmp`.
 - Do not claim numerical results until there are saved logs and per-prompt evaluation outputs.
 
@@ -238,3 +238,52 @@ Run approval:
 - Full GRPO K=8 seed 0 is approved after D4, but R4/R2 remain blocked.
 - Planned R5 should use `NUM_GENERATIONS=8`, `SAVE_INTERVAL_STEPS=250`, and `MAX_TO_KEEP=20` so enough checkpoints are retained for early-selection review.
 - Do not change reward weights for R5; D4 reward sanity concerns remain report/control context, not a launch-blocking code bug.
+
+## 2026-06-09: R5 GRPO K=8 full seed 0 completed
+
+Run:
+- Run root: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R5-grpo-k8-full-s0-20260609_114832`
+- W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R5-grpo-k8-full-s0-20260609_114832`
+- Commit: `820fad61060a4260184e71066568af7b28d3109e`
+- Config: `ADV_ESTIMATOR=grpo`, `NUM_GENERATIONS=8`, `RUN_SEED=0`, `MAX_STEPS=3364`, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, `MAX_STEPS_OVERRIDE` unset.
+- Metadata confirms run-local train/test dirs, checkpoint dir, TensorBoard dir, `num_generations=8`, and `max_to_keep=20`.
+- Training completed with `Training finished.` in `logs/train.log`; no fatal/OOM/traceback markers were found. W&B step-order warnings persisted.
+- TensorBoard event: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R5-grpo-k8-full-s0-20260609_114832/tensorboard/events.out.tfevents.1781005731.t1v-n-0339f27d-w-0`
+
+Retained checkpoints:
+- `ckpts/actor/1`, `250`, `500`, `750`, `1000`, `1250`, `1500`, `1750`, `2000`, `2250`, `2500`, `2750`, `3000`, `3250`, `3364`.
+
+Greedy eval with fresh per-step TFDS caches:
+| Step | Exact | Partial | Format | Empty |
+| ---: | ---: | ---: | ---: | ---: |
+| 250 | 29/64 (45.31%) | 30/64 (46.88%) | 58/64 (90.62%) | 0/64 |
+| 500 | 34/64 (53.12%) | 35/64 (54.69%) | 54/64 (84.38%) | 0/64 |
+| 750 | 31/64 (48.44%) | 34/64 (53.12%) | 60/64 (93.75%) | 0/64 |
+| 1000 | 32/64 (50.00%) | 34/64 (53.12%) | 60/64 (93.75%) | 0/64 |
+| 1250 | 30/64 (46.88%) | 35/64 (54.69%) | 59/64 (92.19%) | 0/64 |
+| 1500 | 29/64 (45.31%) | 31/64 (48.44%) | 57/64 (89.06%) | 0/64 |
+| 1750 | 32/64 (50.00%) | 34/64 (53.12%) | 56/64 (87.50%) | 0/64 |
+| 2000 | 31/64 (48.44%) | 33/64 (51.56%) | 57/64 (89.06%) | 0/64 |
+| 2250 | 30/64 (46.88%) | 31/64 (48.44%) | 58/64 (90.62%) | 0/64 |
+| 2500 | 33/64 (51.56%) | 34/64 (53.12%) | 58/64 (90.62%) | 0/64 |
+| 2750 | 31/64 (48.44%) | 32/64 (50.00%) | 63/64 (98.44%) | 0/64 |
+| 3000 | 31/64 (48.44%) | 32/64 (50.00%) | 56/64 (87.50%) | 0/64 |
+| 3250 | 35/64 (54.69%) | 36/64 (56.25%) | 55/64 (85.94%) | 0/64 |
+| 3364 | 32/64 (50.00%) | 33/64 (51.56%) | 56/64 (87.50%) | 0/64 |
+
+Evidence:
+- All-checkpoint summary: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R5-grpo-k8-full-s0-20260609_114832/eval/r5_all_retained_eval_summary.txt`
+- Original automatic summary: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R5-grpo-k8-full-s0-20260609_114832/eval/r5_eval_summary.txt`
+- CSVs: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R5-grpo-k8-full-s0-20260609_114832/eval/r5_grpo_k8_step{250,500,750,1000,1250,1500,1750,2000,2250,2500,2750,3000,3250,3364}_greedy.csv`
+- Logs: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R5-grpo-k8-full-s0-20260609_114832/logs/`
+
+Comparison:
+- Base greedy: `31/64`.
+- R1 best retained: step 2000, `24/64`; R1 final: `12/64`.
+- R3 best retained: step 2500, `6/64`.
+- D4 K=8 medium step 500: `34/64`.
+- R5 best retained checkpoint is step 3250 at `35/64` exact (`54.69%`), with no empty responses. Final step 3364 is `32/64`, so early/retained checkpoint selection still matters.
+
+Recommendation:
+- R5 is the strongest completed trained result so far and is report-useful as the K=8 GRPO variant.
+- Do not start R4/R2 or another full run yet. Local Codex should review R5 CSVs/W&B curves, then decide whether to report R5 best-checkpoint selection, run bootstrap CIs, or change reward controls.

@@ -106,7 +106,7 @@ Validation:
 
 ## Milestone 5: Full Controlled Runs
 
-Status: R1 GRPO seed 0 training and greedy eval complete; R1 review pending; R3/R4/R2 remain blocked.
+Status: R5 GRPO K=8 seed 0 training and retained-checkpoint eval complete; R4/R2 and any new run remain blocked pending review.
 
 Goal:
 - Execute the locked GRPO vs RLOO comparison with fixed data, seed controls, and compute budget.
@@ -321,3 +321,41 @@ R5 plan:
 - Use `NUM_GENERATIONS=8`, no `MAX_STEPS_OVERRIDE`, `SAVE_INTERVAL_STEPS=250`, and `MAX_TO_KEEP=20`.
 - Evaluate retained checkpoints `500`, `1000`, `1500`, `2000`, `2500`, `3000`, and `3364` if present.
 - Keep run artifacts under `$HOME/tpu-runs/part-i`, not in the repo.
+
+## Milestone 5.12: R5 GRPO K=8 Full Run
+
+Status: complete; review pending.
+
+Run:
+- Run root: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R5-grpo-k8-full-s0-20260609_114832`
+- W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R5-grpo-k8-full-s0-20260609_114832`
+- Commit: `820fad61060a4260184e71066568af7b28d3109e`
+- Config: GRPO, `NUM_GENERATIONS=8`, seed `0`, full `3364` steps, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`.
+- Training completed without fatal error or OOM. W&B step-order warnings persisted.
+
+Retained-checkpoint eval metrics:
+| Step | Exact | Partial | Format | Empty |
+| ---: | ---: | ---: | ---: | ---: |
+| 250 | 29/64 (45.31%) | 30/64 (46.88%) | 58/64 (90.62%) | 0/64 |
+| 500 | 34/64 (53.12%) | 35/64 (54.69%) | 54/64 (84.38%) | 0/64 |
+| 750 | 31/64 (48.44%) | 34/64 (53.12%) | 60/64 (93.75%) | 0/64 |
+| 1000 | 32/64 (50.00%) | 34/64 (53.12%) | 60/64 (93.75%) | 0/64 |
+| 1250 | 30/64 (46.88%) | 35/64 (54.69%) | 59/64 (92.19%) | 0/64 |
+| 1500 | 29/64 (45.31%) | 31/64 (48.44%) | 57/64 (89.06%) | 0/64 |
+| 1750 | 32/64 (50.00%) | 34/64 (53.12%) | 56/64 (87.50%) | 0/64 |
+| 2000 | 31/64 (48.44%) | 33/64 (51.56%) | 57/64 (89.06%) | 0/64 |
+| 2250 | 30/64 (46.88%) | 31/64 (48.44%) | 58/64 (90.62%) | 0/64 |
+| 2500 | 33/64 (51.56%) | 34/64 (53.12%) | 58/64 (90.62%) | 0/64 |
+| 2750 | 31/64 (48.44%) | 32/64 (50.00%) | 63/64 (98.44%) | 0/64 |
+| 3000 | 31/64 (48.44%) | 32/64 (50.00%) | 56/64 (87.50%) | 0/64 |
+| 3250 | 35/64 (54.69%) | 36/64 (56.25%) | 55/64 (85.94%) | 0/64 |
+| 3364 | 32/64 (50.00%) | 33/64 (51.56%) | 56/64 (87.50%) | 0/64 |
+
+Evidence:
+- Summary: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R5-grpo-k8-full-s0-20260609_114832/eval/r5_all_retained_eval_summary.txt`
+- CSVs/logs are under `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R5-grpo-k8-full-s0-20260609_114832/eval` and `logs`.
+
+Decision:
+- Best R5 checkpoint is step 3250 at `35/64` exact, slightly above D4 step 500 (`34/64`) and base (`31/64`).
+- R5 final is `32/64`, so checkpoint selection remains important.
+- Do not launch R4/R2 or any new run until local review. Next report work should compute confidence intervals/paired comparisons and inspect W&B/TensorBoard curves for R5.
