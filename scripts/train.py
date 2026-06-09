@@ -94,6 +94,13 @@ def save_run_metadata(run_id: str | None, ckpt_dir: str) -> str:
         "max_steps": MAX_STEPS,
         "lr_decay_steps": LR_DECAY_STEPS,
         "save_interval_steps": SAVE_INTERVAL_STEPS,
+        "num_generations": NUM_GENERATIONS,
+        "beta": BETA,
+        "epsilon": EPSILON,
+        "temperature": TEMPERATURE,
+        "top_k": TOP_K,
+        "top_p": TOP_P,
+        "total_generation_steps": TOTAL_GENERATION_STEPS,
         "data_source": DATA_SOURCE,
         "train_data_dir": TRAIN_DATA_DIR,
         "test_data_dir": TEST_DATA_DIR,
@@ -236,7 +243,14 @@ def main():
         f"  TENSORBOARD_DIR={TENSORBOARD_DIR}\n"
         f"  MAX_STEPS={MAX_STEPS}\n"
         f"  LR_DECAY_STEPS={LR_DECAY_STEPS}\n"
-        f"  RUN_SEED={RUN_SEED}"
+        f"  RUN_SEED={RUN_SEED}\n"
+        f"  NUM_GENERATIONS={NUM_GENERATIONS}\n"
+        f"  BETA={BETA}\n"
+        f"  EPSILON={EPSILON}\n"
+        f"  TEMPERATURE={TEMPERATURE}\n"
+        f"  TOP_K={TOP_K}\n"
+        f"  TOP_P={TOP_P}\n"
+        f"  TOTAL_GENERATION_STEPS={TOTAL_GENERATION_STEPS}"
     )
     trainer.train(train_ds, val_ds)
     print("Training finished.")

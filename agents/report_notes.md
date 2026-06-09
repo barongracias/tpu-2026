@@ -2,7 +2,7 @@
 
 ## Current Headline State
 
-The `coursework` branch contains the P0-P6 preparation patches for Part I TPU usage and is aligned with `origin/coursework` at `4339ba8`. D1 GRPO and D2 RLOO 50-step debug runs have passed. The hygiene patch is committed, pushed, pulled, and validated. R1 GRPO seed 0 training completed; R1 evaluation/review is pending; other full runs remain blocked.
+The `coursework` branch contains the P0-P6 preparation patches for Part I TPU usage and is aligned with `origin/coursework` at `4339ba8`. D1 GRPO and D2 RLOO 50-step debug runs have passed. The hygiene patch is committed, pushed, pulled, and validated. R1 GRPO seed 0 training and greedy eval completed; R1 review is pending; other full runs remain blocked.
 
 ## 2026-06-08: Patch Review
 
@@ -204,3 +204,221 @@ Launch state:
 
 Restrictions:
 - Do not start R3/R4/R2 until Baron approves after R1 review.
+
+## 2026-06-08: R1 GRPO full seed 0 greedy evaluation
+
+Trained checkpoint eval:
+- Checkpoint requested: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R1-grpo-full-s0-20260608_165231/ckpts`
+- Resolved checkpoint dir: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R1-grpo-full-s0-20260608_165231/ckpts/actor`
+- Restored step: `3364`
+- CSV: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R1-grpo-full-s0-20260608_165231/eval/r1_grpo_step3364_greedy.csv`
+- Log: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R1-grpo-full-s0-20260608_165231/logs/eval_r1_grpo_step3364_greedy.log`
+- Metrics: `correct=12/64`, `acc=18.75%`, `partial=18.75%`, `format=35.94%`
+
+Base-model eval:
+- Restore mode: `--no-restore`
+- CSV: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R1-grpo-full-s0-20260608_165231/eval/base_greedy_seed0.csv`
+- Log: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R1-grpo-full-s0-20260608_165231/logs/eval_base_greedy_seed0.log`
+- Metrics: `correct=31/64`, `acc=48.44%`, `partial=48.44%`, `format=1.56%`
+
+Warnings and failures:
+- Initial trained eval restored `ckpts/actor/3364` but failed when reading the existing `$RUN_ROOT/data/train` TFDS cache with the protobuf `FieldDescriptor.label` issue.
+- Trained eval succeeded after rerunning from `$RUN_ROOT/eval` with fresh eval-local TFDS caches.
+- Initial base eval failed when reusing the trained eval cache; base eval succeeded with a separate fresh eval-local TFDS cache.
+- Common nonfatal warnings included LoRA RNG initialization warning and TensorFlow CUDA/oneDNN messages.
+
+Decision:
+- R1 is valid as the completed I.1 GRPO baseline control from an operational/checkpoint-restore perspective.
+- Numerically, trained R1 greedy underperforms the base model on the 64-prompt eval sample, so inspect outputs/curves before interpreting quality.
+- Do not start R3/R4/R2 until Baron approves after review.
+
+## 2026-06-08: R1 intermediate-checkpoint diagnostic
+
+Metrics:
+| Eval | Exact | Partial | Format |
+| --- | ---: | ---: | ---: |
+| Base greedy | 31/64 (48.44%) | 31/64 (48.44%) | 1/64 (1.56%) |
+| R1 step 2000 | 24/64 (37.50%) | 26/64 (40.62%) | 28/64 (43.75%) |
+| R1 step 2500 | 11/64 (17.19%) | 11/64 (17.19%) | 23/64 (35.94%) |
+| R1 step 3000 | 8/64 (12.50%) | 8/64 (12.50%) | 16/64 (25.00%) |
+| R1 step 3364 | 12/64 (18.75%) | 12/64 (18.75%) | 23/64 (35.94%) |
+
+Trend:
+- Degradation is gradual after step 2000 rather than isolated to the final step.
+- Step 2000 is the best retained R1 checkpoint but remains below base exact accuracy.
+- Steps 2500, 3000, and 3364 are materially worse than base and worse than step 2000.
+
+TensorBoard evidence:
+- Scalar summary: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R1-grpo-full-s0-20260608_165231/eval/r1_tensorboard_scalar_summary.txt`
+- Found KL, pg_clipfrac, reward component, and completion length tags.
+- Did not find `advantage/nonzero_frac` or ratio-spread tags in the event file.
+- Eval KL values: near step 1984 `0.324`, 2496 `0.545`, 3008 `0.859`, 3328 `0.488`.
+- Train KL values: near step 1984 `0.290`, 2496 `0.830`, 3008 `0.977`, 3364 `0.499`.
+- `actor/train/pg_clipfrac` and `actor/eval/pg_clipfrac` stayed `0.0`.
+- Eval format rewards improved while `check_numbers` fell from initial `0.674` to about `0.285` near the end, consistent with format optimisation at the expense of numeric reliability.
+
+Qualitative CSV pattern:
+- Base correct / final trained wrong: 23 prompts.
+- Final trained correct / base wrong: 4 prompts.
+- Both wrong: 29 prompts.
+- Trained responses more often use requested `<reasoning>`/`<answer>` structure, but arithmetic and problem interpretation often degrade.
+- Response lengths are not a simple collapse to empty text: final trained responses average about `176.9` words vs base `143.7`, with max around `596` words.
+
+Recommendation:
+- Do not approve R3 immediately.
+- First review R1 W&B/TensorBoard curves and the per-prompt CSVs.
+- Consider changing R3/full-run controls before more TPU time: use an early checkpoint strategy, reduce run length, adjust reward weighting, or run a small controlled diagnostic with revised evaluation/training settings.
+
+## 2026-06-09: R3 RLOO full seed 0 completed
+
+Run root:
+- `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R3-rloo-full-s0-20260608_230810`
+
+Training:
+- tmux session exited after completion.
+- `Training finished.` present in `logs/train.log`.
+- Metadata records commit `99cb7f88b0e49a7d65bb0c5274734a190833aa3f`, estimator `rloo`, seed `0`, `max_steps=3364`, and run-local train/test data dirs.
+- W&B run: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R3-rloo-full-s0-20260608_230810`
+- Retained checkpoints: `ckpts/actor/2000`, `2500`, `3000`, `3364`.
+
+Auto-evaluation:
+| Eval | Exact | Partial | Format |
+| --- | ---: | ---: | ---: |
+| R3 step 2000 | 1/64 (1.56%) | 1/64 (1.56%) | 10/64 (15.62%) |
+| R3 step 2500 | 6/64 (9.38%) | 7/64 (10.94%) | 16/64 (25.00%) |
+| R3 step 3000 | 1/64 (1.56%) | 2/64 (3.12%) | 4/64 (6.25%) |
+| R3 step 3364 | 1/64 (1.56%) | 1/64 (1.56%) | 5/64 (7.81%) |
+
+Logs and CSVs:
+- Summary: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R3-rloo-full-s0-20260608_230810/eval/r3_eval_summary.txt`
+- CSVs: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R3-rloo-full-s0-20260608_230810/eval/r3_rloo_step{2000,2500,3000,3364}_greedy.csv`
+- Logs: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R3-rloo-full-s0-20260608_230810/logs/eval_r3_rloo_step{2000,2500,3000,3364}_greedy.log`
+
+Warnings and interpretation:
+- W&B step-order warnings occurred again at final step `3364`.
+- Eval logs include fresh TFDS cache `Variant folder ... has no dataset_info.json` warnings; these are expected for new per-step caches and did not stop eval.
+- No fatal training or eval failure was found in inspected completion markers.
+- R3 is operationally complete as the RLOO comparison, but numerically poor: best retained checkpoint is step 2500 at only `6/64` exact.
+
+Decision:
+- Do not start R4/R2 or K=8 yet.
+- Review R1/R3 reward curves and output CSVs before any further full run.
+- The current evidence points to reward/training-control problems rather than a single checkpoint-selection issue.
+
+## 2026-06-09: R1/R3 report-ready diagnosis
+
+Summary metrics:
+| Eval | Exact | Partial | Format | Mean words | Empty responses |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Base greedy | 31/64 (48.44%) | 31/64 (48.44%) | 1/64 (1.56%) | 143.7 | 0/64 |
+| R1 GRPO step 2000 | 24/64 (37.50%) | 26/64 (40.62%) | 28/64 (43.75%) | 174.5 | 0/64 |
+| R1 GRPO step 3364 | 12/64 (18.75%) | 12/64 (18.75%) | 23/64 (35.94%) | 176.9 | 0/64 |
+| R3 RLOO step 2500 | 6/64 (9.38%) | 7/64 (10.94%) | 16/64 (25.00%) | 77.0 | 45/64 |
+| R3 RLOO step 3364 | 1/64 (1.56%) | 1/64 (1.56%) | 5/64 (7.81%) | 24.5 | 58/64 |
+
+Evidence files:
+- Markdown summary: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/report_diagnostics/r1_r3_report_diagnostic_summary.md`
+- Metrics CSV: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/report_diagnostics/r1_r3_eval_metrics.csv`
+- TensorBoard scalar samples CSV: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/report_diagnostics/r1_r3_tensorboard_scalar_samples.csv`
+- R1 scalar summary: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R1-grpo-full-s0-20260608_165231/eval/r1_tensorboard_scalar_summary.txt`
+- R3 scalar summary: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/R3-rloo-full-s0-20260608_230810/eval/r3_tensorboard_scalar_summary.txt`
+- Qualitative examples: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/report_diagnostics/base_correct_r1_r3_wrong_examples.csv`
+
+TensorBoard diagnosis:
+- R1 eval KL rises from about `0.324` near step 1984 to `0.859` near step 3008, then `0.488` near 3328; train KL reaches about `0.977` near step 3008.
+- R3 eval KL is lower/moderate in the sampled scalar table (`0.246` near 1984, `0.440` near 3008, `0.374` near 3328), but external greedy eval collapses, so KL alone is not sufficient.
+- `actor/train/pg_clipfrac` and `actor/eval/pg_clipfrac` remain `0.0` for both runs, so clipping does not flag the instability.
+- Reward/check_answer/check_numbers scalar signals do not align with external greedy accuracy, especially for R3, pointing to reward/eval mismatch.
+
+Qualitative diagnosis:
+- Base correct while both R1 final and R3 final are wrong on 23 prompts.
+- R1 mostly keeps non-empty reasoning and often follows the requested tags, but makes arithmetic or problem-interpretation mistakes.
+- R3 shows generation collapse: 45/64 empty responses at the best retained checkpoint and 58/64 empty at final.
+
+Dominant failure classification:
+- R1: reward-format over-optimisation + arithmetic degradation + checkpoint overtraining, with KL drift as a warning sign.
+- R3: generation collapse / unstable decoding after RLOO training, with reward/eval mismatch; not primarily a TFDS cache artefact.
+
+Recommendation:
+- Do not start another full run yet.
+- A cheap D3 K=8 debug is justified next, but only after exposing/configuring `NUM_GENERATIONS=8`; run it as a short debug with fresh eval caches and explicit empty-output diagnostics.
+- Do not run K=8 full unattended until D3 debug results are reviewed.
+
+## 2026-06-09: D3 GRPO K=8 debug
+
+Run root:
+- `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D3-grpo-k8-debug-20260609_094815`
+
+Patch:
+- `NUM_GENERATIONS` is now env-overridable in `scripts/config.py`, defaulting to `2`.
+- D3 launched with `NUM_GENERATIONS=8` and `MAX_STEPS_OVERRIDE=50`.
+- Uncommitted diff/status snapshot was saved under the run root `patches/` directory.
+
+Training status:
+- Completed without OOM or fatal error.
+- Checkpoints include `ckpts/actor/1` and `ckpts/actor/50`.
+- Metadata records commit `99cb7f88b0e49a7d65bb0c5274734a190833aa3f`, estimator `grpo`, seed `0`, max steps `50`, and run-local data/output dirs.
+- W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/D3-grpo-k8-debug-20260609_094815`
+- Nonfatal warnings: repeated W&B step-order warnings near steps 49/50; expected fresh-cache TFDS variant warnings during eval.
+
+Eval status:
+- Restore succeeded from `ckpts/actor` at step `50`.
+- CSV: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D3-grpo-k8-debug-20260609_094815/eval/d3_grpo_k8_step50_greedy.csv`
+- Eval log: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D3-grpo-k8-debug-20260609_094815/logs/eval_d3_grpo_k8_step50_greedy.log`
+- Summary file: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D3-grpo-k8-debug-20260609_094815/eval/d3_eval_summary.txt`
+
+Metrics:
+| Eval | Exact | Partial | Format | Empty responses |
+| --- | ---: | ---: | ---: | ---: |
+| D3 GRPO K=8 step 50 | 31/64 (48.44%) | 32/64 (50.00%) | 8/64 (12.50%) | 0/64 |
+
+Interpretation:
+- K=8 did not OOM and did not show the R3 empty-response collapse in this 50-step debug.
+- The step-50 score matches the base greedy exact rate, which is encouraging for a cheap diagnostic but not enough evidence that a full K=8 run will avoid the R1/R3 full-horizon degradation.
+- Recommendation: full K=8 is worth considering only after review; a slightly longer K=8 debug or added scalar/CSV diagnostics may be prudent before spending a full overnight run.
+
+## 2026-06-09: Audit, reward sanity, and D4 K=8 medium debug
+
+Code audit:
+- No blocking implementation bug found.
+- `scripts/config.py`: estimator, K, beta/epsilon, generation and sampling config are centrally wired; K is now env-overridable.
+- `scripts/train.py`: `GRPOConfig` receives K, estimator, beta, epsilon; metadata now includes K and sampling/loss controls.
+- `scripts/data.py`: train/val/test split and shuffle seed are deterministic under `RUN_SEED`; train/test TFDS dirs are env-overridable.
+- `scripts/rewards.py`: parser behavior matches implementation; reward scale is the main concern.
+- `scripts/evaluate.py`: actor checkpoint restore and greedy CSV export work; empty responses are countable from `model_response` but not explicitly flagged as a CSV column.
+
+Reward sanity:
+- File: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/report_diagnostics/reward_sanity_check.txt`
+- Correct numeric bad plain format: `-2.5`.
+- Correct numeric answer-only tags: `1.0`.
+- Correct numeric good format: `10.0`.
+- Wrong numeric good format: `6.0`.
+- Empty response: `-2.5`.
+- Malformed answer closing tag with correct number: `3.0`.
+- Interpretation: no parser bug, but format rewards can overpower correctness and should be discussed in the report/control plan.
+
+Reproducibility hygiene:
+- `scripts/config.py` supports `NUM_GENERATIONS` env override.
+- `scripts/train.py` metadata/logging now records `num_generations`, `beta`, `epsilon`, `temperature`, `top_k`, `top_p`, and `total_generation_steps`.
+- D4 run root saved uncommitted diff/status snapshots in `patches/`.
+
+D4 run:
+- Run root: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D4-grpo-k8-medium-debug-20260609_100945`
+- W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/D4-grpo-k8-medium-debug-20260609_100945`
+- Summary: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D4-grpo-k8-medium-debug-20260609_100945/eval/d4_eval_summary.txt`
+- CSVs: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D4-grpo-k8-medium-debug-20260609_100945/eval/d4_grpo_k8_step{200,300,400,500}_greedy.csv`
+- Logs: `/home/ext_barongracias_gmail_com/tpu-runs/part-i/D4-grpo-k8-medium-debug-20260609_100945/logs/`
+
+D4 metrics:
+| Step | Exact | Partial | Format | Empty |
+| ---: | ---: | ---: | ---: | ---: |
+| 100 | missing/pruned | missing/pruned | missing/pruned | missing/pruned |
+| 200 | 26/64 (40.62%) | 28/64 (43.75%) | 55/64 (85.94%) | 0/64 |
+| 300 | 32/64 (50.00%) | 34/64 (53.12%) | 51/64 (79.69%) | 0/64 |
+| 400 | 29/64 (45.31%) | 29/64 (45.31%) | 55/64 (85.94%) | 0/64 |
+| 500 | 34/64 (53.12%) | 35/64 (54.69%) | 54/64 (84.38%) | 0/64 |
+
+Interpretation and recommendation:
+- K=8 medium debug is the best evidence so far: no empty-response collapse, high format compliance, and step 500 reaches `34/64`, above base greedy `31/64` on the same 64-example setup.
+- This supports considering a full K=8 GRPO run after review, with early checkpoint selection and checkpoint-retention hygiene.
+- Reward/control patching is still relevant because reward sanity shows format-heavy reward can still pay wrong answers; the full K=8 run should not be treated as guaranteed stable.
