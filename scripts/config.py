@@ -11,8 +11,8 @@ MODEL_ID = "google/gemma-3-1b-it"
 GEMMA_TOKENIZER_PATH = "gs://gemma-data/tokenizers/tokenizer_gemma3.model"
 
 # ====== Data ======
-TRAIN_DATA_DIR = "./data/train"
-TEST_DATA_DIR = "./data/test"
+TRAIN_DATA_DIR = os.environ.get("TRAIN_DATA_DIR", "./data/train")
+TEST_DATA_DIR = os.environ.get("TEST_DATA_DIR", "./data/test")
 TRAIN_FRACTION = 0.9
 DATA_SOURCE = os.environ.get("DATA_SOURCE", "tfds")  # "tfds" or "kaggle"
 
@@ -41,12 +41,16 @@ TOTAL_GENERATION_STEPS = 768
 TEMPERATURE = 0.9          # high enough that the G samples actually differ
 TOP_P = 1.0
 TOP_K = 50
-NUM_GENERATIONS = 2        # G in the GRPO paper — group size for advantage norm
+NUM_GENERATIONS = int(os.environ.get("NUM_GENERATIONS", "2"))  # G in the GRPO paper — group size for advantage norm
 
 # ====== GRPO loss ======
 NUM_ITERATIONS = 1         # mu — PPO-style inner optimisation passes per batch
 BETA = 0.08                # KL penalty coefficient (anchors to reference model)
 EPSILON = 0.2              # PPO-style clip range
+ADV_ESTIMATOR = os.environ.get("ADV_ESTIMATOR", "grpo")  # grpo | rloo | drgrpo
+
+# ====== Reproducibility ======
+RUN_SEED = int(os.environ.get("RUN_SEED", "0"))
 
 # ====== Training ======
 TRAIN_MICRO_BATCH_SIZE = 1
@@ -54,23 +58,24 @@ NUM_BATCHES = 3738
 NUM_TEST_BATCHES = 64
 EVAL_EVERY_N_STEPS = 64
 NUM_EPOCHS = 1
-MAX_STEPS = int(NUM_BATCHES * NUM_ITERATIONS * TRAIN_FRACTION * NUM_EPOCHS)
+FULL_MAX_STEPS = int(NUM_BATCHES * NUM_ITERATIONS * TRAIN_FRACTION * NUM_EPOCHS)
+MAX_STEPS = int(os.environ.get("MAX_STEPS_OVERRIDE", str(FULL_MAX_STEPS)))
 
 # ====== Optimiser ======
 LEARNING_RATE = 3e-6
 B1 = 0.9
 B2 = 0.99
 WEIGHT_DECAY = 0.1
-WARMUP_STEPS = 0.1 * MAX_STEPS
+WARMUP_STEPS = int(0.1 * FULL_MAX_STEPS)
 MAX_GRAD_NORM = 0.1        # tight clipping keeps KL well-behaved
 
 # ====== Checkpointing ======
 # NOTE: /tmp is volatile. For long runs, point this at persistent storage.
-INTERMEDIATE_CKPT_DIR = "/tmp/content/intermediate_ckpt/"
-CKPT_DIR = "/tmp/content/ckpts/"
-TENSORBOARD_DIR = "/tmp/content/tmp/tensorboard/grpo"
-SAVE_INTERVAL_STEPS = 500
-MAX_TO_KEEP = 4
+INTERMEDIATE_CKPT_DIR = os.environ.get("INTERMEDIATE_CKPT_DIR", "/tmp/content/intermediate_ckpt/")
+CKPT_DIR = os.environ.get("CKPT_DIR", "/tmp/content/ckpts/")
+TENSORBOARD_DIR = os.environ.get("TENSORBOARD_DIR", "/tmp/content/tmp/tensorboard/grpo")
+SAVE_INTERVAL_STEPS = int(os.environ.get("SAVE_INTERVAL_STEPS", "500"))
+MAX_TO_KEEP = int(os.environ.get("MAX_TO_KEEP", "4"))
 
 # ====== Inference presets ======
 GENERATION_CONFIGS = {

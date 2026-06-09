@@ -25,12 +25,14 @@ from tunix.rl.rollout import base_rollout
 from tunix.sft import metrics_logger
 
 from config import (
+    ADV_ESTIMATOR,
     B1, B2,
     BETA,
     CKPT_DIR,
     DATA_SOURCE,
     EPSILON,
     EVAL_EVERY_N_STEPS,
+    INTERMEDIATE_CKPT_DIR,
     LEARNING_RATE,
     MAX_GRAD_NORM,
     MAX_PROMPT_LENGTH,
@@ -41,6 +43,7 @@ from config import (
     NUM_GENERATIONS,
     NUM_ITERATIONS,
     NUM_TEST_BATCHES,
+    RUN_SEED,
     SAVE_INTERVAL_STEPS,
     TEMPERATURE,
     TENSORBOARD_DIR,
@@ -128,6 +131,7 @@ def build_cluster_config(mesh, optimizer, eos_tokens):
             kv_cache_size=MAX_PROMPT_LENGTH + TOTAL_GENERATION_STEPS + 256,
             temperature=TEMPERATURE, top_p=TOP_P, top_k=TOP_K,
             eos_tokens=eos_tokens,
+            seed=RUN_SEED,
         ),
     )
 
@@ -163,14 +167,31 @@ def main():
         num_iterations=NUM_ITERATIONS,
         beta=BETA,
         epsilon=EPSILON,
+        advantage_estimator=ADV_ESTIMATOR,
     )
 
     rl_cluster = rl_cluster_lib.RLCluster(
         actor=lora, reference=base, tokenizer=tokenizer, cluster_config=cluster_cfg,
     )
-    trainer = GRPOLearner(rl_cluster=rl_cluster, reward_fns=REWARD_FNS, algo_config=grpo_cfg)
+    trainer = GRPOLearner(
+        rl_cluster=rl_cluster,
+        reward_fns=REWARD_FNS,
+        algo_config=grpo_cfg,
+        data_shuffle_seed=RUN_SEED,
+    )
 
-    print(f"Starting GRPO training. CKPT_DIR={CKPT_DIR}  MAX_STEPS={MAX_STEPS}")
+    print(
+        f"Starting GRPO training.\n"
+        f"  CKPT_DIR={CKPT_DIR}\n"
+        f"  INTERMEDIATE_CKPT_DIR={INTERMEDIATE_CKPT_DIR}\n"
+        f"  TENSORBOARD_DIR={TENSORBOARD_DIR}\n"
+        f"  ADV_ESTIMATOR={ADV_ESTIMATOR}\n"
+        f"  NUM_GENERATIONS={NUM_GENERATIONS}\n"
+        f"  MAX_STEPS={MAX_STEPS}\n"
+        f"  SAVE_INTERVAL_STEPS={SAVE_INTERVAL_STEPS}\n"
+        f"  MAX_TO_KEEP={MAX_TO_KEEP}\n"
+        f"  RUN_SEED={RUN_SEED}"
+    )
     trainer.train(train_ds, val_ds)
     print("Training finished.")
 
