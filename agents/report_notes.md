@@ -4,6 +4,8 @@
 
 The `coursework` branch contains the P0-P6 preparation patches for Part I TPU usage and is aligned with `origin/coursework` at `820fad6`. D1/D2, R1/R3, D3/D4, and R5 have completed. R5 GRPO K=8 seed 0 is the strongest trained run so far; R4/R2 and any new run remain blocked pending review.
 
+Local run notes, diagnostics, manifests, and runbooks for the current TPU work are now tracked under `experiments/`. Start with `experiments/README.md`, then use `experiments/baseline/`, `experiments/variants/`, and `experiments/diagnostics/` for run-specific summaries; TPU-side raw logs/CSVs remain under each `$RUN_ROOT`.
+
 ## 2026-06-08: Patch Review
 
 Verified branch state:
@@ -487,3 +489,39 @@ Evidence paths:
 Recommendation:
 - Do not start R4/R2 or another training run yet.
 - Next local work: pull this notes commit if pushed, review R5 W&B/TensorBoard curves, compute confidence intervals/paired bootstrap against base and D4/R1/R3, and decide whether the final report should present best-checkpoint R5 or a fixed-step comparison.
+
+## 2026-06-09: Hard-example curriculum idea
+
+Idea:
+- Mine difficult GSM8K training examples by probing which train questions the model fails consistently, then train/evaluate a hard-subset curriculum inspired by the deep-research notes.
+- Optionally add a small GSM-Hard component later, but treat that as a separate ablation because it changes both difficulty and data distribution.
+
+Recommended selector:
+- Use an inference-only probe over GSM8K train with the frozen base model for the clean "hard for the starting policy" experiment.
+- Do not use held-out eval/test examples for mining.
+- A finetuned checkpoint such as R5 can be used for diagnostic comparison, but using R5 failures to choose training data answers a different question: "hard for the already-adapted policy".
+
+Manifest requirements:
+- Save source split, original index or question hash, expected answer, model/revision/checkpoint, prompt template, decoding preset, sample seeds, pass/fail counts, hardness label, and selection rule.
+
+## 2026-06-09: Reproducibility contract patch
+
+Purpose:
+- Fix the eval comparability issue where `RUN_SEED` also changed held-out test ordering.
+- Prevent moving GitHub/Hugging Face refs from changing the software/model environment between runs.
+- Make the launch script and docs encode the experiment contract rather than relying on hand memory.
+
+Changes:
+- `scripts/config.py`: adds `MODEL_REVISION`, dependency ref env vars, `EVAL_SEED`, and `EVAL_MANIFEST`.
+- `scripts/data.py`: adds manifest-backed eval loading and separate train/test shuffle seeds.
+- `scripts/evaluate.py`: creates a missing eval manifest on first use, reloads it on later use, and records eval seed/manifest in per-prompt CSVs.
+- `scripts/train.py`: records model revision, dependency refs, eval seed, and manifest path in `run_metadata.json`.
+- `scripts/model.py`: refuses to download `google/gemma-3-1b-it` unless `MODEL_REVISION` is an exact revision.
+- `bootstrap.sh`: refuses GitHub HEAD installs by requiring `JAX_REF`, `QWIX_REF`, and `FLAX_REF`; `TUNIX_REF` defaults to the known citation commit.
+- `scripts/run_tmux.sh`: derives the repo path, requires `RUN_ROOT` and pin variables, sets persistent output/data dirs, and exports `EVAL_MANIFEST`.
+- Added `experiments/manifests/experiment_contract.md` and updated launch docs.
+
+Validation:
+- `git diff --check` passed.
+- `py_compile` passed for `scripts/config.py`, `scripts/data.py`, `scripts/train.py`, `scripts/evaluate.py`, and `scripts/model.py`.
+- `bash -n` passed for `bootstrap.sh` and `scripts/run_tmux.sh`.

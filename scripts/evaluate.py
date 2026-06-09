@@ -22,6 +22,8 @@ from tunix.sft.checkpoint_manager import CheckpointManager
 from config import (
     CKPT_DIR,
     DATA_SOURCE,
+    EVAL_MANIFEST,
+    EVAL_SEED,
     GENERATION_CONFIGS,
     MAX_PROMPT_LENGTH,
     NUM_BATCHES,
@@ -34,8 +36,15 @@ from config import (
     TRAIN_FRACTION,
     TRAIN_MICRO_BATCH_SIZE,
 )
-from data import SYSTEM_PROMPT, TEMPLATE, build_train_val_test
-from model import build_mesh, download_weights, load_base_model, get_lora_model, load_tokenizer, model_config_for
+from data import (
+    SYSTEM_PROMPT,
+    TEMPLATE,
+    as_text,
+    build_train_val_test,
+    get_dataset_from_manifest,
+    manifest_row,
+)
+from model import build_mesh, download_weights, load_base_model, get_lora_model, load_tokenizer
 from rewards import match_format, match_numbers
 
 
@@ -114,8 +123,8 @@ def evaluate(dataset, sampler, eos_tokens, temperature=0.7, top_k=50, top_p=0.95
             total += 1
             rows.append({
                 "prompt_id": total,
-                "question": q if isinstance(q, str) else q.decode("utf-8"),
-                "expected_answer": ans if isinstance(ans, str) else (ans.decode("utf-8") if ans else ""),
+                "question": as_text(q),
+                "expected_answer": as_text(ans) if ans is not None else "",
                 "model_response": best_response,
                 "correct": int(got_corr),
                 "partial_correct": int(got_partial),
@@ -126,6 +135,45 @@ def evaluate(dataset, sampler, eos_tokens, temperature=0.7, top_k=50, top_p=0.95
                       f"partial={partially_corr/total*100:.2f}% fmt={corr_format/total*100:.2f}%")
 
     return corr, total, corr/total*100, partially_corr/total*100, corr_format/total*100, rows
+
+
+def write_eval_manifest(dataset, manifest_path: str, source: str, split: str, eval_seed: int):
+    os.makedirs(os.path.dirname(os.path.abspath(manifest_path)), exist_ok=True)
+    prompt_id = 0
+    with open(manifest_path, "w", encoding="utf-8") as fh:
+        for batch in dataset:
+            questions = batch["question"]
+            answers = batch["answer"]
+            for q, ans in zip(questions, answers):
+                prompt_id += 1
+                row = manifest_row(
+                    prompt_id=prompt_id,
+                    question=as_text(q),
+                    answer=as_text(ans) if ans is not None else "",
+                    source=source,
+                    split=split,
+                    eval_seed=eval_seed,
+                )
+                fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+    print(f"Eval manifest written to {manifest_path} ({prompt_id} prompts)")
+
+
+def build_eval_dataset(args):
+    if args.eval_manifest:
+        if os.path.exists(args.eval_manifest):
+            print(f"Loading eval manifest: {args.eval_manifest}")
+            return get_dataset_from_manifest(args.eval_manifest, TRAIN_MICRO_BATCH_SIZE)
+        print(f"Eval manifest does not exist yet; will create it: {args.eval_manifest}")
+        args.write_eval_manifest = args.write_eval_manifest or args.eval_manifest
+
+    _, _, test_ds = build_train_val_test(
+        NUM_BATCHES, NUM_TEST_BATCHES, TRAIN_MICRO_BATCH_SIZE, TRAIN_FRACTION,
+        NUM_EPOCHS, TRAIN_DATA_DIR, TEST_DATA_DIR, source=args.source,
+        shuffle_seed=RUN_SEED, test_shuffle_seed=args.eval_seed,
+    )
+    if args.write_eval_manifest:
+        write_eval_manifest(test_ds, args.write_eval_manifest, args.source, "test", args.eval_seed)
+    return test_ds
 
 
 def main():
@@ -140,6 +188,12 @@ def main():
                     help="Skip LoRA restore — evaluates the base model only.")
     ap.add_argument("--output-csv", default=None,
                     help="Write per-prompt results to this CSV path (for bootstrap CI).")
+    ap.add_argument("--eval-seed", type=int, default=EVAL_SEED,
+                    help="Seed for held-out eval ordering when no manifest is supplied.")
+    ap.add_argument("--eval-manifest", default=EVAL_MANIFEST,
+                    help="JSONL manifest of eval prompts. Overrides --eval-seed ordering.")
+    ap.add_argument("--write-eval-manifest", default=None,
+                    help="Write the resolved eval prompt order to this JSONL path.")
     args = ap.parse_args()
 
     mesh = build_mesh()
@@ -155,11 +209,7 @@ def main():
     else:
         restored_step, resolved_ckpt_dir = restore_lora(lora, args.ckpt_dir, args.step)
 
-    _, _, test_ds = build_train_val_test(
-        NUM_BATCHES, NUM_TEST_BATCHES, TRAIN_MICRO_BATCH_SIZE, TRAIN_FRACTION,
-        NUM_EPOCHS, TRAIN_DATA_DIR, TEST_DATA_DIR, source=args.source,
-        shuffle_seed=RUN_SEED,
-    )
+    test_ds = build_eval_dataset(args)
 
     sampler = sampler_lib.Sampler(
         transformer=lora,
@@ -176,17 +226,20 @@ def main():
     print(f"\nFINAL: correct={n}/{t}  acc={acc:.2f}%  partial={pacc:.2f}%  format={facc:.2f}%")
     print(
         f"  requested_ckpt_dir={args.ckpt_dir}  resolved_ckpt_dir={resolved_ckpt_dir}  "
-        f"restored_step={restored_step}  preset={args.preset}"
+        f"restored_step={restored_step}  preset={args.preset}  "
+        f"eval_seed={args.eval_seed}  eval_manifest={args.eval_manifest}"
     )
 
     if args.output_csv:
         os.makedirs(os.path.dirname(os.path.abspath(args.output_csv)), exist_ok=True)
         with open(args.output_csv, "w", newline="", encoding="utf-8") as fh:
             writer = csv_mod.DictWriter(fh, fieldnames=list(rows[0].keys()) + [
-                "requested_ckpt_dir", "resolved_ckpt_dir", "restored_step", "preset", "run_seed"])
+                "requested_ckpt_dir", "resolved_ckpt_dir", "restored_step", "preset",
+                "run_seed", "eval_seed", "eval_manifest"])
             writer.writeheader()
             meta = {"requested_ckpt_dir": args.ckpt_dir, "resolved_ckpt_dir": resolved_ckpt_dir,
-                    "restored_step": restored_step, "preset": args.preset, "run_seed": RUN_SEED}
+                    "restored_step": restored_step, "preset": args.preset, "run_seed": RUN_SEED,
+                    "eval_seed": args.eval_seed, "eval_manifest": args.eval_manifest}
             for row in rows:
                 writer.writerow({**row, **meta})
         print(f"Per-prompt results written to {args.output_csv}")

@@ -34,7 +34,11 @@ from config import (
     CKPT_DIR,
     DATA_SOURCE,
     EPSILON,
+    EVAL_MANIFEST,
+    EVAL_SEED,
+    FLAX_REF,
     INTERMEDIATE_CKPT_DIR,
+    JAX_REF,
     EVAL_EVERY_N_STEPS,
     LR_DECAY_STEPS,
     LEARNING_RATE,
@@ -42,11 +46,14 @@ from config import (
     MAX_PROMPT_LENGTH,
     MAX_STEPS,
     MAX_TO_KEEP,
+    MODEL_ID,
+    MODEL_REVISION,
     NUM_BATCHES,
     NUM_EPOCHS,
     NUM_GENERATIONS,
     NUM_ITERATIONS,
     NUM_TEST_BATCHES,
+    QWIX_REF,
     RUN_SEED,
     SAVE_INTERVAL_STEPS,
     TEMPERATURE,
@@ -57,6 +64,7 @@ from config import (
     TRAIN_DATA_DIR,
     TRAIN_FRACTION,
     TRAIN_MICRO_BATCH_SIZE,
+    TUNIX_REF,
     WANDB_ENTITY,
     WANDB_PROJECT,
     WANDB_RUN_ID,
@@ -89,8 +97,18 @@ def save_run_metadata(run_id: str | None, ckpt_dir: str) -> str:
         "repo_root": _repo_root(),
         "launch_cwd": os.getcwd(),
         "wandb_run_id": run_id,
+        "model_id": MODEL_ID,
+        "model_revision": MODEL_REVISION,
+        "dependency_refs": {
+            "jax": JAX_REF,
+            "tunix": TUNIX_REF,
+            "qwix": QWIX_REF,
+            "flax": FLAX_REF,
+        },
         "advantage_estimator": ADV_ESTIMATOR,
         "run_seed": RUN_SEED,
+        "eval_seed": EVAL_SEED,
+        "eval_manifest": EVAL_MANIFEST,
         "max_steps": MAX_STEPS,
         "lr_decay_steps": LR_DECAY_STEPS,
         "save_interval_steps": SAVE_INTERVAL_STEPS,
@@ -214,7 +232,7 @@ def main():
     train_ds, val_ds, _ = build_train_val_test(
         NUM_BATCHES, NUM_TEST_BATCHES, TRAIN_MICRO_BATCH_SIZE, TRAIN_FRACTION,
         NUM_EPOCHS, TRAIN_DATA_DIR, TEST_DATA_DIR, source=args.source,
-        shuffle_seed=RUN_SEED,
+        shuffle_seed=RUN_SEED, test_shuffle_seed=EVAL_SEED,
     )
     print(f"Datasets: train={len(train_ds)} val={len(val_ds) if val_ds else 0}")
 
@@ -247,6 +265,9 @@ def main():
         f"  SAVE_INTERVAL_STEPS={SAVE_INTERVAL_STEPS}\n"
         f"  MAX_TO_KEEP={MAX_TO_KEEP}\n"
         f"  RUN_SEED={RUN_SEED}\n"
+        f"  EVAL_SEED={EVAL_SEED}\n"
+        f"  EVAL_MANIFEST={EVAL_MANIFEST}\n"
+        f"  MODEL_REVISION={MODEL_REVISION}\n"
         f"  NUM_GENERATIONS={NUM_GENERATIONS}\n"
         f"  BETA={BETA}\n"
         f"  EPSILON={EPSILON}\n"

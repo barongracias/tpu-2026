@@ -12,6 +12,7 @@ Current pre-TPU planning files:
 
 - `manifests/i3_sweep_plan.md`: controlled GRPO vs RLOO experiment design.
 - `manifests/baseline_patch_plan.md`: minimum baseline changes needed before scientific TPU runs.
+- `manifests/experiment_contract.md`: required pins, persistent paths, seeds, and eval manifest contract for comparable runs.
 - `manifests/plotting_and_evidence_plan.md`: source data, figures, tables, and confidence interval plan.
 - `runbooks/tpu_day1_runbook.md`: first TPU session setup, debug, evaluation, and stop/go gates.
 - `templates/iteration_log_template.md`: per-run record template.

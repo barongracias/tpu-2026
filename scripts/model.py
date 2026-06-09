@@ -24,14 +24,21 @@ from config import (
     GEMMA_TOKENIZER_PATH,
     MESH,
     MODEL_ID,
+    MODEL_REVISION,
     RANK,
 )
 
 
 def download_weights():
     """Snapshot the HF repo locally and read the EOS token IDs."""
-    print(f"Downloading {MODEL_ID} from Hugging Face...")
-    local_path = snapshot_download(repo_id=MODEL_ID, ignore_patterns=["*.pth"])
+    if not MODEL_REVISION:
+        raise RuntimeError(
+            "MODEL_REVISION must be set to an exact Hugging Face commit SHA "
+            "before training/evaluation. Refusing to use moving branch HEAD."
+        )
+    print(f"Downloading {MODEL_ID}@{MODEL_REVISION} from Hugging Face...")
+    local_path = snapshot_download(
+        repo_id=MODEL_ID, revision=MODEL_REVISION, ignore_patterns=["*.pth"])
     print(f"Model downloaded to: {local_path}")
 
     eos_tokens = []

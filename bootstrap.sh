@@ -20,6 +20,11 @@ set -euo pipefail
 
 REPO_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 VENV=${VENV:-$HOME/venvs/tunix}
+TUNIX_REF=${TUNIX_REF:-683256db1a0919b5cfd46cee52cebc96331494fb}
+
+: "${JAX_REF:?Set JAX_REF to an exact jax git commit SHA before bootstrapping.}"
+: "${QWIX_REF:?Set QWIX_REF to an exact qwix git commit SHA before bootstrapping.}"
+: "${FLAX_REF:?Set FLAX_REF to an exact flax git commit SHA before bootstrapping.}"
 
 echo "==> Locating python3.12"
 export PATH="$HOME/.local/bin:$PATH"
@@ -54,13 +59,13 @@ echo "==> Installing pinned deps from requirements.txt"
 # on a TPU VM ("A Google TPU may be present ... Falling back to cpu").
 pip install -r "$REPO_DIR/requirements.txt"
 
-echo "==> Installing jax / tunix / qwix / flax from GitHub HEAD"
+echo "==> Installing pinned jax / tunix / qwix / flax git refs"
 # Order matters: tunix pulls flax from PyPI, so we replace flax last.
-# tunix pinned to 683256d (our citation commit) to prevent HEAD-drift breaking reproducibility.
-pip install git+https://github.com/jax-ml/jax
-pip install git+https://github.com/google/tunix@683256db1a0919b5cfd46cee52cebc96331494fb git+https://github.com/google/qwix
+# Tunix defaults to the citation commit; all other git refs must be explicit.
+pip install "git+https://github.com/jax-ml/jax@${JAX_REF}"
+pip install "git+https://github.com/google/tunix@${TUNIX_REF}" "git+https://github.com/google/qwix@${QWIX_REF}"
 pip uninstall -y flax
-pip install git+https://github.com/google/flax
+pip install "git+https://github.com/google/flax@${FLAX_REF}"
 
 echo "==> Registering Jupyter kernel 'tunix'"
 python -m ipykernel install --user --name tunix --display-name "tunix"

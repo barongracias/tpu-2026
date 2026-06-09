@@ -90,6 +90,12 @@ Each script imports from `config.py`. Tune one knob, every script sees it.
 source ~/venvs/tunix/bin/activate
 cd ~/tpu-2026
 # Required env (in .env): WANDB_API_KEY, HF_TOKEN, KAGGLE_USERNAME, KAGGLE_KEY
+# Required reproducibility pins:
+export JAX_REF="<exact jax git commit sha>"
+export QWIX_REF="<exact qwix git commit sha>"
+export FLAX_REF="<exact flax git commit sha>"
+export TUNIX_REF="683256db1a0919b5cfd46cee52cebc96331494fb"
+export MODEL_REVISION="<exact google/gemma-3-1b-it Hugging Face commit sha>"
 ```
 
 ## 5. Running training without losing it when the shell dies
@@ -99,8 +105,12 @@ process group; closing the shell sends SIGHUP and the training dies (this is
 exactly what just happened).
 
 ```bash
-cd ~/tpu-2026/scripts
-./run_tmux.sh                    # starts a fresh run in session "tunix"
+cd ~/tpu-2026
+export RUN_ROOT="$HOME/tpu-runs/part-i/<run-id>"
+export RUN_SEED=0
+export EVAL_SEED=0
+export EVAL_MANIFEST="$HOME/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl"
+scripts/run_tmux.sh              # starts a fresh run in session "tunix"
 # detach:    Ctrl-b  d
 # reattach:  tmux attach -t tunix
 # stop:      tmux kill-session -t tunix
@@ -120,13 +130,8 @@ Two pieces of state need to be resumed independently:
 
 1. **Model + optimizer** — Tunix uses Orbax. Pointing `CKPT_DIR` at a
    directory that already contains step subfolders (`1/`, `500/`, `1000/`, …)
-   makes the trainer restart from the latest one. Your last checkpoint is
-   step **1000** (saved 09:58 today) at `/tmp/content/ckpts/actor/1000/`.
-
-   ⚠️ `/tmp` is volatile. Copy somewhere safe before restarting:
-   ```bash
-   cp -r /tmp/content/ckpts ~/tpu-2026/ckpts_backup
-   ```
+   makes the trainer restart from the latest one. For coursework runs,
+   `CKPT_DIR` should be under `$RUN_ROOT/ckpts`, not `/tmp`.
 
 2. **W&B run** — to keep the same plots, pass the existing run id. Yours is
    `bnh9ttlt`:
@@ -221,10 +226,19 @@ What to look for:
 
 To benchmark the *base* model (no training) before/after a run:
 ```bash
-python evaluate.py --preset greedy
+python evaluate.py \
+    --preset greedy \
+    --no-restore \
+    --eval-manifest "$EVAL_MANIFEST" \
+    --output-csv "$RUN_ROOT/eval/base_greedy.csv"
 ```
 Greedy decoding gives a deterministic number you can compare against. Use
 `--preset standard` for a sampling-based estimate.
+
+`RUN_SEED` is for training and rollout randomness. `EVAL_SEED` controls the
+held-out eval order only until `EVAL_MANIFEST` exists. Once the manifest exists,
+reuse it for every base/checkpoint eval so seed repeats compare against the same
+prompts.
 
 ## 10. Interactive chat with a trained checkpoint
 

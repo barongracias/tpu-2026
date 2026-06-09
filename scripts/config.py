@@ -8,7 +8,14 @@ import jax
 
 # ====== Model ======
 MODEL_ID = "google/gemma-3-1b-it"
+MODEL_REVISION = os.environ.get("MODEL_REVISION")
 GEMMA_TOKENIZER_PATH = "gs://gemma-data/tokenizers/tokenizer_gemma3.model"
+
+# ====== Dependency provenance ======
+JAX_REF = os.environ.get("JAX_REF")
+TUNIX_REF = os.environ.get("TUNIX_REF", "683256db1a0919b5cfd46cee52cebc96331494fb")
+QWIX_REF = os.environ.get("QWIX_REF")
+FLAX_REF = os.environ.get("FLAX_REF")
 
 # ====== Data ======
 TRAIN_DATA_DIR = os.environ.get("TRAIN_DATA_DIR", "./data/train")
@@ -51,6 +58,8 @@ ADV_ESTIMATOR = os.environ.get("ADV_ESTIMATOR", "grpo")  # grpo | rloo | drgrpo
 
 # ====== Reproducibility ======
 RUN_SEED = int(os.environ.get("RUN_SEED", "0"))
+EVAL_SEED = int(os.environ.get("EVAL_SEED", "0"))
+EVAL_MANIFEST = os.environ.get("EVAL_MANIFEST", "")
 
 # ====== Training ======
 TRAIN_MICRO_BATCH_SIZE = 1

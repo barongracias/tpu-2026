@@ -8,6 +8,7 @@ This fork is the Part I practical training/evaluation codebase for the Multi-Age
 - Upstream baseline: `324abbe4b4e229ea812223856393547db4fbb53e`.
 - Current pulled head: `820fad6` on `coursework` / `origin/coursework`.
 - Branch is aligned with `origin/coursework`.
+- Local run notes, diagnostics, runbooks, and manifests are now recorded under `experiments/`; read `experiments/README.md` for the map before searching TPU-side logs.
 - Only baseline-owned files were touched in the 8 commits: `bootstrap.sh`, `scripts/config.py`, `scripts/data.py`, `scripts/train.py`, and `scripts/evaluate.py`.
 - No Tunix source files were edited.
 - D1 GRPO 50-step debug completed successfully: step 50 reached, actor checkpoint restored, TensorBoard/W&B emitted evidence, and greedy eval CSV was written.
@@ -19,11 +20,13 @@ This fork is the Part I practical training/evaluation codebase for the Multi-Age
 - P0: `CKPT_DIR`, `INTERMEDIATE_CKPT_DIR`, and `TENSORBOARD_DIR` are environment-overridable.
 - P1: `ADV_ESTIMATOR` is passed to `GRPOConfig(advantage_estimator=...)` for `grpo`, `rloo`, or `drgrpo`.
 - P2: `RUN_SEED` is threaded into Grain shuffle, rollout config, and `GRPOLearner.data_shuffle_seed`.
+- Reproducibility contract follow-up: held-out eval now uses separate `EVAL_SEED` or an explicit `EVAL_MANIFEST` JSONL, so seed-repeat training runs do not silently change the eval prompt set.
 - P3: `MAX_STEPS_OVERRIDE` caps debug runs without changing the intended full-run LR schedule. Use `SAVE_INTERVAL_STEPS=50` with 50-step debug runs so the restore check has a checkpoint.
 - P4: `evaluate.py` can restore trained LoRA checkpoints through `--ckpt-dir`, optional `--step`, and explicit `--no-restore` for base-model sanity checks.
 - P5: `evaluate.py --output-csv` writes per-prompt rows for bootstrap confidence intervals and auditability.
 - P6: `train.py` writes `run_metadata.json` into `CKPT_DIR` at run start. Hygiene follow-up now records repo root, launch cwd, and train/test data dirs; git commit resolution is repo-root-aware for run-local launches.
-- `bootstrap.sh` pins Tunix to `683256db1a0919b5cfd46cee52cebc96331494fb` to avoid HEAD drift.
+- `bootstrap.sh` pins Tunix to `683256db1a0919b5cfd46cee52cebc96331494fb` and now requires explicit `JAX_REF`, `QWIX_REF`, and `FLAX_REF` commit SHAs to avoid HEAD drift.
+- `model.py` now requires exact `MODEL_REVISION` for Hugging Face downloads and refuses moving model HEAD.
 
 ## Current Experiment Intent
 
@@ -135,9 +138,10 @@ Diagnosis:
 1. `agents/context.md` in this repository.
 2. `agents/plan.md` in this repository.
 3. `agents/report_notes.md` in this repository.
-4. Main coursework repo: `../agentic-ai-coursework/agents/context.md`.
-5. Main coursework repo: `../agentic-ai-coursework/experiments/runbooks/tpu_day1_runbook.md`.
-6. Patched code: `scripts/config.py`, `scripts/train.py`, `scripts/evaluate.py`, `scripts/data.py`, `bootstrap.sh`.
+4. `experiments/README.md`, then the relevant `experiments/baseline/`, `experiments/variants/`, `experiments/diagnostics/`, `experiments/manifests/`, or `experiments/runbooks/` file.
+5. Main coursework repo: `../agentic-ai-coursework/agents/context.md`.
+6. Main coursework repo: `../agentic-ai-coursework/experiments/runbooks/tpu_day1_runbook.md`.
+7. Patched code: `scripts/config.py`, `scripts/train.py`, `scripts/evaluate.py`, `scripts/data.py`, `bootstrap.sh`.
 
 ## Safe Useful Commands
 
@@ -168,6 +172,22 @@ On a TPU VM after setup, use the main coursework runbook before any full run.
 - `evaluate.py --ckpt-dir ... --output-csv ...` restores trained checkpoints, resolves the actor checkpoint root, and writes per-prompt rows for both D1 and D2.
 - W&B logs to the intended team/entity project, not the upstream default.
 - R1 launch requirement: start from repo cwd so metadata records the real commit, and set `TRAIN_DATA_DIR`/`TEST_DATA_DIR` to `$RUN_ROOT/data/train` and `$RUN_ROOT/data/test` to avoid repo-local TFDS/protobuf cache issues.
+
+## Hard-Example Mining Note
+
+- A hard-example curriculum does not require another training run to identify examples; it requires an inference/probing pass over GSM8K train with a fixed model, prompt template, decoding protocol, and seeds.
+- For a clean "hard for the starting policy" experiment, mine failures with the frozen base model (`evaluate.py --no-restore` style), not R5/R1/R3. A finetuned checkpoint can be used for analysis, but selecting data from its failures answers a different question: "hard for the already-adapted policy".
+- Do not mine from the held-out eval/test set. Save a manifest containing source split, original index or question hash, expected answer, model/revision/checkpoint, decoding preset, sample seeds, pass/fail counts, and selection rule.
+- If adding GSM-Hard, treat it as a separate ablation after GSM8K-train hard mining, because it changes both difficulty and data distribution.
+
+## 2026-06-09: Reproducibility contract patch
+
+- `scripts/config.py` adds `MODEL_REVISION`, `JAX_REF`, `TUNIX_REF`, `QWIX_REF`, `FLAX_REF`, `EVAL_SEED`, and `EVAL_MANIFEST`.
+- `scripts/data.py` can load an eval dataset from a JSONL manifest and can use a separate test shuffle seed.
+- `scripts/evaluate.py` creates `EVAL_MANIFEST` on first use if missing, reuses it if present, and writes `eval_seed`/`eval_manifest` into CSV metadata.
+- `scripts/train.py` records model revision, dependency refs, eval seed, and eval manifest in `run_metadata.json`.
+- `bootstrap.sh`, `scripts/run_tmux.sh`, `scripts/README.md`, and `experiments/runbooks/tpu_day1_runbook.md` now encode the launch contract.
+- Contract document: `experiments/manifests/experiment_contract.md`.
 
 ## 2026-06-09: D3 GRPO K=8 debug completed
 

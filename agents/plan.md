@@ -10,6 +10,7 @@ Prepare the `tpu-2026` baseline for reproducible Part I practical runs: baseline
 - Main runbook: `../agentic-ai-coursework/experiments/runbooks/tpu_day1_runbook.md`.
 - Main patch plan: `../agentic-ai-coursework/experiments/manifests/baseline_patch_plan.md`.
 - This repository contains the actual training/evaluation patches for the TPU code.
+- Local run notes, diagnostics, manifests, runbooks, and evidence indexes for the current TPU runs live under `experiments/`; start with `experiments/README.md`.
 
 ## Milestone 1: Verify Patch Scope
 
@@ -245,6 +246,38 @@ Outputs:
 - KL curves.
 - Diagnostic curves such as `advantage/nonzero_frac` if logged.
 - Accuracy/score table with bootstrap confidence intervals from per-prompt CSVs.
+
+## Milestone 7: Hard-Example Curriculum Probe
+
+Status: proposed; no training run required for selection.
+
+Goal:
+- Mine a reproducible GSM8K-train hard subset for a possible curriculum/ablation inspired by the deep-research notes.
+
+Selection protocol:
+- Run an inference-only probe over GSM8K train using the frozen base model, fixed prompt template, fixed decoding presets, and fixed sample seeds.
+- Define hardness from pass/fail counts, for example greedy wrong plus all sampled attempts wrong for "hard", and greedy wrong plus at least one sampled success for "medium".
+- Save a manifest with source split, original index or question hash, answer, model/revision/checkpoint, decoding settings, seeds, pass/fail counts, and selection rule.
+
+Cautions:
+- Do not use held-out eval/test examples for mining.
+- Using R5/R1/R3 failures for selection is allowed only if framed as "hard for the already-finetuned policy"; it is not the clean base-difficulty curriculum.
+- Add GSM-Hard only as a separate ablation after GSM8K-train hard mining, because it introduces distribution shift as well as difficulty.
+
+## Milestone 8: Reproducibility Contract
+
+Status: implemented locally; validate on TPU before the next run.
+
+Goal:
+- Make comparable experiments fail fast unless their eval split, dependency refs, model revision, persistent paths, and launch metadata are explicit.
+
+Implemented:
+- Separate `RUN_SEED` and `EVAL_SEED`.
+- JSONL `EVAL_MANIFEST` support for held-out eval prompt identity.
+- Required exact `MODEL_REVISION` for Hugging Face model download.
+- Required exact JAX/Qwix/Flax refs in `bootstrap.sh`; Tunix remains pinned to `683256db1a0919b5cfd46cee52cebc96331494fb`.
+- Portable `scripts/run_tmux.sh` that derives repo path and exports run-local paths from `RUN_ROOT`.
+- Contract documentation in `experiments/manifests/experiment_contract.md`.
 
 ## Milestone 5.9: D3 GRPO K=8 Debug
 

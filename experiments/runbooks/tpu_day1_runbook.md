@@ -15,6 +15,7 @@ Date target: Monday 2026-06-08.
 ## Inputs
 
 - Coursework PDF requirements and marking criteria.
+- `experiments/manifests/experiment_contract.md` for required dependency/model pins, persistent paths, seeds, and eval manifest use.
 - `experiments/manifests/i3_sweep_plan.md` for the intended experiment matrix.
 - `experiments/manifests/baseline_patch_plan.md` for minimum patches before proper runs.
 - `external/tpu-2026/tpu-setup.md` for upstream TPU setup instructions.
@@ -43,6 +44,18 @@ export WANDB_API_KEY="<wandb token>"
 export WANDB_ENTITY="<team or personal entity>"
 export WANDB_PROJECT="mas-agentic-ai-tpu-2026"
 ```
+
+Minimum reproducibility pins:
+
+```bash
+export JAX_REF="<exact jax git commit sha>"
+export QWIX_REF="<exact qwix git commit sha>"
+export FLAX_REF="<exact flax git commit sha>"
+export TUNIX_REF="683256db1a0919b5cfd46cee52cebc96331494fb"
+export MODEL_REVISION="<exact google/gemma-3-1b-it Hugging Face commit sha>"
+```
+
+Do not use moving branch names such as `main` for these values.
 
 If Kaggle data is used instead of TFDS, also provide the Kaggle credentials expected by the upstream scripts.
 
@@ -110,6 +123,8 @@ export CKPT_DIR="$RUN_ROOT/ckpts"
 export INTERMEDIATE_CKPT_DIR="$RUN_ROOT/intermediate_ckpt"
 export TENSORBOARD_DIR="$RUN_ROOT/tensorboard"
 export RUN_SEED=0
+export EVAL_SEED=0
+export EVAL_MANIFEST="$HOME/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl"
 export MAX_STEPS_OVERRIDE=50
 export SAVE_INTERVAL_STEPS=50
 ```
@@ -168,6 +183,7 @@ python -u evaluate.py --preset greedy --source tfds --ckpt-dir "$CKPT_DIR" --out
 Gate:
 
 - Evaluation output records the requested checkpoint path, resolved checkpoint path, and restored step. If `$CKPT_DIR/actor` exists, the patched evaluator should resolve to it automatically.
+- Evaluation uses `EVAL_MANIFEST` if it exists. If the path does not exist, the first eval creates it using `EVAL_SEED`; all later base/checkpoint evals must reuse that JSONL manifest.
 - Per-prompt correctness or score data is saved for bootstrap confidence intervals.
 - Aggregate numbers are reproducible from the saved per-prompt data.
 
@@ -179,6 +195,8 @@ Only start full training after all items are true:
 - Python 3.12 environment boots cleanly.
 - Estimator switch verified for both GRPO and RLOO.
 - Run seed and dataset shuffle seed are controlled.
+- Held-out eval seed is separate from run seed, and the eval manifest path is fixed.
+- Exact JAX, Tunix, Qwix, Flax, and model revision pins are set and recorded.
 - Checkpoints and TensorBoard logs are persistent.
 - W&B entity/project are correct.
 - Evaluation restores trained checkpoints and reports the resolved actor checkpoint root.
@@ -196,4 +214,3 @@ Stop and diagnose instead of launching full training if:
 - Evaluation cannot identify the checkpoint step being restored.
 - Reward/KL/diagnostic metrics are missing.
 - The debug run crashes before producing a checkpoint.
-
