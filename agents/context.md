@@ -227,3 +227,14 @@ D4 eval metrics:
 Recommendation:
 - K=8 GRPO is worth considering for a full run after review; it is healthier than K=2 at the medium horizon and shows no empty-response collapse.
 - Still use early checkpoint review/selection, and consider making `MAX_TO_KEEP` env-overridable before diagnostics that require all retained checkpoints.
+
+## 2026-06-09: Checkpoint-retention hygiene for full K=8
+
+Code/config:
+- `MAX_TO_KEEP` is now env-overridable in `scripts/config.py`, defaulting to `4`.
+- `scripts/train.py` records `max_to_keep` in `run_metadata.json` and prints `SAVE_INTERVAL_STEPS` plus `MAX_TO_KEEP` in the startup log.
+
+Run approval:
+- Full GRPO K=8 seed 0 is approved after D4, but R4/R2 remain blocked.
+- Planned R5 should use `NUM_GENERATIONS=8`, `SAVE_INTERVAL_STEPS=250`, and `MAX_TO_KEEP=20` so enough checkpoints are retained for early-selection review.
+- Do not change reward weights for R5; D4 reward sanity concerns remain report/control context, not a launch-blocking code bug.

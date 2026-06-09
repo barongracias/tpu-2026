@@ -94,6 +94,7 @@ def save_run_metadata(run_id: str | None, ckpt_dir: str) -> str:
         "max_steps": MAX_STEPS,
         "lr_decay_steps": LR_DECAY_STEPS,
         "save_interval_steps": SAVE_INTERVAL_STEPS,
+        "max_to_keep": MAX_TO_KEEP,
         "num_generations": NUM_GENERATIONS,
         "beta": BETA,
         "epsilon": EPSILON,
@@ -243,6 +244,8 @@ def main():
         f"  TENSORBOARD_DIR={TENSORBOARD_DIR}\n"
         f"  MAX_STEPS={MAX_STEPS}\n"
         f"  LR_DECAY_STEPS={LR_DECAY_STEPS}\n"
+        f"  SAVE_INTERVAL_STEPS={SAVE_INTERVAL_STEPS}\n"
+        f"  MAX_TO_KEEP={MAX_TO_KEEP}\n"
         f"  RUN_SEED={RUN_SEED}\n"
         f"  NUM_GENERATIONS={NUM_GENERATIONS}\n"
         f"  BETA={BETA}\n"

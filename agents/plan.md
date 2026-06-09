@@ -306,3 +306,18 @@ Metrics:
 Decision:
 - Do not start a full K=8 run automatically.
 - Full K=8 GRPO is now reasonable to consider after Baron review, preferably with early checkpoint selection and a `MAX_TO_KEEP`/checkpoint-retention hygiene fix if all planned checkpoints must be evaluated.
+
+## Milestone 5.11: Checkpoint Retention Hygiene And R5 Approval
+
+Status: hygiene patch prepared; R5 launch approved after patch validation/commit.
+
+Patch:
+- Make `MAX_TO_KEEP` env-overridable, defaulting to `4`.
+- Record `max_to_keep` in `run_metadata.json`.
+- Print `SAVE_INTERVAL_STEPS` and `MAX_TO_KEEP` in the startup log.
+
+R5 plan:
+- Launch full GRPO K=8 seed 0 only; do not start R4/R2.
+- Use `NUM_GENERATIONS=8`, no `MAX_STEPS_OVERRIDE`, `SAVE_INTERVAL_STEPS=250`, and `MAX_TO_KEEP=20`.
+- Evaluate retained checkpoints `500`, `1000`, `1500`, `2000`, `2500`, `3000`, and `3364` if present.
+- Keep run artifacts under `$HOME/tpu-runs/part-i`, not in the repo.

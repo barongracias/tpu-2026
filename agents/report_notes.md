@@ -422,3 +422,15 @@ Interpretation and recommendation:
 - K=8 medium debug is the best evidence so far: no empty-response collapse, high format compliance, and step 500 reaches `34/64`, above base greedy `31/64` on the same 64-example setup.
 - This supports considering a full K=8 GRPO run after review, with early checkpoint selection and checkpoint-retention hygiene.
 - Reward/control patching is still relevant because reward sanity shows format-heavy reward can still pay wrong answers; the full K=8 run should not be treated as guaranteed stable.
+
+## 2026-06-09: Checkpoint retention hygiene before R5
+
+Patch intent:
+- `MAX_TO_KEEP` is env-overridable so medium/full diagnostics can retain all planned checkpoints.
+- Training metadata/logging records the retention setting alongside generation/sampling controls.
+
+R5 approval and cautions:
+- D4 supports launching full GRPO K=8 seed 0 after this hygiene patch.
+- R5 should retain enough checkpoints for early-selection review with `SAVE_INTERVAL_STEPS=250` and `MAX_TO_KEEP=20`.
+- Do not start R4/R2 and do not change reward weights yet.
+- Reward sanity still suggests format-heavy reward can pay wrong answers, so final checkpoint quality should not be assumed; compare retained checkpoints against base/R1/R3/D4.
