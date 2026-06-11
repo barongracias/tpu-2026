@@ -422,3 +422,39 @@ Caveats:
 
 Next step:
 - Run matching retained-checkpoint evals for RLOO K=8 and K=2 before comparing to R5 GRPO K=8, R3 RLOO K=2, or base.
+
+## Milestone 5.14: R7 Deterministic RLOO K-Sweep Rerun
+
+Status: K=2 launched on this VM; K=8 delegated to another TPU VM and not yet confirmed in these notes.
+
+Purpose:
+- Repeat the R6 RLOO K comparison on deterministic branch `harvey-grpo-k8-rerun`, because R6 was launched from non-deterministic branch `harvey`.
+
+Branch gate:
+- Current deterministic branch for R7: `harvey-grpo-k8-rerun`.
+- Launch commit for K=2: `71aab87dee2d2c78256384d084d063d8b40c9e0c`.
+- Verified `deterministic-platform` is an ancestor and `harvey` is not an ancestor.
+
+This VM: RLOO K=2
+- Run id: `R7-rloo-k2-det-harvey-full-s0-20260611_102009`.
+- Run root: `/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009`.
+- W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R7-rloo-k2-det-harvey-full-s0-20260611_102009`.
+- Tmux attach: `tmux attach -t r7-rloo-k2-det-harvey-full-s0`.
+- Log tail: `tail -f /home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/logs/train.log`.
+- Config confirmed in log: `ADV_ESTIMATOR=rloo`, `NUM_GENERATIONS=2`, `MAX_STEPS=3364`, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, `MODEL_REVISION=dcc83ea841ab6100d6b47a070329e1ba4cf78752`.
+- `ckpts/run_metadata.json` exists and records commit, model revision, dependency refs, seeds, eval manifest, and run-local paths.
+
+Failed setup attempts:
+- `R7-rloo-k2-det-harvey-full-s0-20260611_101430`: failed on stale `/tmp/libtpu_lockfile` held by a hung diagnostic JAX probe.
+- `R7-rloo-k2-det-harvey-full-s0-20260611_101739`: failed at W&B init because tmux did not inherit intended run env.
+- Successful run used run-local launcher `/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/launch_train.sh`.
+
+Other TPU: RLOO K=8
+- Baron has sent the matching K=8 launch prompt/command to another TPU VM.
+- Expected config: `ADV_ESTIMATOR=rloo`, `NUM_GENERATIONS=8`, same branch lineage, same model revision/dependency refs, `RUN_SEED=0`, `EVAL_SEED=0`, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, and `MAX_STEPS_OVERRIDE` unset.
+- Next agent should only mark K=8 as launched after seeing the other TPU's exact run root, W&B URL, and log-confirmed config.
+
+Next steps:
+- Monitor K=2 through completion and confirm final `ckpts/actor/3364`.
+- Collect the K=8 run root/W&B/log evidence from the second TPU.
+- After both deterministic runs complete, run retained-checkpoint evals using the shared eval manifest before comparing K=8 vs K=2.

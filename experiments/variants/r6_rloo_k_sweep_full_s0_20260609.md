@@ -11,10 +11,14 @@ These two runs were chained on the Google TPU VM to compare RLOO at different gr
 
 ## Source State
 
-- Observed branch when recording notes: `harvey-grpo-k8-rerun`.
-- Observed HEAD when recording notes: `57c6409add0d81bbdb32ca7f4b3e176b4e044068`.
+- Launch branch: `harvey`.
+- W&B-recorded launch commit for both runs: `8a0f7f266552cb2666710ac589cb6bda5cd40121` (`harvey` / `origin/harvey`, commit title `Enable RLOO K8 experiment on harvey`).
+- Git reflog shows checkout/pull onto `harvey` before launch and no checkout to `harvey-grpo-k8-rerun` until 2026-06-10 10:19 UTC, after both R6 runs had finished.
+- Note-time branch when this record was written: `harvey-grpo-k8-rerun`.
+- Note-time HEAD when this record was written: `57c6409add0d81bbdb32ca7f4b3e176b4e044068`.
 - Launch code had environment wiring for `ADV_ESTIMATOR` and `NUM_GENERATIONS`.
 - `MAX_STEPS_OVERRIDE` was unset for both full runs.
+- Important caveat: these runs did **not** use the deterministic-platform code path. The `harvey` launch commit and `deterministic-platform` have merge-base `324abbe`; the R6 launch commit lacks deterministic-platform controls such as required `MODEL_REVISION`, `EVAL_SEED`/`EVAL_MANIFEST`, pinned `JAX_REF`/`QWIX_REF`/`FLAX_REF`, and the deterministic branch's `run_metadata.json` writer.
 
 ## Configuration
 
