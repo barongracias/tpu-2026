@@ -612,3 +612,6 @@ Notes hygiene:
 - K=2 and K=8 notes should use the exact run ID in their filenames.
 - Do not overwrite the K=2 note from the Harvey VM.
 - Do not update shared rollup files until both current R7 runs finish and both exact run IDs/W&B URLs are used.
+- After both R7 runs finish, choose one collector VM and copy only lightweight eval evidence into `$HOME/tpu-runs/part-i/report_diagnostics/r7_rloo_k_sweep_det_20260611/{k2,k8}/`; leave large checkpoint trees in the original run roots.
+- The required files to collate are `eval/*_greedy.csv`, `eval/*summary*.txt`, `logs/eval_*.log`, `logs/train.log`, `ckpts/run_metadata.json`, and the shared manifest `$HOME/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl`.
+- If one VM creates the eval manifest first, copy the exact JSONL to the other VM before evaluation so the K=2 and K=8 per-prompt CSVs are row-aligned. Detailed copy commands are recorded in `agents/context.md` under "R7 post-run lightweight eval collation".

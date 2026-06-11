@@ -384,3 +384,39 @@ K=8 run on this shared Boris VM:
 - `ckpts/run_metadata.json` exists under the K=8 run root and W&B is syncing.
 - Artifact dirs were set under the K=8 run root: `ckpts`, `intermediate_ckpt`, `tensorboard`, `data/train`, `data/test`, `wandb`, and `tmp`; no required artifact is intended to live only in `/tmp`.
 - Use the exact K=8 run id in any future K=8 note filename. Do not overwrite the K=2 note from the Harvey VM, and do not update shared rollups until both current R7 runs finish.
+
+R7 post-run lightweight eval collation:
+- The two R7 run roots live on different VMs, so raw checkpoints will not automatically be in one physical folder. Keep the large checkpoint trees in their original `$RUN_ROOT`s.
+- Choose one collector VM after both runs finish, then store only lightweight comparison evidence under:
+  `/home/<user>/tpu-runs/part-i/report_diagnostics/r7_rloo_k_sweep_det_20260611/`
+- Required shared eval manifest: `$HOME/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl`. If one VM creates this manifest first, copy the exact JSONL to the other VM before eval so K=2 and K=8 CSV rows are prompt-aligned.
+- Recommended collector layout:
+
+```bash
+PAIR_ROOT="$HOME/tpu-runs/part-i/report_diagnostics/r7_rloo_k_sweep_det_20260611"
+mkdir -p "$PAIR_ROOT"/{k2,k8,manifests}
+cp "$HOME/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl" "$PAIR_ROOT/manifests/"
+```
+
+- For each run, copy only these lightweight files into the matching `k2/` or `k8/` folder: `eval/*_greedy.csv`, `eval/*summary*.txt`, `logs/eval_*.log`, `logs/train.log`, and `ckpts/run_metadata.json`. Do not copy `ckpts/actor/` unless eval must be rerun on the collector VM.
+- Example on the collector VM after the relevant files have been transferred from the other VM:
+
+```bash
+K2_ROOT="/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009"
+K8_ROOT="/home/ext_harveybermingham1_gmail_com/tpu-runs/part-i/R7-rloo-k8-det-harvey-full-s0-20260611_105132"
+PAIR_ROOT="$HOME/tpu-runs/part-i/report_diagnostics/r7_rloo_k_sweep_det_20260611"
+
+mkdir -p "$PAIR_ROOT"/{k2,k8}/{eval,logs,metadata}
+cp "$K2_ROOT"/eval/*_greedy.csv "$PAIR_ROOT/k2/eval/"
+cp "$K2_ROOT"/eval/*summary*.txt "$PAIR_ROOT/k2/eval/" 2>/dev/null || true
+cp "$K2_ROOT"/logs/eval_*.log "$PAIR_ROOT/k2/logs/" 2>/dev/null || true
+cp "$K2_ROOT"/logs/train.log "$PAIR_ROOT/k2/logs/"
+cp "$K2_ROOT"/ckpts/run_metadata.json "$PAIR_ROOT/k2/metadata/"
+cp "$K8_ROOT"/eval/*_greedy.csv "$PAIR_ROOT/k8/eval/"
+cp "$K8_ROOT"/eval/*summary*.txt "$PAIR_ROOT/k8/eval/" 2>/dev/null || true
+cp "$K8_ROOT"/logs/eval_*.log "$PAIR_ROOT/k8/logs/" 2>/dev/null || true
+cp "$K8_ROOT"/logs/train.log "$PAIR_ROOT/k8/logs/"
+cp "$K8_ROOT"/ckpts/run_metadata.json "$PAIR_ROOT/k8/metadata/"
+```
+
+- After collation, create a short markdown note in `experiments/variants/` using the exact R7 run ids, W&B URLs, eval summary paths, and best/final checkpoint metrics. Shared rollups should wait until both `k2` and `k8` folders contain eval CSVs from the same manifest.

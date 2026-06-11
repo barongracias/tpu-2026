@@ -465,4 +465,5 @@ Next:
 - Monitor both R7 runs through completion and confirm final `ckpts/actor/3364` for each.
 - Keep K=2 and K=8 notes separate using their exact run IDs in filenames.
 - After both deterministic runs complete, run retained-checkpoint evals using the shared eval manifest before comparing K=8 vs K=2.
+- Collate lightweight eval evidence on one collector VM under `$HOME/tpu-runs/part-i/report_diagnostics/r7_rloo_k_sweep_det_20260611/{k2,k8}/`: copy `eval/*_greedy.csv`, eval summaries, eval logs, `train.log`, `ckpts/run_metadata.json`, and the shared eval manifest. Leave the large `ckpts/actor/` trees in the original run roots unless eval must be rerun.
 - Do not update shared rollup files until both exact run IDs and W&B URLs are available and both runs finish.
