@@ -307,3 +307,54 @@ Comparison:
 Recommendation:
 - R5 is the strongest completed trained result so far and is report-useful as the K=8 GRPO variant.
 - Do not start R4/R2 or another full run yet. Local Codex should review R5 CSVs/W&B curves, then decide whether to report R5 best-checkpoint selection, run bootstrap CIs, or change reward controls.
+
+## 2026-06-09: Hugging Face model revision query
+
+- Queried the Hugging Face model API for `google/gemma-3-1b-it` using the repo-local HF token.
+- Current resolved model revision at query time: `dcc83ea841ab6100d6b47a070329e1ba4cf78752`.
+- For base-model hard-example mining, export `MODEL_REVISION=dcc83ea841ab6100d6b47a070329e1ba4cf78752` unless reproducing a specific older run with a different `run_metadata.json` pin.
+- Caveat: this is the HF API current revision on 2026-06-09; it does not prove Baron's earlier baseline used the same revision unless his metadata records that SHA.
+
+## 2026-06-10: R7 GRPO K=2 hard/medium run collapsed
+
+Run:
+- Run root: `/home/fredlawrence/tpu-runs/part-i/R7-grpo-k2-hardmedium-20260610_102859`
+- W&B run id: `3v8bx0iz`; W&B name `R7-grpo-k2-hardmedium`.
+- Config: `DATA_SOURCE=manifest`, `TRAIN_MANIFEST=/home/fredlawrence/tpu-runs/part-i/manifests/gsm8k_train_base_hard_medium.jsonl`, `ADV_ESTIMATOR=grpo`, `NUM_GENERATIONS=2`, `RUN_SEED=0`, `EVAL_SEED=0`, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`.
+- Metadata recorded `max_steps=3452`, which is expected from `NUM_BATCHES=3836` and `TRAIN_FRACTION=0.9`.
+- Training completed normally with `Training finished.` and final checkpoint `ckpts/actor/3452`; no crash/OOM/traceback was found.
+
+Collapse evidence:
+- TensorBoard shows immediate-EOS/empty-completion collapse, not a process failure.
+- First zero-length train completion appeared at step `457`; a run of 20 zero-length train completions began at step `518`.
+- Final train scalars: `completions/train/mean_length=0`, `rewards/train/score/mean=-2.5`, `rewards/train/mean=-0.625`, `actor/train/grad_norm=0`, `actor/train/kl=0`, `actor/train/loss=0`.
+- Eval peaked early and then degraded: eval reward/score were healthy around steps `192-448`, dropped sharply at `512`, and were fully collapsed by `2240`.
+- Final eval at step `3392`: `completions/eval/mean_length=0`, `rewards/eval/score/mean=-2.5`, `rewards/eval/mean=-0.625`, `rewards/eval/check_answer=0`.
+- `train.log` tail contains empty responses (`Response:` blank, `Extracted: None`) before `Training finished.`
+- W&B emitted repeated step-order warnings because final eval metrics were logged at step `0` after W&B had advanced to step `3452`; use TensorBoard as source of truth for this run.
+
+Interpretation:
+- R7 did not fail operationally; K=2 GRPO on the hard/medium manifest learned to emit EOS immediately and then lost usable within-group reward contrast.
+- With `NUM_GENERATIONS=2`, group-relative normalisation is high variance; once both rollouts for a prompt are empty/equally bad, the reward bottoms out and gradients go to zero, so recovery is unlikely.
+- Best salvage checkpoint is probably `ckpts/actor/250`; step `500` was already degrading and `750+` is mostly unusable by scalar evidence.
+
+Decision:
+- A K=8 retry of this hard/medium manifest is worth doing if TPU time permits, because D4/R5 showed K=8 was much more stable on the earlier distribution and avoided empty-response collapse.
+- Treat it as a stability/manifest-ablation run, not a guaranteed win: keep `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, evaluate retained checkpoints, and watch completion length/empty-response metrics by step `500`.
+- Do not trust W&B final eval plots without checking TensorBoard because the step-order logging bug persists.
+
+## 2026-06-11: Corrected R7/R8 hard/medium eval status
+
+Eval protocol:
+- Normal held-out eval used `/home/fredlawrence/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl`, not the hard/medium training manifest.
+- The CSV metadata columns `requested_ckpt_dir`, `resolved_ckpt_dir`, and `restored_step` are the source of truth for whether a trained checkpoint was restored.
+
+Results:
+- `/home/fredlawrence/tpu-runs/part-i/R7-grpo-k2-hardmedium-20260610_102859/eval/r7_best_greedy.csv` is a base-model/no-restore eval, not a trained R7 checkpoint eval. Log: `/home/fredlawrence/tpu-runs/part-i/R7-grpo-k2-hardmedium-20260610_102859/logs/r7_eval_best_greedy.log`; it says `Skipping checkpoint restore`. Metrics: `31/64` exact (`48.44%`), `31/64` partial (`48.44%`), `1/64` format (`1.56%`), `0/64` empty.
+- `/home/fredlawrence/tpu-runs/part-i/R8-grpo-k8-hardmedium-20260610_131135/eval/best_greedy.csv` is byte-identical to the R7 base eval above and is also no-restore/base, despite living under the R8 run. Log: `/home/fredlawrence/tpu-runs/part-i/R8-grpo-k8-hardmedium-20260610_131135/logs/eval_best_greedy.log`.
+- Valid trained R8 final eval: `/home/fredlawrence/tpu-runs/part-i/R8-grpo-k8-hardmedium-20260610_131135/eval/r8_step3452_greedy.csv`; restored `ckpts/actor` at step `3452`. Metrics: `30/64` exact (`46.88%`), `32/64` partial (`50.00%`), `60/64` format (`93.75%`), `0/64` empty; mean response length about `180.5` words.
+
+Interpretation:
+- R8 hard/medium final did not show the empty-output collapse seen in R7; the training log tail contains normal formatted responses and `Training finished.`
+- R8 final strongly learned the required XML-style format but did not improve exact accuracy over the base eval on this 64-prompt manifest (`30/64` vs base `31/64`).
+- R7 still needs a properly restored trained-checkpoint eval, likely step `250`, if a salvage/early-stopped R7 number is needed. The existing `r7_best_greedy.csv` must not be reported as trained R7.

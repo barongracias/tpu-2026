@@ -63,6 +63,7 @@ from config import (
     TOTAL_GENERATION_STEPS,
     TRAIN_DATA_DIR,
     TRAIN_FRACTION,
+    TRAIN_MANIFEST,
     TRAIN_MICRO_BATCH_SIZE,
     TUNIX_REF,
     WANDB_ENTITY,
@@ -122,6 +123,7 @@ def save_run_metadata(run_id: str | None, ckpt_dir: str) -> str:
         "total_generation_steps": TOTAL_GENERATION_STEPS,
         "data_source": DATA_SOURCE,
         "train_data_dir": TRAIN_DATA_DIR,
+        "train_manifest": TRAIN_MANIFEST,
         "test_data_dir": TEST_DATA_DIR,
         "ckpt_dir": ckpt_dir,
         "intermediate_ckpt_dir": INTERMEDIATE_CKPT_DIR,
@@ -211,7 +213,7 @@ def build_cluster_config(mesh, optimizer, eos_tokens):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--source", default=DATA_SOURCE, choices=["tfds", "kaggle"])
+    ap.add_argument("--source", default=DATA_SOURCE, choices=["tfds", "kaggle", "manifest"])
     ap.add_argument("--wandb-run-id", default=WANDB_RUN_ID,
                     help="Pass an existing run id (e.g. bnh9ttlt) to resume.")
     args = ap.parse_args()
@@ -222,6 +224,8 @@ def main():
     wandb_run = maybe_init_wandb(args.wandb_run_id)
     resolved_wandb_run_id = wandb_run.id if wandb_run is not None else args.wandb_run_id
     save_run_metadata(resolved_wandb_run_id, CKPT_DIR)
+    if args.source == "manifest" and not TRAIN_MANIFEST:
+        raise RuntimeError("DATA_SOURCE=manifest requires TRAIN_MANIFEST to point to a JSONL file.")
 
     mesh = build_mesh()
     local_path, eos_tokens = download_weights()
@@ -233,6 +237,7 @@ def main():
         NUM_BATCHES, NUM_TEST_BATCHES, TRAIN_MICRO_BATCH_SIZE, TRAIN_FRACTION,
         NUM_EPOCHS, TRAIN_DATA_DIR, TEST_DATA_DIR, source=args.source,
         shuffle_seed=RUN_SEED, test_shuffle_seed=EVAL_SEED,
+        train_manifest=TRAIN_MANIFEST if args.source == "manifest" else None,
     )
     print(f"Datasets: train={len(train_ds)} val={len(val_ds) if val_ds else 0}")
 
@@ -267,6 +272,7 @@ def main():
         f"  RUN_SEED={RUN_SEED}\n"
         f"  EVAL_SEED={EVAL_SEED}\n"
         f"  EVAL_MANIFEST={EVAL_MANIFEST}\n"
+        f"  TRAIN_MANIFEST={TRAIN_MANIFEST}\n"
         f"  MODEL_REVISION={MODEL_REVISION}\n"
         f"  NUM_GENERATIONS={NUM_GENERATIONS}\n"
         f"  BETA={BETA}\n"

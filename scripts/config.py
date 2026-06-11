@@ -20,8 +20,9 @@ FLAX_REF = os.environ.get("FLAX_REF")
 # ====== Data ======
 TRAIN_DATA_DIR = os.environ.get("TRAIN_DATA_DIR", "./data/train")
 TEST_DATA_DIR = os.environ.get("TEST_DATA_DIR", "./data/test")
+TRAIN_MANIFEST = os.environ.get("TRAIN_MANIFEST", "")
 TRAIN_FRACTION = 0.9
-DATA_SOURCE = os.environ.get("DATA_SOURCE", "tfds")  # "tfds" or "kaggle"
+DATA_SOURCE = os.environ.get("DATA_SOURCE", "tfds")  # "tfds", "kaggle", or "manifest"
 
 # ====== LoRA (parameter-efficient finetuning) ======
 # Only the LoRA adapters are trained; the base model is frozen and shared with
@@ -63,7 +64,7 @@ EVAL_MANIFEST = os.environ.get("EVAL_MANIFEST", "")
 
 # ====== Training ======
 TRAIN_MICRO_BATCH_SIZE = 1
-NUM_BATCHES = 3738
+NUM_BATCHES = int(os.environ.get("NUM_BATCHES", "3738"))
 NUM_TEST_BATCHES = 64
 EVAL_EVERY_N_STEPS = 64
 NUM_EPOCHS = 1

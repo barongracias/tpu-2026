@@ -392,3 +392,25 @@ Decision:
 - Best R5 checkpoint is step 3250 at `35/64` exact, slightly above D4 step 500 (`34/64`) and base (`31/64`).
 - R5 final is `32/64`, so checkpoint selection remains important.
 - Do not launch R4/R2 or any new run until local review. Next report work should compute confidence intervals/paired comparisons and inspect W&B/TensorBoard curves for R5.
+
+## Milestone 5.13: R7/R8 Hard/Medium Eval Correction
+
+Status: partial; R8 final trained eval complete, R7 trained salvage eval still pending if needed.
+
+Evidence:
+- Normal held-out eval manifest: `/home/fredlawrence/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl`.
+- R7 base/no-restore CSV: `/home/fredlawrence/tpu-runs/part-i/R7-grpo-k2-hardmedium-20260610_102859/eval/r7_best_greedy.csv`.
+- R8 base/no-restore CSV: `/home/fredlawrence/tpu-runs/part-i/R8-grpo-k8-hardmedium-20260610_131135/eval/best_greedy.csv`.
+- R8 trained final CSV: `/home/fredlawrence/tpu-runs/part-i/R8-grpo-k8-hardmedium-20260610_131135/eval/r8_step3452_greedy.csv`.
+
+Metrics:
+| Run/file | Restore | Exact | Partial | Format | Empty |
+| --- | --- | ---: | ---: | ---: | ---: |
+| R7 `r7_best_greedy.csv` | none/base | 31/64 (48.44%) | 31/64 (48.44%) | 1/64 (1.56%) | 0/64 |
+| R8 `best_greedy.csv` | none/base | 31/64 (48.44%) | 31/64 (48.44%) | 1/64 (1.56%) | 0/64 |
+| R8 `r8_step3452_greedy.csv` | step 3452 | 30/64 (46.88%) | 32/64 (50.00%) | 60/64 (93.75%) | 0/64 |
+
+Decision:
+- Do not report the `best_greedy` files as trained R7/R8; both skipped checkpoint restore and are byte-identical base evals.
+- R8 final avoided empty-response collapse but did not beat base exact accuracy on this held-out 64-prompt eval.
+- If reporting an early-stopped R7 number, rerun R7 with explicit restore at step `250`.

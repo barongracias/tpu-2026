@@ -17,6 +17,16 @@ export MODEL_REVISION="<exact google/gemma-3-1b-it Hugging Face commit sha>"
 `bootstrap.sh` refuses to install JAX/Qwix/Flax from moving HEAD. `model.py`
 refuses to download the model unless `MODEL_REVISION` is set.
 
+Current resolved Hugging Face model revision for `google/gemma-3-1b-it`
+queried from the HF model API on 2026-06-09:
+
+```bash
+export MODEL_REVISION="dcc83ea841ab6100d6b47a070329e1ba4cf78752"
+```
+
+This pins the current HF revision at query time. Prefer an existing
+`run_metadata.json` value when reproducing a specific historical run.
+
 ## Required Run Paths
 
 Every run must use a persistent run root:
