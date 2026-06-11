@@ -13,7 +13,8 @@ This fork is the Part I practical training/evaluation codebase for the Multi-Age
 - No Tunix source files were edited.
 - D1 GRPO 50-step debug completed successfully: step 50 reached, actor checkpoint restored, TensorBoard/W&B emitted evidence, and greedy eval CSV was written.
 - D2 RLOO 50-step debug completed successfully: step 50 reached, actor checkpoint restored, TensorBoard/W&B emitted evidence, and greedy eval CSV was written.
-- R5 GRPO K=8 seed 0 full training and retained-checkpoint eval completed; do not start R4/R2 or any new run until Baron/local Codex reviews R5.
+- R5 GRPO K=8 seed 0 full training and retained-checkpoint eval completed.
+- R6 RLOO K-sweep training completed on 2026-06-10: K=8 then chained K=2, both seed 0, both full 3364 steps. Eval is pending; do not treat these as performance results until retained-checkpoint eval CSVs exist.
 
 ## What Was Implemented
 
@@ -42,6 +43,9 @@ Target matrix:
 | R3 | rloo | 0 | Full controlled variant. |
 | R4 | rloo | 1 | Second-seed variant if TPU time permits. |
 | R2 | grpo | 1 | Second-seed baseline if TPU time permits. |
+| R5 | grpo | 0 | complete: full K=8 training and retained-checkpoint eval finished. |
+| R6 K=8 | rloo | 0 | complete: full K=8 training finished; eval pending. |
+| R6 K=2 | rloo | 0 | complete: chained full K=2 training finished; eval pending. |
 
 R1 completed training:
 - Session: `r1-grpo-full-s0` exited after training completion
@@ -307,3 +311,30 @@ Comparison:
 Recommendation:
 - R5 is the strongest completed trained result so far and is report-useful as the K=8 GRPO variant.
 - Do not start R4/R2 or another full run yet. Local Codex should review R5 CSVs/W&B curves, then decide whether to report R5 best-checkpoint selection, run bootstrap CIs, or change reward controls.
+
+## 2026-06-10: R6 RLOO K-sweep full seed 0 training completed
+
+Run pair:
+| Run | Estimator | K | Start UTC | Finish UTC | Status |
+| --- | --- | ---: | --- | --- | --- |
+| `R6-rloo-k8-full-s0-20260609_212314` | `rloo` | 8 | 2026-06-09 ~21:57 | 2026-06-10 ~05:37 | training complete |
+| `R6-rloo-k2-full-s0-20260609_220042` | `rloo` | 2 | 2026-06-10 05:37:42 | 2026-06-10 ~07:41 | training complete |
+
+Common config:
+- `RUN_SEED=0`, `MAX_STEPS=3364`, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, `MAX_STEPS_OVERRIDE` unset.
+- Both runs used persistent run-local paths under `/home/harvey/tpu-runs/part-i`, not `/tmp`.
+- Current note-time checkout was `harvey-grpo-k8-rerun` at `57c6409add0d81bbdb32ca7f4b3e176b4e044068`. Verify launch commit separately before making strict reproducibility claims; launch logs confirm the runtime env values but no `run_metadata.json` was found in either R6 checkpoint root.
+
+Evidence:
+- K=8 root: `/home/harvey/tpu-runs/part-i/R6-rloo-k8-full-s0-20260609_212314`
+- K=2 root: `/home/harvey/tpu-runs/part-i/R6-rloo-k2-full-s0-20260609_220042`
+- K=8 W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R6-rloo-k8-full-s0-20260609_212314`
+- K=2 W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R6-rloo-k2-full-s0-20260609_220042`
+- Both final checkpoints exist at `ckpts/actor/3364`; retained checkpoints also exist every 250 steps from 250 through 3250 plus step 1.
+- TensorBoard event files exist in each run root's `tensorboard/`.
+- Local W&B artifacts are copied/stored under each run root's `wandb/`.
+- Detailed paired note: `experiments/variants/r6_rloo_k_sweep_full_s0_20260609.md`.
+
+Caveat and next step:
+- These are training-complete runs, not evaluated performance results. No post-training greedy eval CSVs or eval summaries were found for either run at note time.
+- Next step is retained-checkpoint eval for both RLOO K=8 and K=2 using the same eval manifest/seed as R5-style comparisons.

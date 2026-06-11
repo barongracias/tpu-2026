@@ -2,7 +2,7 @@
 
 ## Current Headline State
 
-The `coursework` branch contains the P0-P6 preparation patches for Part I TPU usage and is aligned with `origin/coursework` at `820fad6`. D1/D2, R1/R3, D3/D4, and R5 have completed. R5 GRPO K=8 seed 0 is the strongest trained run so far; R4/R2 and any new run remain blocked pending review.
+The `coursework` branch contains the P0-P6 preparation patches for Part I TPU usage and was aligned with `origin/coursework` at `820fad6` for earlier runs. D1/D2, R1/R3, D3/D4, and R5 have completed. On the later `harvey-grpo-k8-rerun` checkout, R6 RLOO K=8 and chained RLOO K=2 full training completed; those R6 runs still need retained-checkpoint evaluation before they are used as performance evidence.
 
 Local run notes, diagnostics, manifests, and runbooks for the current TPU work are now tracked under `experiments/`. Start with `experiments/README.md`, then use `experiments/baseline/`, `experiments/variants/`, and `experiments/diagnostics/` for run-specific summaries; TPU-side raw logs/CSVs remain under each `$RUN_ROOT`.
 
@@ -525,3 +525,44 @@ Validation:
 - `git diff --check` passed.
 - `py_compile` passed for `scripts/config.py`, `scripts/data.py`, `scripts/train.py`, `scripts/evaluate.py`, and `scripts/model.py`.
 - `bash -n` passed for `bootstrap.sh` and `scripts/run_tmux.sh`.
+
+## 2026-06-10: R6 RLOO K-sweep training completed
+
+Purpose:
+- Run a full RLOO K-sweep after the GRPO K=8 results: first RLOO with `NUM_GENERATIONS=8`, then chained RLOO with `NUM_GENERATIONS=2`.
+
+Run table:
+| Run | Estimator | K | Start UTC | Finish UTC | Status |
+| --- | --- | ---: | --- | --- | --- |
+| `R6-rloo-k8-full-s0-20260609_212314` | `rloo` | 8 | 2026-06-09 ~21:57 | 2026-06-10 ~05:37 | training complete |
+| `R6-rloo-k2-full-s0-20260609_220042` | `rloo` | 2 | 2026-06-10 05:37:42 | 2026-06-10 ~07:41 | training complete |
+
+Common config:
+- `RUN_SEED=0`
+- `MAX_STEPS=3364`
+- `SAVE_INTERVAL_STEPS=250`
+- `MAX_TO_KEEP=20`
+- `MAX_STEPS_OVERRIDE` unset
+- Runtime paths were persistent under `/home/harvey/tpu-runs/part-i`, not `/tmp`.
+
+Evidence:
+- K=8 root: `/home/harvey/tpu-runs/part-i/R6-rloo-k8-full-s0-20260609_212314`
+- K=2 root: `/home/harvey/tpu-runs/part-i/R6-rloo-k2-full-s0-20260609_220042`
+- K=8 W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R6-rloo-k8-full-s0-20260609_212314`
+- K=2 W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R6-rloo-k2-full-s0-20260609_220042`
+- Detailed note: `experiments/variants/r6_rloo_k_sweep_full_s0_20260609.md`
+
+Artifacts:
+- Both runs logged `Training finished.`.
+- Both have final actor checkpoint `ckpts/actor/3364`.
+- Both have retained actor checkpoints at step `1` and every `250` steps through `3250`.
+- TensorBoard event files and local W&B artifacts are stored under each run root.
+- `/tmp` was small when checked (`~61M`); run directories are about `3.5G` each under `/home/harvey/tpu-runs/part-i`.
+
+Caveats:
+- No post-training greedy eval CSVs or eval summaries were found for either R6 run at note time.
+- No `run_metadata.json` was found in either R6 checkpoint root at note time.
+- W&B step-order warnings persisted near final step `3364`.
+
+Next action:
+- Run retained-checkpoint evaluation for both R6 runs with a fixed eval manifest/seed before comparing RLOO K=8 vs RLOO K=2 or against R5 GRPO K=8.

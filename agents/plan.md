@@ -107,7 +107,7 @@ Validation:
 
 ## Milestone 5: Full Controlled Runs
 
-Status: R5 GRPO K=8 seed 0 training and retained-checkpoint eval complete; R4/R2 and any new run remain blocked pending review.
+Status: R5 GRPO K=8 seed 0 training and retained-checkpoint eval complete. R6 RLOO K=8 and chained RLOO K=2 training also completed, but eval is pending; do not treat R6 as performance evidence until retained-checkpoint evals are recorded.
 
 Goal:
 - Execute the locked GRPO vs RLOO comparison with fixed data, seed controls, and compute budget.
@@ -392,3 +392,33 @@ Decision:
 - Best R5 checkpoint is step 3250 at `35/64` exact, slightly above D4 step 500 (`34/64`) and base (`31/64`).
 - R5 final is `32/64`, so checkpoint selection remains important.
 - Do not launch R4/R2 or any new run until local review. Next report work should compute confidence intervals/paired comparisons and inspect W&B/TensorBoard curves for R5.
+
+## Milestone 5.13: R6 RLOO K-Sweep Full Runs
+
+Status: training complete; retained-checkpoint eval pending.
+
+Run pair:
+| Run | Estimator | K / `NUM_GENERATIONS` | Start UTC | Finish UTC | Status |
+| --- | --- | ---: | --- | --- | --- |
+| `R6-rloo-k8-full-s0-20260609_212314` | `rloo` | 8 | 2026-06-09 ~21:57 | 2026-06-10 ~05:37 | complete |
+| `R6-rloo-k2-full-s0-20260609_220042` | `rloo` | 2 | 2026-06-10 05:37:42 | 2026-06-10 ~07:41 | complete |
+
+Common config:
+- `RUN_SEED=0`, `MAX_STEPS=3364`, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, `MAX_STEPS_OVERRIDE` unset.
+- Both runs used persistent run-local artifact directories under `/home/harvey/tpu-runs/part-i`, not `/tmp`.
+- Final actor checkpoint exists for both at `ckpts/actor/3364`; retained checkpoints also exist at step `1` and every `250` steps from `250` through `3250`.
+
+Evidence:
+- K=8 root: `/home/harvey/tpu-runs/part-i/R6-rloo-k8-full-s0-20260609_212314`
+- K=2 root: `/home/harvey/tpu-runs/part-i/R6-rloo-k2-full-s0-20260609_220042`
+- K=8 W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R6-rloo-k8-full-s0-20260609_212314`
+- K=2 W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R6-rloo-k2-full-s0-20260609_220042`
+- Detailed note: `experiments/variants/r6_rloo_k_sweep_full_s0_20260609.md`
+
+Caveats:
+- No post-training greedy eval CSVs or eval summaries were found for either R6 run at note time.
+- No `run_metadata.json` was found in either R6 checkpoint root at note time; use train logs and shell history/notes for runtime config until metadata is regenerated or backfilled.
+- W&B step-order warnings persisted near final step `3364`, as in earlier runs.
+
+Next step:
+- Run matching retained-checkpoint evals for RLOO K=8 and K=2 before comparing to R5 GRPO K=8, R3 RLOO K=2, or base.
