@@ -5,7 +5,7 @@ This fork is the Part I practical training/evaluation codebase for the Multi-Age
 ## Current Status
 
 - Active local branch for the current R7 work: `harvey-grpo-k8-rerun`.
-- Active local commit after notes updates: `71aab87dee2d2c78256384d084d063d8b40c9e0c` plus local documentation edits.
+- Active local commit for the current K=8 launch: `e3d69a1938fe8e8a2a67a3c84a03331133ed46f1` plus local documentation edits.
 - This branch is based on deterministic-platform commit `57c6409add0d81bbdb32ca7f4b3e176b4e044068`; `harvey` is not an ancestor.
 - Historical coursework baseline: `324abbe4b4e229ea812223856393547db4fbb53e`; earlier R5 notes refer to `coursework` / `origin/coursework` at `820fad6`.
 - Local run notes, diagnostics, runbooks, and manifests are now recorded under `experiments/`; read `experiments/README.md` for the map before searching TPU-side logs.
@@ -15,7 +15,7 @@ This fork is the Part I practical training/evaluation codebase for the Multi-Age
 - D2 RLOO 50-step debug completed successfully: step 50 reached, actor checkpoint restored, TensorBoard/W&B emitted evidence, and greedy eval CSV was written.
 - R5 GRPO K=8 seed 0 full training and retained-checkpoint eval completed.
 - R6 RLOO K-sweep training completed on 2026-06-10: K=8 then chained K=2, both seed 0, both full 3364 steps. Eval is pending; do not treat these as performance results until retained-checkpoint eval CSVs exist. These R6 runs were launched from non-deterministic branch `harvey` at commit `8a0f7f266552cb2666710ac589cb6bda5cd40121`, not from deterministic-platform.
-- R7 deterministic rerun is now split across TPUs: this VM launched only RLOO K=2 from deterministic branch `harvey-grpo-k8-rerun` at commit `71aab87dee2d2c78256384d084d063d8b40c9e0c`; Baron has sent the matching K=8 launch prompt/command to a second TPU VM, but this repo note does not yet confirm that K=8 has started.
+- R7 deterministic rerun is now split across TPUs: the separate Harvey VM is running RLOO K=2 from deterministic branch `harvey-grpo-k8-rerun` at commit `71aab87dee2d2c78256384d084d063d8b40c9e0c`; this shared Boris VM is running the matching RLOO K=8 job from `harvey-grpo-k8-rerun` at commit `e3d69a1938fe8e8a2a67a3c84a03331133ed46f1`.
 
 ## What Was Implemented
 
@@ -344,43 +344,43 @@ Caveat and next step:
 
 Purpose:
 - Rerun the R6 RLOO K comparison on the deterministic platform branch lineage after discovering the R6 pair was launched from non-deterministic `harvey`.
-- This VM is responsible only for RLOO K=2. Baron sent the matching K=8 setup/launch prompt to another TPU VM; K=8 status and run root must be confirmed on that VM before adding results here.
+- The R7 K-sweep is intentionally split across two TPUs/VMs so the runs do not clash.
+- Harvey VM: running the RLOO K=2 deterministic full run recorded below.
+- Shared Boris VM: running the matching RLOO K=8 deterministic full run recorded below.
 
 Branch and deterministic checks:
-- Repo: `/home/harvey/tpu-2026`.
 - Branch: `harvey-grpo-k8-rerun`.
-- Commit: `71aab87dee2d2c78256384d084d063d8b40c9e0c`.
-- Verified `deterministic-platform` is an ancestor and `harvey` is not an ancestor.
+- K=2 launch commit on Harvey VM: `71aab87dee2d2c78256384d084d063d8b40c9e0c`.
+- K=8 launch commit on shared Boris VM: `e3d69a1938fe8e8a2a67a3c84a03331133ed46f1`.
+- Verified `deterministic-platform` is an ancestor and `harvey` is not an ancestor before the K=8 launch.
 - Verified deterministic wiring exists for `MODEL_REVISION`, dependency refs, `EVAL_SEED`, `EVAL_MANIFEST`, `ADV_ESTIMATOR`, `NUM_GENERATIONS`, and `ckpts/run_metadata.json`.
 
-Successful K=2 run on this VM:
+K=2 run on separate Harvey VM:
 - Run id: `R7-rloo-k2-det-harvey-full-s0-20260611_102009`.
 - Tmux session: `r7-rloo-k2-det-harvey-full-s0`.
 - Run root: `/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009`.
 - W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R7-rloo-k2-det-harvey-full-s0-20260611_102009`.
 - Attach: `tmux attach -t r7-rloo-k2-det-harvey-full-s0`.
 - Tail: `tail -f /home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/logs/train.log`.
-
-Confirmed launch config in `logs/train.log`:
-- `ADV_ESTIMATOR=rloo`.
-- `NUM_GENERATIONS=2`.
-- `MAX_STEPS=3364`.
-- `SAVE_INTERVAL_STEPS=250`.
-- `MAX_TO_KEEP=20`.
-- `MODEL_REVISION=dcc83ea841ab6100d6b47a070329e1ba4cf78752`.
-- `MAX_STEPS_OVERRIDE` was unset.
-
-Recorded metadata:
-- `ckpts/run_metadata.json` exists and records commit `71aab87dee2d2c78256384d084d063d8b40c9e0c`, model revision `dcc83ea841ab6100d6b47a070329e1ba4cf78752`, estimator `rloo`, `num_generations=2`, `run_seed=0`, `eval_seed=0`, and eval manifest `/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl`.
-- Dependency refs recorded: JAX `3ff6dc40cdb982921de0ef12c0bf8e5c64311a6f`, Tunix `7fadb3c81e4348f714b2b5a07f6cc2bd10da10de`, Qwix `c2548f06eeca005090329530576623afcd48241c`, Flax `5ab9d1463550a7fc7fe13575af55081e68258dd7`.
+- Config confirmed in log: `ADV_ESTIMATOR=rloo`, `NUM_GENERATIONS=2`, `MAX_STEPS=3364`, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, and `MODEL_REVISION=dcc83ea841ab6100d6b47a070329e1ba4cf78752`.
+- `RUN_SEED=0`, `EVAL_SEED=0`, and `MAX_STEPS_OVERRIDE` was unset.
+- `ckpts/run_metadata.json` exists and records the deterministic metadata.
 - Run-local launcher: `/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/launch_train.sh`. This was used because the existing tmux server did not inherit newly supplied run env vars.
 
-Failed setup attempts left in place:
+Failed K=2 setup attempts left in place:
 - `/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_101430`: failed before config print because a hung diagnostic JAX process held `/tmp/libtpu_lockfile`; the process was stopped and the stale lockfile removed.
 - `/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_101739`: failed at W&B init with `permission denied` because launching through the existing tmux server lost the intended `WANDB_RUN_ID`/`WANDB_DIR` env. The successful retry used a run-local launcher with explicit exports inside the tmux command.
 - These failed roots were intentionally not deleted.
 
-Matching K=8 on other TPU:
-- Use the same branch `harvey-grpo-k8-rerun`, same model revision, dependency refs, seeds, eval manifest path, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, and `MAX_STEPS_OVERRIDE` unset.
-- Expected K=8 run naming: `R7-rloo-k8-det-harvey-full-s0-<UTC timestamp>`, with a distinct W&B run id and run root so notes do not clash with K=2.
-- Do not update shared rollup results until the other TPU reports the exact K=8 run root, W&B URL, and log-confirmed config.
+K=8 run on this shared Boris VM:
+- Run id: `R7-rloo-k8-det-harvey-full-s0-20260611_105132`.
+- Tmux session: `r7-rloo-k8-det-harvey-full-s0`.
+- Run root: `/home/ext_harveybermingham1_gmail_com/tpu-runs/part-i/R7-rloo-k8-det-harvey-full-s0-20260611_105132`.
+- W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R7-rloo-k8-det-harvey-full-s0-20260611_105132`.
+- Attach: `tmux attach -t r7-rloo-k8-det-harvey-full-s0`.
+- Tail: `tail -f /home/ext_harveybermingham1_gmail_com/tpu-runs/part-i/R7-rloo-k8-det-harvey-full-s0-20260611_105132/logs/train.log`.
+- Config confirmed in log: `ADV_ESTIMATOR=rloo`, `NUM_GENERATIONS=8`, `MAX_STEPS=3364`, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, and `MODEL_REVISION=dcc83ea841ab6100d6b47a070329e1ba4cf78752`.
+- `RUN_SEED=0`, `EVAL_SEED=0`, and `MAX_STEPS_OVERRIDE` was unset at launch.
+- `ckpts/run_metadata.json` exists under the K=8 run root and W&B is syncing.
+- Artifact dirs were set under the K=8 run root: `ckpts`, `intermediate_ckpt`, `tensorboard`, `data/train`, `data/test`, `wandb`, and `tmp`; no required artifact is intended to live only in `/tmp`.
+- Use the exact K=8 run id in any future K=8 note filename. Do not overwrite the K=2 note from the Harvey VM, and do not update shared rollups until both current R7 runs finish.
