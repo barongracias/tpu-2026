@@ -1,0 +1,15 @@
+step,correct,total,accuracy_pct,partial_correct,partial_pct,format_correct,format_pct,empty_responses,mean_words,csv
+250,23,64,35.9375,25,39.0625,34,53.125,0,157.65625,/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/r7_rloo_k2_step250_greedy.csv
+500,30,64,46.875,31,48.4375,53,82.8125,0,183.765625,/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/r7_rloo_k2_step500_greedy.csv
+750,25,64,39.0625,27,42.1875,44,68.75,0,275.515625,/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/r7_rloo_k2_step750_greedy.csv
+1000,27,64,42.1875,28,43.75,49,76.5625,0,273.109375,/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/r7_rloo_k2_step1000_greedy.csv
+1250,27,64,42.1875,29,45.3125,38,59.375,0,332.265625,/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/r7_rloo_k2_step1250_greedy.csv
+1500,25,64,39.0625,28,43.75,58,90.625,0,192.796875,/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/r7_rloo_k2_step1500_greedy.csv
+1750,15,64,23.4375,17,26.5625,27,42.1875,26,168.234375,/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/r7_rloo_k2_step1750_greedy.csv
+2000,1,64,1.5625,1,1.5625,10,15.625,52,46.859375,/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/r7_rloo_k2_step2000_greedy.csv
+2250,0,64,0.0,0,0.0,2,3.125,62,6.515625,/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/r7_rloo_k2_step2250_greedy.csv
+2500,6,64,9.375,7,10.9375,16,25.0,45,77.015625,/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/r7_rloo_k2_step2500_greedy.csv
+2750,1,64,1.5625,2,3.125,4,6.25,59,14.6875,/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/r7_rloo_k2_step2750_greedy.csv
+3000,1,64,1.5625,2,3.125,4,6.25,60,12.4375,/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/r7_rloo_k2_step3000_greedy.csv
+3250,1,64,1.5625,1,1.5625,2,3.125,60,15.1875,/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/r7_rloo_k2_step3250_greedy.csv
+3364,1,64,1.5625,1,1.5625,5,7.8125,58,24.5,/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/r7_rloo_k2_step3364_greedy.csv

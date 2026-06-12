@@ -1,0 +1,32 @@
+{
+  "os":  "Linux-6.8.0-1015-gcp-x86_64-with-glibc2.35",
+  "python":  "CPython 3.12.13",
+  "startedAt":  "2026-06-11T10:22:56.950168Z",
+  "args":  [
+    "--wandb-run-id",
+    "R7-rloo-k2-det-harvey-full-s0-20260611_102009"
+  ],
+  "program":  "/home/harvey/tpu-2026/scripts/train.py",
+  "codePath":  "scripts/train.py",
+  "codePathLocal":  "train.py",
+  "git":  {
+    "remote":  "https://github.com/barongracias/tpu-2026.git",
+    "commit":  "71aab87dee2d2c78256384d084d063d8b40c9e0c"
+  },
+  "email":  "harveybermingham1@gmail.com",
+  "root":  "/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/wandb",
+  "host":  "t1v-n-6e5e72ce-w-0",
+  "executable":  "/home/harvey/venvs/tunix/bin/python",
+  "cpu_count":  22,
+  "cpu_count_logical":  44,
+  "disk":  {
+    "/":  {
+      "total":  "103865303040",
+      "used":  "25448521728"
+    }
+  },
+  "memory":  {
+    "total":  "185688772608"
+  },
+  "writerId":  "2xmc4t5khueb2t7u8xxuitc8tc14fut4"
+}
