@@ -1,0 +1,1 @@
+STAGE1 exact=30/64 partial=36/64 format=93.75% empty=0/64

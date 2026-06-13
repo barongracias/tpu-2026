@@ -1,0 +1,64 @@
+{
+  "created_utc": "2026-06-09T22:01:17.746597+00:00",
+  "command": "/home/fredlawrence/venvs/tunix/bin/python scripts/mine_hard_examples.py",
+  "config": {
+    "source": "tfds",
+    "split": "train",
+    "run_root": "/home/fredlawrence/tpu-runs/part-i/hard_mining_base_gsm8k_train_20260609_220117",
+    "train_data_dir": "/home/fredlawrence/tpu-runs/part-i/hard_mining_base_gsm8k_train_20260609_220117/data/train",
+    "limit": null,
+    "offset": 0,
+    "training_seed_recorded_only": 0,
+    "mining_seed": 0,
+    "greedy_preset": "greedy",
+    "sample_preset": "standard",
+    "num_samples": 8,
+    "sample_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "generation_configs": {
+      "greedy": {
+        "temperature": null,
+        "top_k": 1,
+        "top_p": null
+      },
+      "standard": {
+        "temperature": 0.7,
+        "top_k": 50,
+        "top_p": 0.95
+      }
+    },
+    "max_prompt_length": 256,
+    "total_generation_steps": 768,
+    "prompt_template_version": "data.TEMPLATE+SYSTEM_PROMPT",
+    "prompt_template": "<start_of_turn>user\n{system_prompt}\n\n{question}<end_of_turn>\n<start_of_turn>model\n",
+    "system_prompt": "You are given a problem. First, think about the problem and provide your reasoning. Place it between <reasoning> and </reasoning>. Then, provide the final answer (i.e., just one numerical value) between <answer> and </answer>."
+  },
+  "git": {
+    "commit": "57c6409add0d81bbdb32ca7f4b3e176b4e044068",
+    "branch": "fred",
+    "dirty": true,
+    "status_short": "M agents/context.md\n M agents/report_notes.md\n M experiments/manifests/experiment_contract.md\n?? scripts/mine_hard_examples.py"
+  },
+  "env_pins": {
+    "MODEL_REVISION": "dcc83ea841ab6100d6b47a070329e1ba4cf78752",
+    "JAX_REF": "3ff6dc40cdb982921de0ef12c0bf8e5c64311a6f",
+    "TUNIX_REF": "683256db1a0919b5cfd46cee52cebc96331494fb",
+    "QWIX_REF": "c2548f06eeca005090329530576623afcd48241c",
+    "FLAX_REF": "5ab9d1463550a7fc7fe13575af55081e68258dd7",
+    "RUN_SEED": "0",
+    "EVAL_SEED": "0",
+    "MINING_SEED": "0",
+    "TRAIN_DATA_DIR": "./data/train"
+  },
+  "model_id": "google/gemma-3-1b-it",
+  "model_revision": "dcc83ea841ab6100d6b47a070329e1ba4cf78752",
+  "probe_model": "base"
+}

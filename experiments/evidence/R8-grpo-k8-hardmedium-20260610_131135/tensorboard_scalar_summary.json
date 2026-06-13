@@ -1,0 +1,302 @@
+[
+  {
+    "count": 54,
+    "first_step": 0,
+    "first_value": 0.0016549145802855492,
+    "last_step": 3392,
+    "last_value": 0.3720789849758148,
+    "max_value": 0.49048060178756714,
+    "min_value": 0.0016549145802855492,
+    "tag": "actor/eval/kl"
+  },
+  {
+    "count": 3452,
+    "first_step": 0,
+    "first_value": -0.0625,
+    "last_step": 3451,
+    "last_value": 6.875,
+    "max_value": 10.0,
+    "min_value": -2.5,
+    "tag": "rewards/train/sum"
+  },
+  {
+    "count": 3452,
+    "first_step": 0,
+    "first_value": -0.015625,
+    "last_step": 3451,
+    "last_value": 1.71875,
+    "max_value": 2.5,
+    "min_value": -0.625,
+    "tag": "rewards/train/mean"
+  },
+  {
+    "count": 3452,
+    "first_step": 0,
+    "first_value": -1.5,
+    "last_step": 3451,
+    "last_value": -1.0,
+    "max_value": 1.5,
+    "min_value": -2.5,
+    "tag": "rewards/train/min"
+  },
+  {
+    "count": 3452,
+    "first_step": 0,
+    "first_value": 1.5,
+    "last_step": 3451,
+    "last_value": 3.0,
+    "max_value": 3.0,
+    "min_value": 0.0,
+    "tag": "rewards/train/max"
+  },
+  {
+    "count": 3452,
+    "first_step": 0,
+    "first_value": 0.0,
+    "last_step": 3451,
+    "last_value": 3.0,
+    "max_value": 3.0,
+    "min_value": 0.0,
+    "tag": "rewards/train/match_format_exactly"
+  },
+  {
+    "count": 3452,
+    "first_step": 0,
+    "first_value": -0.625,
+    "last_step": 3451,
+    "last_value": 2.5,
+    "max_value": 2.5,
+    "min_value": -2.5,
+    "tag": "rewards/train/match_format_approximately"
+  },
+  {
+    "count": 3452,
+    "first_step": 0,
+    "first_value": 0.0,
+    "last_step": 3451,
+    "last_value": 0.8125,
+    "max_value": 3.0,
+    "min_value": -1.0,
+    "tag": "rewards/train/check_answer"
+  },
+  {
+    "count": 3452,
+    "first_step": 0,
+    "first_value": 0.5625,
+    "last_step": 3451,
+    "last_value": 0.5625,
+    "max_value": 1.5,
+    "min_value": 0.0,
+    "tag": "rewards/train/check_numbers"
+  },
+  {
+    "count": 3452,
+    "first_step": 0,
+    "first_value": -0.0625,
+    "last_step": 3451,
+    "last_value": 6.875,
+    "max_value": 10.0,
+    "min_value": -2.5,
+    "tag": "rewards/train/score/mean"
+  },
+  {
+    "count": 3452,
+    "first_step": 0,
+    "first_value": 1.0,
+    "last_step": 3451,
+    "last_value": 10.0,
+    "max_value": 10.0,
+    "min_value": -2.5,
+    "tag": "rewards/train/score/max"
+  },
+  {
+    "count": 3452,
+    "first_step": 0,
+    "first_value": -1.5,
+    "last_step": 3451,
+    "last_value": 4.5,
+    "max_value": 10.0,
+    "min_value": -2.5,
+    "tag": "rewards/train/score/min"
+  },
+  {
+    "count": 3452,
+    "first_step": 0,
+    "first_value": 159.625,
+    "last_step": 3451,
+    "last_value": 252.75,
+    "max_value": 768.0,
+    "min_value": 73.0,
+    "tag": "completions/train/mean_length"
+  },
+  {
+    "count": 3452,
+    "first_step": 0,
+    "first_value": 241.0,
+    "last_step": 3451,
+    "last_value": 357.0,
+    "max_value": 768.0,
+    "min_value": 95.0,
+    "tag": "completions/train/max_length"
+  },
+  {
+    "count": 3452,
+    "first_step": 0,
+    "first_value": 62.0,
+    "last_step": 3451,
+    "last_value": 191.0,
+    "max_value": 768.0,
+    "min_value": 10.0,
+    "tag": "completions/train/min_length"
+  },
+  {
+    "count": 54,
+    "first_step": 0,
+    "first_value": -0.19921875,
+    "last_step": 3392,
+    "last_value": 6.153076171875,
+    "max_value": 6.402425289154053,
+    "min_value": -0.19921875,
+    "tag": "rewards/eval/sum"
+  },
+  {
+    "count": 54,
+    "first_step": 0,
+    "first_value": -0.0498046875,
+    "last_step": 3392,
+    "last_value": 1.53826904296875,
+    "max_value": 1.6006063222885132,
+    "min_value": -0.0498046875,
+    "tag": "rewards/eval/mean"
+  },
+  {
+    "count": 54,
+    "first_step": 0,
+    "first_value": -2.5,
+    "last_step": 3392,
+    "last_value": -1.0,
+    "max_value": -1.0,
+    "min_value": -2.5,
+    "tag": "rewards/eval/min"
+  },
+  {
+    "count": 54,
+    "first_step": 0,
+    "first_value": 3.0,
+    "last_step": 3392,
+    "last_value": 3.0,
+    "max_value": 3.0,
+    "min_value": 3.0,
+    "tag": "rewards/eval/max"
+  },
+  {
+    "count": 54,
+    "first_step": 0,
+    "first_value": 0.2119140625,
+    "last_step": 3392,
+    "last_value": 2.826171875,
+    "max_value": 2.880859375,
+    "min_value": 0.2119140625,
+    "tag": "rewards/eval/match_format_exactly"
+  },
+  {
+    "count": 54,
+    "first_step": 0,
+    "first_value": -0.7024739384651184,
+    "last_step": 3392,
+    "last_value": 2.3333332538604736,
+    "max_value": 2.3876953125,
+    "min_value": -0.7024739384651184,
+    "tag": "rewards/eval/match_format_approximately"
+  },
+  {
+    "count": 54,
+    "first_step": 0,
+    "first_value": -0.02067057229578495,
+    "last_step": 3392,
+    "last_value": 0.5087077021598816,
+    "max_value": 0.72607421875,
+    "min_value": -0.02067057229578495,
+    "tag": "rewards/eval/check_answer"
+  },
+  {
+    "count": 54,
+    "first_step": 0,
+    "first_value": 0.31201171875,
+    "last_step": 3392,
+    "last_value": 0.48486328125,
+    "max_value": 0.56494140625,
+    "min_value": 0.310546875,
+    "tag": "rewards/eval/check_numbers"
+  },
+  {
+    "count": 54,
+    "first_step": 0,
+    "first_value": -0.19921875,
+    "last_step": 3392,
+    "last_value": 6.153076171875,
+    "max_value": 6.402425289154053,
+    "min_value": -0.19921875,
+    "tag": "rewards/eval/score/mean"
+  },
+  {
+    "count": 54,
+    "first_step": 0,
+    "first_value": 10.0,
+    "last_step": 3392,
+    "last_value": 10.0,
+    "max_value": 10.0,
+    "min_value": 10.0,
+    "tag": "rewards/eval/score/max"
+  },
+  {
+    "count": 54,
+    "first_step": 0,
+    "first_value": -2.5,
+    "last_step": 3392,
+    "last_value": -0.5,
+    "max_value": -0.5,
+    "min_value": -2.5,
+    "tag": "rewards/eval/score/min"
+  },
+  {
+    "count": 54,
+    "first_step": 0,
+    "first_value": 267.0872497558594,
+    "last_step": 3392,
+    "last_value": 348.8388671875,
+    "max_value": 371.7601013183594,
+    "min_value": 261.1695861816406,
+    "tag": "completions/eval/mean_length"
+  },
+  {
+    "count": 54,
+    "first_step": 0,
+    "first_value": 768.0,
+    "last_step": 3392,
+    "last_value": 768.0,
+    "max_value": 768.0,
+    "min_value": 768.0,
+    "tag": "completions/eval/max_length"
+  },
+  {
+    "count": 54,
+    "first_step": 0,
+    "first_value": 14.0,
+    "last_step": 3392,
+    "last_value": 87.0,
+    "max_value": 99.0,
+    "min_value": 4.0,
+    "tag": "completions/eval/min_length"
+  },
+  {
+    "count": 3452,
+    "first_step": 1,
+    "first_value": -0.0021918467245996,
+    "last_step": 3452,
+    "last_value": 0.3962831497192383,
+    "max_value": 0.8004744648933411,
+    "min_value": -0.006008852273225784,
+    "tag": "actor/train/kl"
+  }
+]
