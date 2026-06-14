@@ -1,0 +1,25 @@
+MISSING step=100
+step=200
+  rows=64
+  correct=26/64 acc=40.62%
+  partial=28/64 partial_acc=43.75%
+  format=55/64 format_acc=85.94%
+  empty=0/64
+step=300
+  rows=64
+  correct=32/64 acc=50.00%
+  partial=34/64 partial_acc=53.12%
+  format=51/64 format_acc=79.69%
+  empty=0/64
+step=400
+  rows=64
+  correct=29/64 acc=45.31%
+  partial=29/64 partial_acc=45.31%
+  format=55/64 format_acc=85.94%
+  empty=0/64
+step=500
+  rows=64
+  correct=34/64 acc=53.12%
+  partial=35/64 partial_acc=54.69%
+  format=54/64 format_acc=84.38%
+  empty=0/64

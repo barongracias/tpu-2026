@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-06-08T23:08:40.142902Z",
+  "tpu2026_commit": "99cb7f88b0e49a7d65bb0c5274734a190833aa3f",
+  "repo_root": "/home/ext_barongracias_gmail_com/tpu-2026",
+  "launch_cwd": "/home/ext_barongracias_gmail_com/tpu-2026",
+  "wandb_run_id": "R3-rloo-full-s0-20260608_230810",
+  "advantage_estimator": "rloo",
+  "run_seed": 0,
+  "max_steps": 3364,
+  "lr_decay_steps": 3364,
+  "save_interval_steps": 500,
+  "data_source": "tfds",
+  "train_data_dir": "/home/ext_barongracias_gmail_com/tpu-runs/part-i/R3-rloo-full-s0-20260608_230810/data/train",
+  "test_data_dir": "/home/ext_barongracias_gmail_com/tpu-runs/part-i/R3-rloo-full-s0-20260608_230810/data/test",
+  "ckpt_dir": "/home/ext_barongracias_gmail_com/tpu-runs/part-i/R3-rloo-full-s0-20260608_230810/ckpts",
+  "intermediate_ckpt_dir": "/home/ext_barongracias_gmail_com/tpu-runs/part-i/R3-rloo-full-s0-20260608_230810/intermediate_ckpt",
+  "tensorboard_dir": "/home/ext_barongracias_gmail_com/tpu-runs/part-i/R3-rloo-full-s0-20260608_230810/tensorboard",
+  "wandb_project": "agentic-ai-coursework",
+  "wandb_entity": "barongracias-university-of-cambridge"
+}

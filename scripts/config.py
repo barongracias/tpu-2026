@@ -56,6 +56,12 @@ BETA = 0.08                # KL penalty coefficient (anchors to reference model)
 EPSILON = 0.2              # PPO-style clip range
 ADV_ESTIMATOR = os.environ.get("ADV_ESTIMATOR", "grpo")  # grpo | rloo | drgrpo
 
+# ====== Reward weights ======
+# Defaults preserve the original unweighted reward sum.
+REWARD_FORMAT_WEIGHT = float(os.environ.get("REWARD_FORMAT_WEIGHT", "1.0"))
+REWARD_ANSWER_WEIGHT = float(os.environ.get("REWARD_ANSWER_WEIGHT", "1.0"))
+REWARD_NUMBER_WEIGHT = float(os.environ.get("REWARD_NUMBER_WEIGHT", "1.0"))
+
 # ====== Reproducibility ======
 RUN_SEED = int(os.environ.get("RUN_SEED", "0"))
 EVAL_SEED = int(os.environ.get("EVAL_SEED", "0"))

@@ -19,6 +19,7 @@ from comparing siblings drawn from the same prompt.
 """
 import re
 
+from config import REWARD_ANSWER_WEIGHT, REWARD_FORMAT_WEIGHT, REWARD_NUMBER_WEIGHT
 from data import reasoning_start, reasoning_end, solution_start, solution_end
 
 
@@ -39,7 +40,7 @@ match_numbers = re.compile(
 def match_format_exactly(prompts, completions, **kwargs):
     """+3 if the whole template parses, 0 otherwise."""
     return [
-        0 if match_format.search(r) is None else 3.0
+        REWARD_FORMAT_WEIGHT * (0 if match_format.search(r) is None else 3.0)
         for r in completions
     ]
 
@@ -54,7 +55,7 @@ def match_format_approximately(prompts, completions, **kwargs):
         s += 0.5 if response.count(reasoning_end) == 1 else -0.5
         s += 0.5 if response.count(solution_start) == 1 else -0.5
         s += 0.5 if response.count(solution_end) == 1 else -0.5
-        scores.append(s)
+        scores.append(REWARD_FORMAT_WEIGHT * s)
     return scores
 
 
@@ -72,20 +73,20 @@ def check_answer(prompts, completions, answer, **kwargs):
             scores.append(0)
             continue
         if guess == true:
-            scores.append(3.0)
+            scores.append(REWARD_ANSWER_WEIGHT * 3.0)
         elif guess.strip() == true.strip():
-            scores.append(1.5)
+            scores.append(REWARD_ANSWER_WEIGHT * 1.5)
         else:
             try:
                 ratio = float(guess) / float(true)
                 if 0.9 <= ratio <= 1.1:
-                    scores.append(0.5)
+                    scores.append(REWARD_ANSWER_WEIGHT * 0.5)
                 elif 0.8 <= ratio <= 1.2:
-                    scores.append(0.25)
+                    scores.append(REWARD_ANSWER_WEIGHT * 0.25)
                 else:
-                    scores.append(-1.0)
+                    scores.append(REWARD_ANSWER_WEIGHT * -1.0)
             except Exception:
-                scores.append(-0.5)
+                scores.append(REWARD_ANSWER_WEIGHT * -0.5)
     return scores
 
 
@@ -110,7 +111,8 @@ def check_numbers(prompts, completions, answer, **kwargs):
             scores.append(0)
             continue
         try:
-            scores.append(1.5 if float(guess.strip()) == float(true.strip()) else 0.0)
+            score = 1.5 if float(guess.strip()) == float(true.strip()) else 0.0
+            scores.append(REWARD_NUMBER_WEIGHT * score)
         except Exception:
             scores.append(0)
     return scores

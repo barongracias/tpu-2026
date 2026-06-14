@@ -1,0 +1,42 @@
+step 500
+  rows=64
+  correct=34/64 acc=53.12%
+  partial=35/64 partial_acc=54.69%
+  format=54/64 format_acc=84.38%
+  empty=0/64
+step 1000
+  rows=64
+  correct=32/64 acc=50.00%
+  partial=34/64 partial_acc=53.12%
+  format=60/64 format_acc=93.75%
+  empty=0/64
+step 1500
+  rows=64
+  correct=29/64 acc=45.31%
+  partial=31/64 partial_acc=48.44%
+  format=57/64 format_acc=89.06%
+  empty=0/64
+step 2000
+  rows=64
+  correct=31/64 acc=48.44%
+  partial=33/64 partial_acc=51.56%
+  format=57/64 format_acc=89.06%
+  empty=0/64
+step 2500
+  rows=64
+  correct=33/64 acc=51.56%
+  partial=34/64 partial_acc=53.12%
+  format=58/64 format_acc=90.62%
+  empty=0/64
+step 3000
+  rows=64
+  correct=31/64 acc=48.44%
+  partial=32/64 partial_acc=50.00%
+  format=56/64 format_acc=87.50%
+  empty=0/64
+step 3364
+  rows=64
+  correct=32/64 acc=50.00%
+  partial=33/64 partial_acc=51.56%
+  format=56/64 format_acc=87.50%
+  empty=0/64
