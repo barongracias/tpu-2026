@@ -21,3 +21,26 @@ Best retained checkpoint by exact accuracy: step 2000 (35/64, 54.69%)
 | 3000 | 28/64 (43.75%) | 29/64 (45.31%) | 53/64 (82.81%) | 0/64 |
 | 3250 | 27/64 (42.19%) | 28/64 (43.75%) | 54/64 (84.38%) | 0/64 |
 | 3364 | 26/64 (40.62%) | 29/64 (45.31%) | 54/64 (84.38%) | 0/64 |
+
+## Full-test confirmation - 2026-06-14
+
+Full GSM8K test manifest:
+
+- `experiments/manifests/gsm8k_test_seed0_full.jsonl`
+- SHA-256: `07f0f0fc10580dee941b6f921a3986854a8b0b74529d9bb952662d5daaea6bb2`
+- Rows: `1,319`
+
+Completed full evals:
+
+| Model / checkpoint | Exact | Partial | Format | Empty |
+|---|---:|---:|---:|---:|
+| Base greedy | 625/1319 (47.38%) | 659/1319 (49.96%) | 53/1319 (4.02%) | 0/1319 |
+| R7 RLOO K=8 step 2000 | 722/1319 (54.74%) | 764/1319 (57.92%) | 1242/1319 (94.16%) | 0/1319 |
+
+Paired bootstrap over the 1,319 shared prompts used `10000` resamples and seed
+`12345`. Step `2000` beats base by `+7.35` percentage points exact accuracy with
+95% CI `[+4.62 pp, +10.16 pp]`.
+
+Step `3364` was not full-evaluated in this pass. Use the retained-checkpoint
+64-prompt table above for final-checkpoint screening only until a full final eval
+is run.
