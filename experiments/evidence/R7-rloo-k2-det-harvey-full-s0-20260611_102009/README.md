@@ -11,5 +11,12 @@ Contents:
 - `metadata/`: `run_metadata.json`, `launch_train.sh`, W&B metadata, and W&B summary.
 - `manifests/gsm8k_test_seed0_n64.jsonl`: shared held-out eval manifest.
 
-Known gap:
-- Base `--no-restore` eval CSV was not present on this VM during the 2026-06-12 collation pass.
+Full-test update, 2026-06-14:
+- `eval/base_full.csv`: base model greedy eval on the full 1,319-row GSM8K test manifest.
+- `eval/r7_rloo_k2_step500_full.csv`: best retained R7 K=2 checkpoint from the n=64 sweep, evaluated on the full test manifest.
+- `eval/r7_rloo_k2_step3364_full.csv`: final R7 K=2 checkpoint, evaluated on the full test manifest.
+- `eval/r7_rloo_k2_full_ci.csv` and `.json`: paired/bootstrap confidence intervals over the full-test CSVs.
+
+Full manifest:
+- `../../manifests/gsm8k_test_seed0_full.jsonl`
+- SHA-256: `07f0f0fc10580dee941b6f921a3986854a8b0b74529d9bb952662d5daaea6bb2`
