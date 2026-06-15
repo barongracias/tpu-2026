@@ -107,7 +107,7 @@ Validation:
 
 ## Milestone 5: Full Controlled Runs
 
-Status: R5 GRPO K=8 seed 0 training and retained-checkpoint eval complete; R4/R2 and any new run remain blocked pending review.
+Status: R5 GRPO K=8 seed 0 training and retained-checkpoint eval complete. R6 RLOO K=8 and chained RLOO K=2 training also completed, but eval is pending; do not treat R6 as performance evidence until retained-checkpoint evals are recorded.
 
 Goal:
 - Execute the locked GRPO vs RLOO comparison with fixed data, seed controls, and compute budget.
@@ -392,3 +392,78 @@ Decision:
 - Best R5 checkpoint is step 3250 at `35/64` exact, slightly above D4 step 500 (`34/64`) and base (`31/64`).
 - R5 final is `32/64`, so checkpoint selection remains important.
 - Do not launch R4/R2 or any new run until local review. Next report work should compute confidence intervals/paired comparisons and inspect W&B/TensorBoard curves for R5.
+
+## Milestone 5.13: R6 RLOO K-Sweep Full Runs
+
+Status: training complete; retained-checkpoint eval pending.
+
+Run pair:
+| Run | Estimator | K / `NUM_GENERATIONS` | Start UTC | Finish UTC | Status |
+| --- | --- | ---: | --- | --- | --- |
+| `R6-rloo-k8-full-s0-20260609_212314` | `rloo` | 8 | 2026-06-09 ~21:57 | 2026-06-10 ~05:37 | complete |
+| `R6-rloo-k2-full-s0-20260609_220042` | `rloo` | 2 | 2026-06-10 05:37:42 | 2026-06-10 ~07:41 | complete |
+
+Common config:
+- `RUN_SEED=0`, `MAX_STEPS=3364`, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, `MAX_STEPS_OVERRIDE` unset.
+- Both runs used persistent run-local artifact directories under `/home/harvey/tpu-runs/part-i`, not `/tmp`.
+- Final actor checkpoint exists for both at `ckpts/actor/3364`; retained checkpoints also exist at step `1` and every `250` steps from `250` through `3250`.
+
+Evidence:
+- K=8 root: `/home/harvey/tpu-runs/part-i/R6-rloo-k8-full-s0-20260609_212314`
+- K=2 root: `/home/harvey/tpu-runs/part-i/R6-rloo-k2-full-s0-20260609_220042`
+- K=8 W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R6-rloo-k8-full-s0-20260609_212314`
+- K=2 W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R6-rloo-k2-full-s0-20260609_220042`
+- Detailed note: `experiments/variants/r6_rloo_k_sweep_full_s0_20260609.md`
+
+Caveats:
+- No post-training greedy eval CSVs or eval summaries were found for either R6 run at note time.
+- No `run_metadata.json` was found in either R6 checkpoint root at note time; use train logs and shell history/notes for runtime config until metadata is regenerated or backfilled.
+- W&B step-order warnings persisted near final step `3364`, as in earlier runs.
+
+Next step:
+- Run matching retained-checkpoint evals for RLOO K=8 and K=2 before comparing to R5 GRPO K=8, R3 RLOO K=2, or base.
+
+## Milestone 5.14: R7 Deterministic RLOO K-Sweep Rerun
+
+Status: K=2 is running on the separate Harvey VM; K=8 is running on this shared Boris VM.
+
+Purpose:
+- Repeat the R6 RLOO K comparison on deterministic branch `harvey-grpo-k8-rerun`, because R6 was launched from non-deterministic branch `harvey`.
+
+Branch gate:
+- Current deterministic branch for R7: `harvey-grpo-k8-rerun`.
+- K=2 launch commit on Harvey VM: `71aab87dee2d2c78256384d084d063d8b40c9e0c`.
+- K=8 launch commit on shared Boris VM: `e3d69a1938fe8e8a2a67a3c84a03331133ed46f1`.
+- Verified `deterministic-platform` is an ancestor and `harvey` is not an ancestor before the K=8 launch.
+
+Harvey VM: RLOO K=2
+- Run id: `R7-rloo-k2-det-harvey-full-s0-20260611_102009`.
+- Run root: `/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009`.
+- W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R7-rloo-k2-det-harvey-full-s0-20260611_102009`.
+- Tmux attach: `tmux attach -t r7-rloo-k2-det-harvey-full-s0`.
+- Log tail: `tail -f /home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/logs/train.log`.
+- Config confirmed in log: `ADV_ESTIMATOR=rloo`, `NUM_GENERATIONS=2`, `MAX_STEPS=3364`, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, `MODEL_REVISION=dcc83ea841ab6100d6b47a070329e1ba4cf78752`.
+- Metadata file exists: `ckpts/run_metadata.json`.
+
+Shared Boris VM: RLOO K=8
+- Run id: `R7-rloo-k8-det-harvey-full-s0-20260611_105132`.
+- Run root: `/home/ext_harveybermingham1_gmail_com/tpu-runs/part-i/R7-rloo-k8-det-harvey-full-s0-20260611_105132`.
+- W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R7-rloo-k8-det-harvey-full-s0-20260611_105132`.
+- Tmux attach: `tmux attach -t r7-rloo-k8-det-harvey-full-s0`.
+- Log tail: `tail -f /home/ext_harveybermingham1_gmail_com/tpu-runs/part-i/R7-rloo-k8-det-harvey-full-s0-20260611_105132/logs/train.log`.
+- Config confirmed in log: `ADV_ESTIMATOR=rloo`, `NUM_GENERATIONS=8`, `MAX_STEPS=3364`, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, `MODEL_REVISION=dcc83ea841ab6100d6b47a070329e1ba4cf78752`.
+- `RUN_SEED=0`, `EVAL_SEED=0`, and `MAX_STEPS_OVERRIDE` was unset at launch.
+- Metadata file exists: `ckpts/run_metadata.json`; W&B is syncing.
+- Artifact dirs are under the run root, including `tmp` and `wandb`; no required artifacts should be left only in `/tmp`.
+
+Failed K=2 setup attempts on Harvey VM:
+- `R7-rloo-k2-det-harvey-full-s0-20260611_101430`: failed on stale `/tmp/libtpu_lockfile` held by a hung diagnostic JAX probe.
+- `R7-rloo-k2-det-harvey-full-s0-20260611_101739`: failed at W&B init because tmux did not inherit intended run env.
+- Successful K=2 run used run-local launcher `/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/launch_train.sh`.
+
+Next:
+- Monitor both R7 runs through completion and confirm final `ckpts/actor/3364` for each.
+- Keep K=2 and K=8 notes separate using their exact run IDs in filenames.
+- After both deterministic runs complete, run retained-checkpoint evals using the shared eval manifest before comparing K=8 vs K=2.
+- Collate lightweight eval evidence on one collector VM under `$HOME/tpu-runs/part-i/report_diagnostics/r7_rloo_k_sweep_det_20260611/{k2,k8}/`: copy `eval/*_greedy.csv`, eval summaries, eval logs, `train.log`, `ckpts/run_metadata.json`, and the shared eval manifest. Leave the large `ckpts/actor/` trees in the original run roots unless eval must be rerun.
+- Do not update shared rollup files until both exact run IDs and W&B URLs are available and both runs finish.

@@ -16,3 +16,7 @@ Current pre-TPU planning files:
 - `manifests/plotting_and_evidence_plan.md`: source data, figures, tables, and confidence interval plan.
 - `runbooks/tpu_day1_runbook.md`: first TPU session setup, debug, evaluation, and stop/go gates.
 - `templates/iteration_log_template.md`: per-run record template.
+
+Recent run records:
+
+- `variants/r6_rloo_k_sweep_full_s0_20260609.md`: side-by-side record for the completed RLOO K=8 and chained RLOO K=2 full training runs; evaluation pending.

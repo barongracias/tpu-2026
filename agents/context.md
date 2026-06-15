@@ -4,16 +4,18 @@ This fork is the Part I practical training/evaluation codebase for the Multi-Age
 
 ## Current Status
 
-- Branch: `coursework`.
-- Upstream baseline: `324abbe4b4e229ea812223856393547db4fbb53e`.
-- Current pulled head: `820fad6` on `coursework` / `origin/coursework`.
-- Branch is aligned with `origin/coursework`.
+- Active local branch for the current R7 work: `harvey-grpo-k8-rerun`.
+- Active local commit for the current K=8 launch: `e3d69a1938fe8e8a2a67a3c84a03331133ed46f1` plus local documentation edits.
+- This branch is based on deterministic-platform commit `57c6409add0d81bbdb32ca7f4b3e176b4e044068`; `harvey` is not an ancestor.
+- Historical coursework baseline: `324abbe4b4e229ea812223856393547db4fbb53e`; earlier R5 notes refer to `coursework` / `origin/coursework` at `820fad6`.
 - Local run notes, diagnostics, runbooks, and manifests are now recorded under `experiments/`; read `experiments/README.md` for the map before searching TPU-side logs.
 - Only baseline-owned files were touched in the 8 commits: `bootstrap.sh`, `scripts/config.py`, `scripts/data.py`, `scripts/train.py`, and `scripts/evaluate.py`.
 - No Tunix source files were edited.
 - D1 GRPO 50-step debug completed successfully: step 50 reached, actor checkpoint restored, TensorBoard/W&B emitted evidence, and greedy eval CSV was written.
 - D2 RLOO 50-step debug completed successfully: step 50 reached, actor checkpoint restored, TensorBoard/W&B emitted evidence, and greedy eval CSV was written.
-- R5 GRPO K=8 seed 0 full training and retained-checkpoint eval completed; do not start R4/R2 or any new run until Baron/local Codex reviews R5.
+- R5 GRPO K=8 seed 0 full training and retained-checkpoint eval completed.
+- R6 RLOO K-sweep training completed on 2026-06-10: K=8 then chained K=2, both seed 0, both full 3364 steps. Eval is pending; do not treat these as performance results until retained-checkpoint eval CSVs exist. These R6 runs were launched from non-deterministic branch `harvey` at commit `8a0f7f266552cb2666710ac589cb6bda5cd40121`, not from deterministic-platform.
+- R7 deterministic rerun is now split across TPUs: the separate Harvey VM is running RLOO K=2 from deterministic branch `harvey-grpo-k8-rerun` at commit `71aab87dee2d2c78256384d084d063d8b40c9e0c`; this shared Boris VM is running the matching RLOO K=8 job from `harvey-grpo-k8-rerun` at commit `e3d69a1938fe8e8a2a67a3c84a03331133ed46f1`.
 
 ## What Was Implemented
 
@@ -42,6 +44,9 @@ Target matrix:
 | R3 | rloo | 0 | Full controlled variant. |
 | R4 | rloo | 1 | Second-seed variant if TPU time permits. |
 | R2 | grpo | 1 | Second-seed baseline if TPU time permits. |
+| R5 | grpo | 0 | complete: full K=8 training and retained-checkpoint eval finished. |
+| R6 K=8 | rloo | 0 | complete: full K=8 training finished; eval pending. |
+| R6 K=2 | rloo | 0 | complete: chained full K=2 training finished; eval pending. |
 
 R1 completed training:
 - Session: `r1-grpo-full-s0` exited after training completion
@@ -307,3 +312,111 @@ Comparison:
 Recommendation:
 - R5 is the strongest completed trained result so far and is report-useful as the K=8 GRPO variant.
 - Do not start R4/R2 or another full run yet. Local Codex should review R5 CSVs/W&B curves, then decide whether to report R5 best-checkpoint selection, run bootstrap CIs, or change reward controls.
+
+## 2026-06-10: R6 RLOO K-sweep full seed 0 training completed
+
+Run pair:
+| Run | Estimator | K | Start UTC | Finish UTC | Status |
+| --- | --- | ---: | --- | --- | --- |
+| `R6-rloo-k8-full-s0-20260609_212314` | `rloo` | 8 | 2026-06-09 ~21:57 | 2026-06-10 ~05:37 | training complete |
+| `R6-rloo-k2-full-s0-20260609_220042` | `rloo` | 2 | 2026-06-10 05:37:42 | 2026-06-10 ~07:41 | training complete |
+
+Common config:
+- `RUN_SEED=0`, `MAX_STEPS=3364`, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, `MAX_STEPS_OVERRIDE` unset.
+- Both runs used persistent run-local paths under `/home/harvey/tpu-runs/part-i`, not `/tmp`.
+- Launch branch was `harvey` based on the pre-launch `git branch --show-current` check. W&B metadata for both R6 runs records git commit `8a0f7f266552cb2666710ac589cb6bda5cd40121`, which is `harvey` / `origin/harvey`, not deterministic-platform. Git reflog shows the checkout to `harvey-grpo-k8-rerun` happened later, at 2026-06-10 10:19 UTC, after both runs had finished. The R6 launch commit lacks deterministic-platform controls such as required `MODEL_REVISION`, eval manifest/seed wiring, pinned dependency refs, and `run_metadata.json`; no `run_metadata.json` was found in either R6 checkpoint root.
+
+Evidence:
+- K=8 root: `/home/harvey/tpu-runs/part-i/R6-rloo-k8-full-s0-20260609_212314`
+- K=2 root: `/home/harvey/tpu-runs/part-i/R6-rloo-k2-full-s0-20260609_220042`
+- K=8 W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R6-rloo-k8-full-s0-20260609_212314`
+- K=2 W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R6-rloo-k2-full-s0-20260609_220042`
+- Both final checkpoints exist at `ckpts/actor/3364`; retained checkpoints also exist every 250 steps from 250 through 3250 plus step 1.
+- TensorBoard event files exist in each run root's `tensorboard/`.
+- Local W&B artifacts are copied/stored under each run root's `wandb/`.
+- Detailed paired note: `experiments/variants/r6_rloo_k_sweep_full_s0_20260609.md`.
+
+Caveat and next step:
+- These are training-complete runs, not evaluated performance results. No post-training greedy eval CSVs or eval summaries were found for either run at note time.
+- Next step is retained-checkpoint eval for both RLOO K=8 and K=2 using the same eval manifest/seed as R5-style comparisons.
+
+## 2026-06-11: R7 deterministic RLOO rerun split across TPUs
+
+Purpose:
+- Rerun the R6 RLOO K comparison on the deterministic platform branch lineage after discovering the R6 pair was launched from non-deterministic `harvey`.
+- The R7 K-sweep is intentionally split across two TPUs/VMs so the runs do not clash.
+- Harvey VM: running the RLOO K=2 deterministic full run recorded below.
+- Shared Boris VM: running the matching RLOO K=8 deterministic full run recorded below.
+
+Branch and deterministic checks:
+- Branch: `harvey-grpo-k8-rerun`.
+- K=2 launch commit on Harvey VM: `71aab87dee2d2c78256384d084d063d8b40c9e0c`.
+- K=8 launch commit on shared Boris VM: `e3d69a1938fe8e8a2a67a3c84a03331133ed46f1`.
+- Verified `deterministic-platform` is an ancestor and `harvey` is not an ancestor before the K=8 launch.
+- Verified deterministic wiring exists for `MODEL_REVISION`, dependency refs, `EVAL_SEED`, `EVAL_MANIFEST`, `ADV_ESTIMATOR`, `NUM_GENERATIONS`, and `ckpts/run_metadata.json`.
+
+K=2 run on separate Harvey VM:
+- Run id: `R7-rloo-k2-det-harvey-full-s0-20260611_102009`.
+- Tmux session: `r7-rloo-k2-det-harvey-full-s0`.
+- Run root: `/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009`.
+- W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R7-rloo-k2-det-harvey-full-s0-20260611_102009`.
+- Attach: `tmux attach -t r7-rloo-k2-det-harvey-full-s0`.
+- Tail: `tail -f /home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/logs/train.log`.
+- Config confirmed in log: `ADV_ESTIMATOR=rloo`, `NUM_GENERATIONS=2`, `MAX_STEPS=3364`, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, and `MODEL_REVISION=dcc83ea841ab6100d6b47a070329e1ba4cf78752`.
+- `RUN_SEED=0`, `EVAL_SEED=0`, and `MAX_STEPS_OVERRIDE` was unset.
+- `ckpts/run_metadata.json` exists and records the deterministic metadata.
+- Run-local launcher: `/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/launch_train.sh`. This was used because the existing tmux server did not inherit newly supplied run env vars.
+
+Failed K=2 setup attempts left in place:
+- `/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_101430`: failed before config print because a hung diagnostic JAX process held `/tmp/libtpu_lockfile`; the process was stopped and the stale lockfile removed.
+- `/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_101739`: failed at W&B init with `permission denied` because launching through the existing tmux server lost the intended `WANDB_RUN_ID`/`WANDB_DIR` env. The successful retry used a run-local launcher with explicit exports inside the tmux command.
+- These failed roots were intentionally not deleted.
+
+K=8 run on this shared Boris VM:
+- Run id: `R7-rloo-k8-det-harvey-full-s0-20260611_105132`.
+- Tmux session: `r7-rloo-k8-det-harvey-full-s0`.
+- Run root: `/home/ext_harveybermingham1_gmail_com/tpu-runs/part-i/R7-rloo-k8-det-harvey-full-s0-20260611_105132`.
+- W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R7-rloo-k8-det-harvey-full-s0-20260611_105132`.
+- Attach: `tmux attach -t r7-rloo-k8-det-harvey-full-s0`.
+- Tail: `tail -f /home/ext_harveybermingham1_gmail_com/tpu-runs/part-i/R7-rloo-k8-det-harvey-full-s0-20260611_105132/logs/train.log`.
+- Config confirmed in log: `ADV_ESTIMATOR=rloo`, `NUM_GENERATIONS=8`, `MAX_STEPS=3364`, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, and `MODEL_REVISION=dcc83ea841ab6100d6b47a070329e1ba4cf78752`.
+- `RUN_SEED=0`, `EVAL_SEED=0`, and `MAX_STEPS_OVERRIDE` was unset at launch.
+- `ckpts/run_metadata.json` exists under the K=8 run root and W&B is syncing.
+- Artifact dirs were set under the K=8 run root: `ckpts`, `intermediate_ckpt`, `tensorboard`, `data/train`, `data/test`, `wandb`, and `tmp`; no required artifact is intended to live only in `/tmp`.
+- Use the exact K=8 run id in any future K=8 note filename. Do not overwrite the K=2 note from the Harvey VM, and do not update shared rollups until both current R7 runs finish.
+
+R7 post-run lightweight eval collation:
+- The two R7 run roots live on different VMs, so raw checkpoints will not automatically be in one physical folder. Keep the large checkpoint trees in their original `$RUN_ROOT`s.
+- Choose one collector VM after both runs finish, then store only lightweight comparison evidence under:
+  `/home/<user>/tpu-runs/part-i/report_diagnostics/r7_rloo_k_sweep_det_20260611/`
+- Required shared eval manifest: `$HOME/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl`. If one VM creates this manifest first, copy the exact JSONL to the other VM before eval so K=2 and K=8 CSV rows are prompt-aligned.
+- Recommended collector layout:
+
+```bash
+PAIR_ROOT="$HOME/tpu-runs/part-i/report_diagnostics/r7_rloo_k_sweep_det_20260611"
+mkdir -p "$PAIR_ROOT"/{k2,k8,manifests}
+cp "$HOME/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl" "$PAIR_ROOT/manifests/"
+```
+
+- For each run, copy only these lightweight files into the matching `k2/` or `k8/` folder: `eval/*_greedy.csv`, `eval/*summary*.txt`, `logs/eval_*.log`, `logs/train.log`, and `ckpts/run_metadata.json`. Do not copy `ckpts/actor/` unless eval must be rerun on the collector VM.
+- Example on the collector VM after the relevant files have been transferred from the other VM:
+
+```bash
+K2_ROOT="/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009"
+K8_ROOT="/home/ext_harveybermingham1_gmail_com/tpu-runs/part-i/R7-rloo-k8-det-harvey-full-s0-20260611_105132"
+PAIR_ROOT="$HOME/tpu-runs/part-i/report_diagnostics/r7_rloo_k_sweep_det_20260611"
+
+mkdir -p "$PAIR_ROOT"/{k2,k8}/{eval,logs,metadata}
+cp "$K2_ROOT"/eval/*_greedy.csv "$PAIR_ROOT/k2/eval/"
+cp "$K2_ROOT"/eval/*summary*.txt "$PAIR_ROOT/k2/eval/" 2>/dev/null || true
+cp "$K2_ROOT"/logs/eval_*.log "$PAIR_ROOT/k2/logs/" 2>/dev/null || true
+cp "$K2_ROOT"/logs/train.log "$PAIR_ROOT/k2/logs/"
+cp "$K2_ROOT"/ckpts/run_metadata.json "$PAIR_ROOT/k2/metadata/"
+cp "$K8_ROOT"/eval/*_greedy.csv "$PAIR_ROOT/k8/eval/"
+cp "$K8_ROOT"/eval/*summary*.txt "$PAIR_ROOT/k8/eval/" 2>/dev/null || true
+cp "$K8_ROOT"/logs/eval_*.log "$PAIR_ROOT/k8/logs/" 2>/dev/null || true
+cp "$K8_ROOT"/logs/train.log "$PAIR_ROOT/k8/logs/"
+cp "$K8_ROOT"/ckpts/run_metadata.json "$PAIR_ROOT/k8/metadata/"
+```
+
+- After collation, create a short markdown note in `experiments/variants/` using the exact R7 run ids, W&B URLs, eval summary paths, and best/final checkpoint metrics. Shared rollups should wait until both `k2` and `k8` folders contain eval CSVs from the same manifest.

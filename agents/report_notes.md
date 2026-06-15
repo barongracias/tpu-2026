@@ -2,7 +2,7 @@
 
 ## Current Headline State
 
-The `coursework` branch contains the P0-P6 preparation patches for Part I TPU usage and is aligned with `origin/coursework` at `820fad6`. D1/D2, R1/R3, D3/D4, and R5 have completed. R5 GRPO K=8 seed 0 is the strongest trained run so far; R4/R2 and any new run remain blocked pending review.
+The `coursework` branch contains the P0-P6 preparation patches for Part I TPU usage and was aligned with `origin/coursework` at `820fad6` for earlier runs. D1/D2, R1/R3, D3/D4, and R5 have completed. R6 RLOO K=8 and chained RLOO K=2 full training were launched from non-deterministic branch `harvey` at W&B-recorded commit `8a0f7f266552cb2666710ac589cb6bda5cd40121`; the later note-time checkout was `harvey-grpo-k8-rerun`. The R6 runs still need retained-checkpoint evaluation before they are used as performance evidence. R7 is the deterministic rerun: K=2 is running on the separate Harvey VM from `harvey-grpo-k8-rerun` commit `71aab87dee2d2c78256384d084d063d8b40c9e0c`, and K=8 is running on this shared Boris VM from `harvey-grpo-k8-rerun` commit `e3d69a1938fe8e8a2a67a3c84a03331133ed46f1`.
 
 Local run notes, diagnostics, manifests, and runbooks for the current TPU work are now tracked under `experiments/`. Start with `experiments/README.md`, then use `experiments/baseline/`, `experiments/variants/`, and `experiments/diagnostics/` for run-specific summaries; TPU-side raw logs/CSVs remain under each `$RUN_ROOT`.
 
@@ -525,3 +525,93 @@ Validation:
 - `git diff --check` passed.
 - `py_compile` passed for `scripts/config.py`, `scripts/data.py`, `scripts/train.py`, `scripts/evaluate.py`, and `scripts/model.py`.
 - `bash -n` passed for `bootstrap.sh` and `scripts/run_tmux.sh`.
+
+## 2026-06-10: R6 RLOO K-sweep training completed
+
+Purpose:
+- Run a full RLOO K-sweep after the GRPO K=8 results: first RLOO with `NUM_GENERATIONS=8`, then chained RLOO with `NUM_GENERATIONS=2`.
+
+Source-state caveat:
+- These R6 runs were not launched from deterministic-platform. W&B metadata for both runs records git commit `8a0f7f266552cb2666710ac589cb6bda5cd40121` on branch `harvey`; git reflog shows checkout to `harvey-grpo-k8-rerun` only at 2026-06-10 10:19 UTC, after both runs had finished.
+- The `harvey` launch commit lacks deterministic-platform controls: required `MODEL_REVISION`, `EVAL_SEED`/`EVAL_MANIFEST`, pinned `JAX_REF`/`QWIX_REF`/`FLAX_REF`, and the deterministic branch's `run_metadata.json` writer.
+
+Run table:
+| Run | Estimator | K | Start UTC | Finish UTC | Status |
+| --- | --- | ---: | --- | --- | --- |
+| `R6-rloo-k8-full-s0-20260609_212314` | `rloo` | 8 | 2026-06-09 ~21:57 | 2026-06-10 ~05:37 | training complete |
+| `R6-rloo-k2-full-s0-20260609_220042` | `rloo` | 2 | 2026-06-10 05:37:42 | 2026-06-10 ~07:41 | training complete |
+
+Common config:
+- `RUN_SEED=0`
+- `MAX_STEPS=3364`
+- `SAVE_INTERVAL_STEPS=250`
+- `MAX_TO_KEEP=20`
+- `MAX_STEPS_OVERRIDE` unset
+- Runtime paths were persistent under `/home/harvey/tpu-runs/part-i`, not `/tmp`.
+
+Evidence:
+- K=8 root: `/home/harvey/tpu-runs/part-i/R6-rloo-k8-full-s0-20260609_212314`
+- K=2 root: `/home/harvey/tpu-runs/part-i/R6-rloo-k2-full-s0-20260609_220042`
+- K=8 W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R6-rloo-k8-full-s0-20260609_212314`
+- K=2 W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R6-rloo-k2-full-s0-20260609_220042`
+- Detailed note: `experiments/variants/r6_rloo_k_sweep_full_s0_20260609.md`
+
+Artifacts:
+- Both runs logged `Training finished.`.
+- Both have final actor checkpoint `ckpts/actor/3364`.
+- Both have retained actor checkpoints at step `1` and every `250` steps through `3250`.
+- TensorBoard event files and local W&B artifacts are stored under each run root.
+- `/tmp` was small when checked (`~61M`); run directories are about `3.5G` each under `/home/harvey/tpu-runs/part-i`.
+
+Caveats:
+- No post-training greedy eval CSVs or eval summaries were found for either R6 run at note time.
+- No `run_metadata.json` was found in either R6 checkpoint root at note time.
+- W&B step-order warnings persisted near final step `3364`.
+
+Next action:
+- Run retained-checkpoint evaluation for both R6 runs with a fixed eval manifest/seed before comparing RLOO K=8 vs RLOO K=2 or against R5 GRPO K=8.
+
+## 2026-06-11: R7 deterministic RLOO K=2 and K=8 launched on separate VMs
+
+Reason:
+- R6 was found to be non-deterministic because both R6 runs were launched from branch `harvey` at commit `8a0f7f266552cb2666710ac589cb6bda5cd40121`.
+- R7 repeats the RLOO K comparison on deterministic branch `harvey-grpo-k8-rerun`.
+- The current R7 runs are split so artifacts and W&B runs do not clash: K=2 on the separate Harvey VM, K=8 on this shared Boris VM.
+
+Branch gate:
+- Branch: `harvey-grpo-k8-rerun`.
+- K=2 launch commit on Harvey VM: `71aab87dee2d2c78256384d084d063d8b40c9e0c`.
+- K=8 launch commit on shared Boris VM: `e3d69a1938fe8e8a2a67a3c84a03331133ed46f1`.
+- Verified deterministic-platform ancestry and verified `harvey` is not an ancestor before the K=8 launch.
+
+Harvey VM K=2:
+- Active run id: `R7-rloo-k2-det-harvey-full-s0-20260611_102009`.
+- Run root: `/home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009`.
+- W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R7-rloo-k2-det-harvey-full-s0-20260611_102009`.
+- Tmux attach: `tmux attach -t r7-rloo-k2-det-harvey-full-s0`.
+- Log tail: `tail -f /home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/logs/train.log`.
+- Confirmed config: `ADV_ESTIMATOR=rloo`, `NUM_GENERATIONS=2`, `RUN_SEED=0`, `EVAL_SEED=0`, `MAX_STEPS=3364`, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, `MODEL_REVISION=dcc83ea841ab6100d6b47a070329e1ba4cf78752`, and `MAX_STEPS_OVERRIDE` unset.
+- `ckpts/run_metadata.json` exists and records deterministic metadata, including `num_generations=2`.
+
+Shared Boris VM K=8:
+- Active run id: `R7-rloo-k8-det-harvey-full-s0-20260611_105132`.
+- Run root: `/home/ext_harveybermingham1_gmail_com/tpu-runs/part-i/R7-rloo-k8-det-harvey-full-s0-20260611_105132`.
+- W&B: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/R7-rloo-k8-det-harvey-full-s0-20260611_105132`.
+- Tmux attach: `tmux attach -t r7-rloo-k8-det-harvey-full-s0`.
+- Log tail: `tail -f /home/ext_harveybermingham1_gmail_com/tpu-runs/part-i/R7-rloo-k8-det-harvey-full-s0-20260611_105132/logs/train.log`.
+- Confirmed config: `ADV_ESTIMATOR=rloo`, `NUM_GENERATIONS=8`, `RUN_SEED=0`, `EVAL_SEED=0`, `MAX_STEPS=3364`, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`, `MODEL_REVISION=dcc83ea841ab6100d6b47a070329e1ba4cf78752`, and `MAX_STEPS_OVERRIDE` unset.
+- `ckpts/run_metadata.json` exists and records deterministic metadata, including `num_generations=8`; W&B is syncing.
+- Artifact dirs were set under the run root: `CKPT_DIR`, `INTERMEDIATE_CKPT_DIR`, `TENSORBOARD_DIR`, `TRAIN_DATA_DIR`, `TEST_DATA_DIR`, `WANDB_DIR`, and `TMPDIR`; no required artifact is intended to live only in `/tmp`.
+
+Failed K=2 setup attempts on Harvey VM:
+- `R7-rloo-k2-det-harvey-full-s0-20260611_101430` failed because `/tmp/libtpu_lockfile` was held by a hung diagnostic JAX probe.
+- `R7-rloo-k2-det-harvey-full-s0-20260611_101739` failed at W&B init because the existing tmux server did not inherit the intended run environment.
+- Both failed roots were left in place intentionally.
+
+Notes hygiene:
+- K=2 and K=8 notes should use the exact run ID in their filenames.
+- Do not overwrite the K=2 note from the Harvey VM.
+- Do not update shared rollup files until both current R7 runs finish and both exact run IDs/W&B URLs are used.
+- After both R7 runs finish, choose one collector VM and copy only lightweight eval evidence into `$HOME/tpu-runs/part-i/report_diagnostics/r7_rloo_k_sweep_det_20260611/{k2,k8}/`; leave large checkpoint trees in the original run roots.
+- The required files to collate are `eval/*_greedy.csv`, `eval/*summary*.txt`, `logs/eval_*.log`, `logs/train.log`, `ckpts/run_metadata.json`, and the shared manifest `$HOME/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl`.
+- If one VM creates the eval manifest first, copy the exact JSONL to the other VM before evaluation so the K=2 and K=8 per-prompt CSVs are row-aligned. Detailed copy commands are recorded in `agents/context.md` under "R7 post-run lightweight eval collation".

@@ -1,0 +1,41 @@
+{
+  "metric": "correct",
+  "seed": 12345,
+  "resamples": 10000,
+  "shared_prompts": 1319,
+  "per_model": [
+    {
+      "label": "base",
+      "n": 1319,
+      "correct": 625,
+      "acc": 0.47384382107657314,
+      "ci_low": 0.447289613343442,
+      "ci_high": 0.5011372251705838,
+      "restored_step": "",
+      "path": "/home/ext_harveybermingham1_gmail_com/tpu-runs/part-i/R7-rloo-k8-det-harvey-full-s0-20260611_105132/eval/base_full.csv"
+    },
+    {
+      "label": "r7_k8_best",
+      "n": 1319,
+      "correct": 722,
+      "acc": 0.5473843821076573,
+      "ci_low": 0.5208491281273692,
+      "ci_high": 0.574677786201668,
+      "restored_step": "2000",
+      "path": "/home/ext_harveybermingham1_gmail_com/tpu-runs/part-i/R7-rloo-k8-det-harvey-full-s0-20260611_105132/eval/r7_rloo_k8_step2000_full.csv"
+    }
+  ],
+  "comparisons": [
+    {
+      "a": "r7_k8_best",
+      "b": "base",
+      "n": 1319,
+      "delta_acc": 0.07354056103108415,
+      "ci_low": 0.046247156937073486,
+      "ci_high": 0.10159211523881723,
+      "prob_gt0": 1.0,
+      "p_two_sided": 0.0,
+      "ci_excludes_zero": true
+    }
+  ]
+}
