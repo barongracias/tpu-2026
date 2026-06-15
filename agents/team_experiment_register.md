@@ -12,6 +12,7 @@ This register collates the submitted evidence files under `experiments/team_evid
 | `evidence_harvey_full_eval_20260614.md` | Harvey | Full GSM8K confirmation evals for deterministic RLOO K=2 and K=8 selected/final checkpoints, with paired bootstrap CIs. |
 | `evidence_harvey_k4_full_eval_20260614.md` | Harvey | Full GSM8K confirmation eval for completed GRPO K=4 best-retained and final checkpoints, with paired bootstrap CIs. |
 | `evidence_harvey_k16_full_eval_20260615.md` | Harvey | Full GSM8K confirmation eval for capped GRPO K=16 last-good checkpoint; training stopped early with `RESOURCE_EXHAUSTED`. |
+| `baron_results_handoff_20260615.md` | Harvey | Compact response to Baron's 2026-06-15 handoff ask: GRPO K=4/K=16 status, provenance, scalar/eval artefact map, and optional RLOO full-test evidence. |
 | `evidence_basia_20260612.md` | Basia/Barbara | External collaborator evidence for KL, length, empty-penalty, and G8+microbatch diagnostics. |
 | `evidence_funmi_20260612` | Funmi | External collaborator evidence. File contains repeated pasted audits; the fuller middle section is treated as canonical for variant runs. |
 | `evidence_rowan_20260612.md` | Rowan | External collaborator K sweep/reward-reweight evidence. Includes K=16 partial run and pending reward-reweight eval opportunity. |
