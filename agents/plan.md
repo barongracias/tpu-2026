@@ -392,3 +392,22 @@ Decision:
 - Best R5 checkpoint is step 3250 at `35/64` exact, slightly above D4 step 500 (`34/64`) and base (`31/64`).
 - R5 final is `32/64`, so checkpoint selection remains important.
 - Do not launch R4/R2 or any new run until local review. Next report work should compute confidence intervals/paired comparisons and inspect W&B/TensorBoard curves for R5.
+
+## 2026-06-15 Shutdown Plan State
+
+Status: Baron reward-rebalance and full-test evidence are complete and analysis-ready on branch `baron-reward-rebalance-k8`.
+
+Completed work:
+- Reward-weight knobs implemented with baseline-preserving defaults and recorded in run metadata.
+- Existing R1/R3/R5/D4 lightweight artefacts harvested into `experiments/evidence/<run-id>/` and summarized in `experiments/team_evidence/result_existing-runs-harvest_baron_20260613.md`.
+- Reward-rebalance run `B-grpo-k8-rewardrebalance-s0-20260614` trained, evaluated on n=64, scalar-exported, summarized, and committed.
+- Shared full-test protocol artefacts and Harvey base CSV synced into this branch.
+- Full-test eval completed for Baron report-ready targets R5 and B, with bootstrap CIs committed.
+
+Next analysis steps off-TPU:
+- Pull `baron-reward-rebalance-k8` and use `experiments/team_evidence/result_full-test-baron_20260613.md` as the primary Baron full-test evidence file.
+- Collate full-test rows into the team register/report using base 625/1319, R5 740/1319, and B 704/1319.
+- Treat R5 as the stronger GRPO K=8 result; the reward-rebalance run improved over base but did not beat R5 on the full test.
+- Preserve the provenance caveat that the harvested R1/R3/R5/D4 n=64 CSVs are from Baron's seed-0 draw and are separate from the committed n=64/full-test manifests.
+
+No additional TPU work is required for Baron's report-ready evidence unless the team requests new diagnostics from raw checkpoints.

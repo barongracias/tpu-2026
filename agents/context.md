@@ -307,3 +307,39 @@ Comparison:
 Recommendation:
 - R5 is the strongest completed trained result so far and is report-useful as the K=8 GRPO variant.
 - Do not start R4/R2 or another full run yet. Local Codex should review R5 CSVs/W&B curves, then decide whether to report R5 best-checkpoint selection, run bootstrap CIs, or change reward controls.
+
+## 2026-06-15 Shutdown Handoff: Baron Reward Rebalance And Full-Test Evidence
+
+Branch: `baron-reward-rebalance-k8` from deterministic-platform commit `57c6409`.
+Evidence/code commits before this handoff note:
+- `74b648a` adds the reward-weight knobs and existing-run harvest evidence.
+- `dbfea80` adds reward-rebalance eval evidence plus the shared full-test protocol artefacts.
+
+Analysis-ready Baron artefacts are committed in the repo. The TPU run roots are no longer required for the report analysis unless someone wants to inspect raw checkpoints or TensorBoard event binaries.
+
+Key report-ready evidence:
+- Existing-run harvest: `experiments/team_evidence/result_existing-runs-harvest_baron_20260613.md`.
+- Reward rebalance n=64 result: `experiments/team_evidence/result_B-grpo-k8-rewardrebalance-s0-20260614_baron_20260613.md`.
+- Baron full-test result: `experiments/team_evidence/result_full-test-baron_20260613.md`.
+- Reward rebalance summary/evidence: `experiments/evidence/B-grpo-k8-rewardrebalance-s0-20260614/summary.md`.
+- R5 full-test summary/evidence: `experiments/evidence/R5-grpo-k8-full-s0-20260609_114832/summary.md`.
+- Shared full-test baseline CSV: `experiments/evidence/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/base_full.csv`.
+
+Manifest/provenance anchors:
+- Full-test manifest: `experiments/manifests/gsm8k_test_seed0_full.jsonl`, SHA-256 `07f0f0fc10580dee941b6f921a3986854a8b0b74529d9bb952662d5daaea6bb2`.
+- Reward-rebalance n=64 manifest: `experiments/manifests/gsm8k_test_seed0_n64.jsonl`, SHA-256 `9aa1814e295e155f4735c9302a7f9c28c6aaa2319074e053a5888e3f3b2448b0`.
+- R1/R3/R5/D4 harvested n=64 eval CSVs are Baron seed-0-draw sample artefacts from empty `EVAL_MANIFEST`. They are valid together for the old paired base-vs-R5 test, but must not be pooled with committed n=64 or full-test manifest paired tests.
+
+Full-test numbers on the committed n=1319 manifest:
+- Base: 625/1319 = 47.38%, 95% CI [44.73%, 50.11%].
+- R5 GRPO K=8 best step 3250: 740/1319 = 56.10%, paired delta vs base +8.72pp, 95% CI [+5.99, +11.37].
+- R5 GRPO K=8 final step 3364: 740/1319 = 56.10%, paired delta vs base +8.72pp, 95% CI [+5.91, +11.45].
+- B reward rebalance best step 500: 704/1319 = 53.37%, paired delta vs base +5.99pp, 95% CI [+3.26, +8.49].
+- B reward rebalance final step 3364: 704/1319 = 53.37%, paired delta vs base +5.99pp, 95% CI [+3.03, +8.79].
+
+Reward-rebalance run details:
+- Run id: `B-grpo-k8-rewardrebalance-s0-20260614`.
+- W&B URL: `https://wandb.ai/barongracias-university-of-cambridge/agentic-ai-coursework/runs/B-grpo-k8-rewardrebalance-s0-20260614`.
+- W&B runtime recorded as 32929.790906207 seconds, approximately 9h09m.
+- Reward weights: format=0.3, answer=2.0, number=1.0; defaults remain 1/1/1.
+- n=64 base was 31/64; retained best was 34/64 at step 500; final was 32/64 at step 3364.

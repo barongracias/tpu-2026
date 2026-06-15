@@ -525,3 +525,28 @@ Validation:
 - `git diff --check` passed.
 - `py_compile` passed for `scripts/config.py`, `scripts/data.py`, `scripts/train.py`, `scripts/evaluate.py`, and `scripts/model.py`.
 - `bash -n` passed for `bootstrap.sh` and `scripts/run_tmux.sh`.
+
+## 2026-06-15 Baron Report Notes: Full-Test And Reward Rebalance
+
+Baron full-test evidence is report-ready on branch `baron-reward-rebalance-k8`.
+
+Use the full-test n=1319 results as the primary accuracy comparison:
+- Shared base: 625/1319, 47.38%, 95% CI [44.73%, 50.11%].
+- R5 GRPO K=8 best retained step 3250: 740/1319, 56.10%, paired delta vs base +8.72pp, 95% CI [+5.99, +11.37].
+- R5 GRPO K=8 final step 3364: 740/1319, 56.10%, paired delta vs base +8.72pp, 95% CI [+5.91, +11.45].
+- B reward-rebalance best retained step 500: 704/1319, 53.37%, paired delta vs base +5.99pp, 95% CI [+3.26, +8.49].
+- B reward-rebalance final step 3364: 704/1319, 53.37%, paired delta vs base +5.99pp, 95% CI [+3.03, +8.79].
+
+Interpretation for the report:
+- Reward rebalancing, with format=0.3 and answer=2.0, improved over the base model on the full test but underperformed the earlier R5 GRPO K=8 result.
+- Both R5 and B have paired bootstrap CIs excluding zero against the shared base on the committed full-test manifest.
+- R5 remains the best Baron GRPO K=8 result for the main report table.
+
+Files to cite or collate:
+- `experiments/team_evidence/result_full-test-baron_20260613.md`.
+- `experiments/evidence/R5-grpo-k8-full-s0-20260609_114832/summary.md`.
+- `experiments/evidence/B-grpo-k8-rewardrebalance-s0-20260614/summary.md`.
+- `experiments/team_evidence/result_B-grpo-k8-rewardrebalance-s0-20260614_baron_20260613.md`.
+- `experiments/team_evidence/result_existing-runs-harvest_baron_20260613.md`.
+
+Caveat: the old harvested n=64 R1/R3/R5/D4 evals came from Baron's seed-0 draw with empty `EVAL_MANIFEST`. They can support the historical paired base-vs-R5 analysis on that sample, but they are not the same sample as the committed n=64 manifest or the n=1319 full-test manifest.
