@@ -1,0 +1,73 @@
+{
+  "metric": "correct",
+  "seed": 12345,
+  "resamples": 10000,
+  "shared_prompts": 1319,
+  "per_model": [
+    {
+      "label": "base",
+      "n": 1319,
+      "correct": 625,
+      "acc": 0.47384382107657314,
+      "ci_low": 0.447289613343442,
+      "ci_high": 0.5011372251705838,
+      "restored_step": "",
+      "path": "/home/harvey/tpu-runs/part-i/H-grpo-k16-cap2500-s0-20260614-r2/eval/base_full.csv"
+    },
+    {
+      "label": "k16_best",
+      "n": 1319,
+      "correct": 703,
+      "acc": 0.5329795299469295,
+      "ci_low": 0.5056861258529188,
+      "ci_high": 0.5602729340409401,
+      "restored_step": "500",
+      "path": "/home/harvey/tpu-runs/part-i/H-grpo-k16-cap2500-s0-20260614-r2/eval/H-grpo-k16-cap2500-s0-20260614-r2_step500_full.csv"
+    },
+    {
+      "label": "k16_final",
+      "n": 1319,
+      "correct": 703,
+      "acc": 0.5329795299469295,
+      "ci_low": 0.5056861258529188,
+      "ci_high": 0.5595147839272175,
+      "restored_step": "500",
+      "path": "/home/harvey/tpu-runs/part-i/H-grpo-k16-cap2500-s0-20260614-r2/eval/H-grpo-k16-cap2500-s0-20260614-r2_step500_full.csv"
+    }
+  ],
+  "comparisons": [
+    {
+      "a": "k16_best",
+      "b": "k16_final",
+      "n": 1319,
+      "delta_acc": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "prob_gt0": 0.0,
+      "p_two_sided": 1.0,
+      "ci_excludes_zero": false
+    },
+    {
+      "a": "k16_best",
+      "b": "base",
+      "n": 1319,
+      "delta_acc": 0.05913570887035633,
+      "ci_low": 0.0318423047763457,
+      "ci_high": 0.086429112964367,
+      "prob_gt0": 1.0,
+      "p_two_sided": 0.0,
+      "ci_excludes_zero": true
+    },
+    {
+      "a": "k16_final",
+      "b": "base",
+      "n": 1319,
+      "delta_acc": 0.05913570887035633,
+      "ci_low": 0.03184230477634575,
+      "ci_high": 0.0864291129643669,
+      "prob_gt0": 1.0,
+      "p_two_sided": 0.0,
+      "ci_excludes_zero": true
+    }
+  ]
+}

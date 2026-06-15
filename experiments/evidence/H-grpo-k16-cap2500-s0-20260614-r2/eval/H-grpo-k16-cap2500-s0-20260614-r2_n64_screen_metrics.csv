@@ -1,0 +1,4 @@
+kind,step,n,exact,partial,format,empty,restored_step,eval_manifest,path
+base,,64,31,31,1,0,,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k16-cap2500-s0-20260614-r2/eval/base_greedy.csv
+checkpoint,250,64,30,33,56,0,250,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k16-cap2500-s0-20260614-r2/eval/H-grpo-k16-cap2500-s0-20260614-r2_step250_greedy.csv
+checkpoint,500,64,31,32,47,0,500,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k16-cap2500-s0-20260614-r2/eval/H-grpo-k16-cap2500-s0-20260614-r2_step500_greedy.csv
