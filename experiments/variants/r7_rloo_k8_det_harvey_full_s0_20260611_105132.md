@@ -22,7 +22,7 @@ Best retained checkpoint by exact accuracy: step 2000 (35/64, 54.69%)
 | 3250 | 27/64 (42.19%) | 28/64 (43.75%) | 54/64 (84.38%) | 0/64 |
 | 3364 | 26/64 (40.62%) | 29/64 (45.31%) | 54/64 (84.38%) | 0/64 |
 
-## Full-test confirmation - 2026-06-14
+## Full-test confirmation - 2026-06-14 and 2026-06-15
 
 Full GSM8K test manifest:
 
@@ -36,11 +36,17 @@ Completed full evals:
 |---|---:|---:|---:|---:|
 | Base greedy | 625/1319 (47.38%) | 659/1319 (49.96%) | 53/1319 (4.02%) | 0/1319 |
 | R7 RLOO K=8 step 2000 | 722/1319 (54.74%) | 764/1319 (57.92%) | 1242/1319 (94.16%) | 0/1319 |
+| R7 RLOO K=8 step 3364 | 742/1319 (56.25%) | 770/1319 (58.38%) | 1203/1319 (91.21%) | 0/1319 |
 
 Paired bootstrap over the 1,319 shared prompts used `10000` resamples and seed
-`12345`. Step `2000` beats base by `+7.35` percentage points exact accuracy with
-95% CI `[+4.62 pp, +10.16 pp]`.
+`12345`.
 
-Step `3364` was not full-evaluated in this pass. Use the retained-checkpoint
-64-prompt table above for final-checkpoint screening only until a full final eval
-is run.
+| Comparison | Delta exact | 95% CI | Result |
+|---|---:|---:|---|
+| R7 K=8 step 2000 vs base | +7.35 pp | [+4.62 pp, +10.16 pp] | CI excludes 0 |
+| R7 K=8 step 3364 vs base | +8.87 pp | [+6.14 pp, +11.68 pp] | CI excludes 0 |
+
+The 64-prompt screen selected step `2000`, but the full-test final checkpoint
+step `3364` is higher on exact accuracy. Report both checkpoint-selection facts:
+step `2000` was the retained-screen winner, while step `3364` is the full-test
+final checkpoint result.
