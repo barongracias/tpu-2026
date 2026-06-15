@@ -1,0 +1,62 @@
+{
+  "metric": "correct",
+  "seed": 12345,
+  "resamples": 10000,
+  "shared_prompts": 1319,
+  "per_model": [
+    {
+      "label": "base",
+      "n": 1319,
+      "correct": 625,
+      "acc": 0.47384382107657314,
+      "ci_low": 0.447289613343442,
+      "ci_high": 0.5011372251705838,
+      "restored_step": "",
+      "path": "/home/ext_barongracias_gmail_com/tpu-2026/experiments/evidence/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/base_full.csv"
+    },
+    {
+      "label": "best",
+      "n": 1319,
+      "correct": 704,
+      "acc": 0.533737680060652,
+      "ci_low": 0.5072024260803639,
+      "ci_high": 0.5610310841546626,
+      "restored_step": "500",
+      "path": "/home/ext_barongracias_gmail_com/tpu-runs/part-i/B-grpo-k8-rewardrebalance-s0-20260614/eval/B-grpo-k8-rewardrebalance-s0-20260614_step500_full.csv"
+    },
+    {
+      "label": "final",
+      "n": 1319,
+      "correct": 704,
+      "acc": 0.533737680060652,
+      "ci_low": 0.5064442759666414,
+      "ci_high": 0.5610310841546626,
+      "restored_step": "3364",
+      "path": "/home/ext_barongracias_gmail_com/tpu-runs/part-i/B-grpo-k8-rewardrebalance-s0-20260614/eval/B-grpo-k8-rewardrebalance-s0-20260614_step3364_full.csv"
+    }
+  ],
+  "comparisons": [
+    {
+      "a": "best",
+      "b": "base",
+      "n": 1319,
+      "delta_acc": 0.05989385898407885,
+      "ci_low": 0.03260045489006824,
+      "ci_high": 0.08491281273692197,
+      "prob_gt0": 0.9999,
+      "p_two_sided": 0.0002,
+      "ci_excludes_zero": true
+    },
+    {
+      "a": "final",
+      "b": "base",
+      "n": 1319,
+      "delta_acc": 0.05989385898407885,
+      "ci_low": 0.03032600454890072,
+      "ci_high": 0.08794541319181204,
+      "prob_gt0": 0.9999,
+      "p_two_sided": 0.0002,
+      "ci_excludes_zero": true
+    }
+  ]
+}

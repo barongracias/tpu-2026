@@ -1,0 +1,62 @@
+{
+  "metric": "correct",
+  "seed": 12345,
+  "resamples": 10000,
+  "shared_prompts": 1319,
+  "per_model": [
+    {
+      "label": "base",
+      "n": 1319,
+      "correct": 625,
+      "acc": 0.47384382107657314,
+      "ci_low": 0.447289613343442,
+      "ci_high": 0.5011372251705838,
+      "restored_step": "",
+      "path": "/home/ext_barongracias_gmail_com/tpu-2026/experiments/evidence/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/base_full.csv"
+    },
+    {
+      "label": "best",
+      "n": 1319,
+      "correct": 740,
+      "acc": 0.5610310841546626,
+      "ci_low": 0.533737680060652,
+      "ci_high": 0.5883244882486732,
+      "restored_step": "3250",
+      "path": "/home/ext_barongracias_gmail_com/tpu-runs/part-i/R5-grpo-k8-full-s0-20260609_114832/eval/R5-grpo-k8-full-s0-20260609_114832_step3250_full.csv"
+    },
+    {
+      "label": "final",
+      "n": 1319,
+      "correct": 740,
+      "acc": 0.5610310841546626,
+      "ci_low": 0.5344958301743745,
+      "ci_high": 0.5875663381349507,
+      "restored_step": "3364",
+      "path": "/home/ext_barongracias_gmail_com/tpu-runs/part-i/R5-grpo-k8-full-s0-20260609_114832/eval/R5-grpo-k8-full-s0-20260609_114832_step3364_full.csv"
+    }
+  ],
+  "comparisons": [
+    {
+      "a": "best",
+      "b": "base",
+      "n": 1319,
+      "delta_acc": 0.08718726307808947,
+      "ci_low": 0.059893858984078785,
+      "ci_high": 0.1137225170583776,
+      "prob_gt0": 1.0,
+      "p_two_sided": 0.0,
+      "ci_excludes_zero": true
+    },
+    {
+      "a": "final",
+      "b": "base",
+      "n": 1319,
+      "delta_acc": 0.08718726307808947,
+      "ci_low": 0.059135708870356296,
+      "ci_high": 0.11449962092494294,
+      "prob_gt0": 1.0,
+      "p_two_sided": 0.0,
+      "ci_excludes_zero": true
+    }
+  ]
+}
