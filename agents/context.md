@@ -343,3 +343,6 @@ Reward-rebalance run details:
 - W&B runtime recorded as 32929.790906207 seconds, approximately 9h09m.
 - Reward weights: format=0.3, answer=2.0, number=1.0; defaults remain 1/1/1.
 - n=64 base was 31/64; retained best was 34/64 at step 500; final was 32/64 at step 3364.
+## 2026-06-15 Team Handoff Pointer
+
+A compact Baron results handoff now exists at `experiments/team_evidence/baron_results_handoff_20260615.md`. It summarises the full-test R5 and reward-rebalance evidence, points to the committed lightweight artefacts, and lists the remaining requested packages from Fred and Harvey. Use it as the first file for cross-team Part I result collation on this branch.
