@@ -9,7 +9,7 @@ This register collates the submitted evidence files under `experiments/team_evid
 | `evidence_baron_20260612.md` | Baron | Internal runs from the original coursework branch and later deterministic work. Includes K=2 GRPO/RLOO, K=8 diagnostics, and R5 full K=8. |
 | `evidence_fred_20260612.md` | Fred | Internal hard-question mining and hard/medium manifest runs. Includes R8 K=8 hard-medium and R9 staged reward attempt. |
 | `evidence_harvey_20260612.md` | Harvey | Internal deterministic RLOO K=2 and K=8 runs. K=8 has strong retained-checkpoint result; K=2 collapses late. |
-| `evidence_harvey_full_eval_20260614.md` | Harvey | Full GSM8K confirmation evals for deterministic RLOO K=2 and K=8 selected/final checkpoints, with paired bootstrap CIs. |
+| `evidence_harvey_full_eval_20260614.md` | Harvey | Full GSM8K confirmation evals for deterministic RLOO K=2 and K=8 selected/final checkpoints, GRPO K=4/K=16, and the deterministic GRPO K=2 baseline reproduction, with paired bootstrap CIs. |
 | `evidence_harvey_k4_full_eval_20260614.md` | Harvey | Full GSM8K confirmation eval for completed GRPO K=4 best-retained and final checkpoints, with paired bootstrap CIs. |
 | `evidence_harvey_k16_full_eval_20260615.md` | Harvey | Full GSM8K confirmation eval for capped GRPO K=16 last-good checkpoint; training stopped early with `RESOURCE_EXHAUSTED`. |
 | `baron_results_handoff_20260615.md` | Harvey | Compact response to Baron's 2026-06-15 handoff ask: GRPO K=4/K=16 status, provenance, scalar/eval artefact map, and optional RLOO full-test evidence. |
@@ -19,7 +19,7 @@ This register collates the submitted evidence files under `experiments/team_evid
 
 ## Executive summary
 
-The strongest supported internal story is that K=2 training is unstable for this setup, while larger K materially improves stability and format adherence. The gains in exact GSM8K accuracy are modest on the 64-question greedy evaluation set: Baron R5 GRPO K=8 reaches 35/64 at its best retained checkpoint and 32/64 at the final checkpoint, against a base reference of 31/64. Harvey's deterministic RLOO K=8 reaches 35/64 at its best retained checkpoint on the 64-question screen, `722/1319` at that selected step on the full test set, and `742/1319` at the final checkpoint. The full-test final beats base by `+8.87` percentage points with a paired bootstrap 95% CI of `[+6.14, +11.68]` points. Harvey's GRPO K=4 run also beats base at both selected and final checkpoints, while the capped GRPO K=16 run reaches `703/1319` at its last-good checkpoint but stops early from TPU memory exhaustion. In contrast, Baron/Harvey RLOO K=2 and Baron GRPO K=2 degrade badly by the end of training, with RLOO K=2 showing severe empty-response collapse.
+The strongest supported internal story is that K=2 training is unstable for this setup, while larger K materially improves stability and format adherence. The gains in exact GSM8K accuracy are modest on the 64-question greedy evaluation set: Baron R5 GRPO K=8 reaches 35/64 at its best retained checkpoint and 32/64 at the final checkpoint, against a base reference of 31/64. Harvey's deterministic RLOO K=8 reaches 35/64 at its best retained checkpoint on the 64-question screen, `722/1319` at that selected step on the full test set, and `742/1319` at the final checkpoint. The full-test final beats base by `+8.87` percentage points with a paired bootstrap 95% CI of `[+6.14, +11.68]` points. Harvey's GRPO K=4 run also beats base at both selected and final checkpoints, while the capped GRPO K=16 run reaches `703/1319` at its last-good checkpoint but stops early from TPU memory exhaustion. The deterministic GRPO K=2 baseline reproduction reaches `656/1319` at its selected checkpoint step `500`, but the paired CI versus base includes zero, and the final checkpoint falls to `218/1319`. In contrast, Baron/Harvey RLOO K=2 and Baron/Harvey GRPO K=2 degrade badly by the end of training, with RLOO K=2 showing severe empty-response collapse.
 
 Fred's hard-question mining is valuable for method coverage and dataset provenance, but the completed K=8 hard-medium run does not beat the base exact score at final evaluation. External collaborators add useful coverage: KL, length, empty-penalty, LoRA, learning-rate, K=4/K=16, and reward-reweight attempts. These should be used as supporting context unless their evaluation protocol and provenance are reconciled with the internal runs.
 
@@ -52,6 +52,7 @@ Fred's hard-question mining is valuable for method coverage and dataset provenan
 | Harvey | R7 RLOO K=8 deterministic | `e3d69a1` | RLOO | 8 | 0 | full base + step 2000 + step 3364 eval complete; retained checkpoints restored on 64-prompt screen | 722/1319 at step 2000 full eval | 742/1319 at 3364 full eval | 0/1319 at step 2000 and step 3364 full evals | Report-ready positive full-test RLOO K=8 result; final beats base by +8.87 pp. |
 | Harvey | H GRPO K=4 full | `57c6409` | GRPO | 4 | 0 | full base + step 2750 + step 3364 eval complete; retained checkpoints restored on 64-prompt screen | 682/1319 at step 2750 full eval | 681/1319 at 3364 full eval | 0/1319 at step 2750 and step 3364 full evals | Report-ready positive full-test GRPO K=4 result; both selected and final beat base. |
 | Harvey | H GRPO K=16 capped | `57c6409` | GRPO | 16 | 0 | full base + step 500 eval complete; training stopped early with `RESOURCE_EXHAUSTED` after scalar step 678 | 703/1319 at step 500 full eval | 703/1319 at step 500 last-good full eval | 0/1319 at step 500 | Report-ready as early-stopped/capped K=16 evidence only; not compute-matched to full-budget runs. |
+| Harvey | Deterministic GRPO K=2 baseline | `7a77bce` | GRPO | 2 | 0 | full base + step 500 + step 3364 eval complete; retained checkpoints restored on 64-prompt screen | 656/1319 at step 500 full eval | 218/1319 at 3364 full eval | 0/1319 at step 500 and step 3364 full evals | Report-ready deterministic coursework baseline reproduction; selected checkpoint CI vs base includes 0, final checkpoint collapses. |
 | Harvey | Older R6 RLOO variants | `8a0f7f2` | RLOO | 2/8 | unclear | no eval found | missing | missing | missing | Not usable. |
 
 ## External collaborator runs
@@ -79,7 +80,7 @@ Fred's hard-question mining is valuable for method coverage and dataset provenan
 
 | Comparison | Evidence | Current conclusion | Caveat |
 |---|---|---|---|
-| GRPO K=2 vs base | Baron R1 vs base greedy | R1 best retained 24/64 and final 12/64, both below base 31/64. Format improves but exact reasoning degrades. | Single seed, 64 prompts, needs paired uncertainty before final wording. |
+| GRPO K=2 vs base | Baron R1 vs base greedy; Harvey deterministic baseline full-test reproduction | R1 best retained 24/64 and final 12/64, both below base 31/64. The deterministic full-test baseline selected step 500 reaches 656/1319 vs base 625/1319 but its CI includes 0; final step 3364 falls to 218/1319. Format improves at selected checkpoints but exact reasoning degrades late. | Single seed; best-checkpoint selection must be separated from final-checkpoint reporting. |
 | RLOO K=2 vs base | Baron R3 and Harvey R7 K=2 | RLOO K=2 is unstable and collapses late; final exact 1/64 in both Baron/Harvey-style evidence. | Baron and Harvey runs are not identical branches; Harvey K=2 now has same-manifest full-test base comparison, while Baron remains 64-prompt evidence. |
 | GRPO K=8 vs base | Baron R5 | K=8 is much healthier: best 35/64 and final 32/64 against base 31/64, no empty collapse. | Improvement is small; best-checkpoint selection needs to be described honestly. |
 | GRPO K=4 vs base | Harvey H GRPO K=4 | K=4 is positive on the full test set: selected step 2750 reaches 682/1319 and final step 3364 reaches 681/1319, both above base 625/1319 with paired CIs excluding zero. | Same checkpoint-selection caveat for the selected checkpoint; this is a single seed. |
@@ -101,12 +102,13 @@ Fred's hard-question mining is valuable for method coverage and dataset provenan
 The following are the safest claims to draft around, subject to final paired/bootstrap analysis:
 
 1. In this implementation, K=2 training can make the model worse despite improving format-related reward. Baron R1 is the cleanest GRPO example: exact accuracy falls from base 31/64 to 24/64 at the best retained checkpoint and 12/64 at the final checkpoint.
-2. RLOO with K=2 is particularly unstable in the collected runs. Baron R3 and Harvey K=2 both end near 1/64 exact with many empty outputs.
-3. Increasing generations beyond K=2 is the strongest practical stabiliser observed internally. Harvey GRPO K=4 reaches `682/1319` at its selected checkpoint and `681/1319` at final, while Baron R5 GRPO K=8 has no empty outputs and reaches 35/64 exact at its best retained checkpoint. Harvey RLOO K=8 reaches the same best exact score on the 64-prompt screen, `722/1319` at the selected step `2000`, and `742/1319` at final step `3364` on the full test set.
-4. The exact-accuracy improvement from K=8 is checkpoint-dependent but positive for both Harvey full-test checkpoints evaluated. Harvey RLOO K=8 step `2000` improves over the full-test base by `+7.35` points with paired 95% CI `[+4.62, +10.16]`; final step `3364` improves by `+8.87` points with paired 95% CI `[+6.14, +11.68]`. The report should distinguish the n=64 checkpoint-selection result from the full-test final result.
-5. GRPO K=16 is promising but memory-limited in this setup: Harvey's capped run reaches `703/1319` at step `500`, but stops before the `2500` cap with `RESOURCE_EXHAUSTED`. Use it as feasibility and last-good evidence, not as a completed full-budget result.
-6. Hard-question mining produced a clean hard/medium training subset, but Fred R8 does not yet show a final exact-accuracy improvement over base. It is useful as an attempted improvement and negative result.
-7. External collaborator runs broaden the failure-mode map: KL strength, reward shaping, LoRA capacity, learning rate, and larger K all affect stability, but none is a simple guaranteed fix.
+2. The deterministic full-test GRPO K=2 baseline reproduction reaches `656/1319` at selected step `500`, but the paired CI versus base includes zero; final step `3364` falls to `218/1319` with a strongly negative paired CI.
+3. RLOO with K=2 is particularly unstable in the collected runs. Baron R3 and Harvey K=2 both end near 1/64 exact with many empty outputs.
+4. Increasing generations beyond K=2 is the strongest practical stabiliser observed internally. Harvey GRPO K=4 reaches `682/1319` at its selected checkpoint and `681/1319` at final, while Baron R5 GRPO K=8 has no empty outputs and reaches 35/64 exact at its best retained checkpoint. Harvey RLOO K=8 reaches the same best exact score on the 64-prompt screen, `722/1319` at the selected step `2000`, and `742/1319` at final step `3364` on the full test set.
+5. The exact-accuracy improvement from K=8 is checkpoint-dependent but positive for both Harvey full-test checkpoints evaluated. Harvey RLOO K=8 step `2000` improves over the full-test base by `+7.35` points with paired 95% CI `[+4.62, +10.16]`; final step `3364` improves by `+8.87` points with paired 95% CI `[+6.14, +11.68]`. The report should distinguish the n=64 checkpoint-selection result from the full-test final result.
+6. GRPO K=16 is promising but memory-limited in this setup: Harvey's capped run reaches `703/1319` at step `500`, but stops before the `2500` cap with `RESOURCE_EXHAUSTED`. Use it as feasibility and last-good evidence, not as a completed full-budget result.
+7. Hard-question mining produced a clean hard/medium training subset, but Fred R8 does not yet show a final exact-accuracy improvement over base. It is useful as an attempted improvement and negative result.
+8. External collaborator runs broaden the failure-mode map: KL strength, reward shaping, LoRA capacity, learning rate, and larger K all affect stability, but none is a simple guaranteed fix.
 
 ## Claims to avoid or qualify
 
@@ -144,8 +146,9 @@ For the main report, keep the table compact and favour the internally controlled
 
 | Row | Why include |
 |---|---|
-| Base greedy reference, 31/64 | Anchor for all internal claims. |
-| Baron R1 GRPO K=2 best/final | Shows format optimisation can hurt exact reasoning. |
+| Base greedy reference, 31/64 or 625/1319 full-test | Anchor for all internal claims. |
+| Deterministic GRPO K=2 baseline selected/final full-test | Coursework baseline reproduction: selected step 500 is inconclusive vs base, final step 3364 collapses. |
+| Baron R1 GRPO K=2 best/final | Earlier 64-prompt evidence that format optimisation can hurt exact reasoning. |
 | Baron R3 RLOO K=2 best/final | Shows severe RLOO K=2 empty collapse. |
 | Baron R5 GRPO K=8 best/final | Main positive internal result. |
 | Harvey GRPO K=4 selected/final full-test | Positive completed GRPO group-size result with paired CIs. |
@@ -164,4 +167,4 @@ For the main report, keep the table compact and favour the internally controlled
 
 ## Immediate next analysis task
 
-Prepare a `report/data/` or `experiments/analysis/` table from the report-ready rows only, then compute paired/bootstrap confidence intervals for the base-vs-R5 comparison. Harvey's RLOO K=2-vs-K=8 and GRPO K=4/K=16 full-test comparisons now have same-manifest evidence and can be folded into that table. The current register is enough to choose which rows belong in that table; it is not yet a substitute for the final numeric analysis.
+Prepare a `report/data/` or `experiments/analysis/` table from the report-ready rows only, then compute paired/bootstrap confidence intervals for the base-vs-R5 comparison. Harvey's deterministic baseline, RLOO K=2-vs-K=8, and GRPO K=4/K=16 full-test comparisons now have same-manifest evidence and can be folded into that table. The current register is enough to choose which rows belong in that table; it is not yet a substitute for the final numeric analysis.

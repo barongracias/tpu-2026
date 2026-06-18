@@ -1,11 +1,12 @@
-# Evidence: Harvey full-test eval, 2026-06-14 and 2026-06-15
+# Evidence: Harvey full-test eval, 2026-06-14 to 2026-06-18
 
 ## Scope
 
 This note records full GSM8K test-set confirmation evals for Harvey RLOO and
-GRPO group-size runs.
+GRPO group-size runs, plus the deterministic coursework GRPO baseline
+reproduction.
 
-Completed K=2 eval:
+Completed RLOO K=2 eval:
 
 - Run id: `R7-rloo-k2-det-harvey-full-s0-20260611_102009`
 - Commit: `71aab87dee2d2c78256384d084d063d8b40c9e0c`
@@ -14,7 +15,7 @@ Completed K=2 eval:
 - Seed: `0`
 - Checkpoint policy: step `500` was selected as the best retained checkpoint from the existing n=64 sweep; step `3364` is the final checkpoint.
 
-Completed K=8 eval:
+Completed RLOO K=8 eval:
 
 - Run id: `R7-rloo-k8-det-harvey-full-s0-20260611_105132`
 - Commit: `e3d69a1938fe8e8a2a67a3c84a03331133ed46f1`
@@ -41,6 +42,16 @@ Completed GRPO K=16 capped eval:
 - Seed: `0`
 - Checkpoint policy: step `500` was selected as the best retained checkpoint from the n=64 screen.
 - Training status: stopped before the `2500` step cap with JAX/XLA `RESOURCE_EXHAUSTED` after scalar step `678`; step `500` is the final / last-good retained checkpoint.
+
+Completed deterministic baseline GRPO K=2 eval:
+
+- Run id: `R-baseline-grpo-k2-spamnet31-s0-20260617_183846`
+- Commit: `7a77bce3a79783d5caa4ff782c1746012e4defe7`
+- Method: GRPO
+- K: `2`
+- Seed: `0`
+- Model revision: `dcc83ea841ab6100d6b47a070329e1ba4cf78752`
+- Checkpoint policy: step `500` was selected as the best retained checkpoint from the n=64 screen by exact-correct count with lowest-step tie-break; step `3364` is the final checkpoint.
 
 No R6 checkpoint was evaluated for this evidence note. R6 remains non-report-ready under the team register provenance criteria.
 
@@ -84,6 +95,13 @@ Committed lightweight artefacts:
 - `experiments/evidence/H-grpo-k16-cap2500-s0-20260614-r2/eval/H-grpo-k16-cap2500-s0-20260614-r2_full_ci.csv`
 - `experiments/evidence/H-grpo-k16-cap2500-s0-20260614-r2/eval/H-grpo-k16-cap2500-s0-20260614-r2_full_ci.json`
 - `experiments/evidence/H-grpo-k16-cap2500-s0-20260614-r2/metadata/run_metadata.json`
+- `experiments/evidence/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/base_full.csv`
+- `experiments/evidence/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step500_full.csv`
+- `experiments/evidence/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step3364_full.csv`
+- `experiments/evidence/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_full_ci.csv`
+- `experiments/evidence/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_full_ci.json`
+- `experiments/evidence/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_eval_validation.json`
+- `experiments/evidence/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/metadata/run_metadata.json`
 
 Raw TPU-side logs remain under:
 
@@ -95,6 +113,7 @@ Raw TPU-side logs remain under:
 - `/home/ext_harveybermingham1_gmail_com/tpu-runs/part-i/R7-rloo-k8-det-harvey-full-s0-20260611_105132/logs/eval_r7_rloo_k8_step3364_full.log`
 - `/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/logs/eval_k4_runbook_20260614.log`
 - `/home/harvey/tpu-runs/part-i/H-grpo-k16-cap2500-s0-20260614-r2/logs/auto_eval_k16_after_train_20260615.log`
+- `/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/logs/eval_pipeline.log`
 
 ## Results
 
@@ -108,6 +127,8 @@ Raw TPU-side logs remain under:
 | H GRPO K=4 step 2750 | 682/1319 (51.71%) | 712/1319 (53.98%) | 1104/1319 (83.70%) | 0/1319 |
 | H GRPO K=4 step 3364 | 681/1319 (51.63%) | 712/1319 (53.98%) | 1097/1319 (83.17%) | 0/1319 |
 | H GRPO K=16 step 500 | 703/1319 (53.30%) | 729/1319 (55.27%) | 1100/1319 (83.40%) | 0/1319 |
+| Baseline GRPO K=2 step 500 | 656/1319 (49.73%) | 688/1319 (52.16%) | 1038/1319 (78.70%) | 0/1319 |
+| Baseline GRPO K=2 step 3364 | 218/1319 (16.53%) | 240/1319 (18.20%) | 469/1319 (35.56%) | 0/1319 |
 
 Bootstrap confidence intervals used `10000` resamples and seed `12345`.
 
@@ -121,6 +142,8 @@ Bootstrap confidence intervals used `10000` resamples and seed `12345`.
 | H GRPO K=4 step 2750 vs base | +4.32 pp | [+1.36 pp, +7.20 pp] | CI excludes 0 |
 | H GRPO K=4 step 3364 vs base | +4.25 pp | [+1.67 pp, +6.90 pp] | CI excludes 0 |
 | H GRPO K=16 step 500 vs base | +5.91 pp | [+3.18 pp, +8.64 pp] | CI excludes 0 |
+| Baseline GRPO K=2 step 500 vs base | +2.35 pp | [-0.30 pp, +5.00 pp] | CI includes 0 |
+| Baseline GRPO K=2 step 3364 vs base | -30.86 pp | [-34.04 pp, -27.82 pp] | CI excludes 0 |
 
 ## Interpretation
 
@@ -146,3 +169,9 @@ The GRPO K=16 capped run reached a stronger last-good full-test result than K=4,
 but it stopped early from TPU memory exhaustion. It should be reported as
 `K=16 step 500, early-stopped/OOM`, not as a completed or compute-matched
 2500-step result.
+
+The deterministic coursework GRPO K=2 baseline reproduction is consistent with
+the earlier negative K=2 diagnosis. The selected retained checkpoint step `500`
+is only modestly above base and its paired bootstrap interval includes zero,
+while the final checkpoint step `3364` is substantially below base with a
+paired interval that excludes zero.

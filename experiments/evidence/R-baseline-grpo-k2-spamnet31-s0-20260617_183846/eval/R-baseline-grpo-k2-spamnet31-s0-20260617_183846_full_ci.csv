@@ -1,0 +1,6 @@
+kind,label_or_A,B,n,acc_or_delta,ci_low,ci_high,prob_gt0,p_two_sided
+model,base,,1319,0.473844,0.447290,0.501137,,
+model,baseline_best,,1319,0.497346,0.470053,0.523901,,
+model,baseline_final,,1319,0.165277,0.145565,0.184989,,
+pair,baseline_best,base,1319,0.023503,-0.003033,0.050038,0.955800,0.088400
+pair,baseline_final,base,1319,-0.308567,-0.340409,-0.278241,0.000000,0.000000
