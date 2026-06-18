@@ -28,6 +28,9 @@ wandb/
 scripts/wandb/
 scripts/*.log
 
+# local agent/helper notes
+agents/
+
 # editor
 .vscode/
 .idea/
