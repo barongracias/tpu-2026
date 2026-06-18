@@ -129,6 +129,21 @@ def get_dataset_from_manifest(manifest_path: str,
     return grain.MapDataset.source(rows).batch(batch_size)
 
 
+def get_train_dataset_from_manifest(manifest_path: str,
+                                    shuffle_seed: int = 0) -> grain.MapDataset:
+    """Load a training manifest as an unbatched Grain dataset."""
+    rows = []
+    with open(manifest_path, encoding="utf-8") as fh:
+        for line in fh:
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            question = row["question"]
+            answer = row.get("expected_answer", row.get("answer"))
+            rows.append(format_example(question, answer))
+    return grain.MapDataset.source(rows).shuffle(seed=shuffle_seed)
+
+
 def manifest_row(prompt_id: int,
                  question: str,
                  answer: str | None,
@@ -155,12 +170,17 @@ def build_train_val_test(num_batches: int,
                          test_dir: str,
                          source: str = "tfds",
                          shuffle_seed: int = 0,
-                         test_shuffle_seed: int | None = None):
+                         test_shuffle_seed: int | None = None,
+                         train_manifest: str | None = None):
     """Materialise (train, val, test) datasets with batching applied."""
     if test_shuffle_seed is None:
         test_shuffle_seed = shuffle_seed
-    full = get_dataset(train_dir, "train", source, shuffle_seed=shuffle_seed).batch(
-        train_micro_batch_size)[:num_batches]
+    if train_manifest:
+        full = get_train_dataset_from_manifest(
+            train_manifest, shuffle_seed=shuffle_seed).batch(train_micro_batch_size)[:num_batches]
+    else:
+        full = get_dataset(train_dir, "train", source, shuffle_seed=shuffle_seed).batch(
+            train_micro_batch_size)[:num_batches]
 
     if train_fraction == 1.0:
         train_ds = full.repeat(num_epochs)
@@ -170,6 +190,7 @@ def build_train_val_test(num_batches: int,
         train_ds = full[:cut].repeat(num_epochs)
         val_ds = full[cut:].repeat(num_epochs)
 
-    test_ds = get_dataset(test_dir, "test", source, shuffle_seed=test_shuffle_seed).batch(
+    test_source = "tfds" if source == "manifest" else source
+    test_ds = get_dataset(test_dir, "test", test_source, shuffle_seed=test_shuffle_seed).batch(
         train_micro_batch_size)[:num_test_batches]
     return train_ds, val_ds, test_ds

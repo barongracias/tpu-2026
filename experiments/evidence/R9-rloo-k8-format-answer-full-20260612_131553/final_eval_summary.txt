@@ -1,0 +1,6 @@
+STEP 500 exact=30/64 partial=36/64 format=93.75% empty=0/64
+STEP 1000 exact=30/64 partial=31/64 format=96.88% empty=0/64
+STEP 2000 exact=33/64 partial=35/64 format=87.50% empty=0/64
+STEP 2500 exact=37/64 partial=37/64 format=90.62% empty=0/64
+STEP 3000 exact=37/64 partial=38/64 format=89.06% empty=0/64
+STEP 3364 exact=34/64 partial=36/64 format=87.50% empty=0/64

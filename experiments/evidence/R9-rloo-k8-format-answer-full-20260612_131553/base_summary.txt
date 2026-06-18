@@ -1,0 +1,1 @@
+BASE exact=31/64 partial=31/64 format=1.56% empty=0/64

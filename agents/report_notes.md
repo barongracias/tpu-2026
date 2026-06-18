@@ -490,6 +490,77 @@ Recommendation:
 - Do not start R4/R2 or another training run yet.
 - Next local work: pull this notes commit if pushed, review R5 W&B/TensorBoard curves, compute confidence intervals/paired bootstrap against base and D4/R1/R3, and decide whether the final report should present best-checkpoint R5 or a fixed-step comparison.
 
+## 2026-06-09: Hugging Face model revision query
+
+Resolved `google/gemma-3-1b-it` via the Hugging Face model API using the repo-local HF token:
+
+```bash
+export MODEL_REVISION=dcc83ea841ab6100d6b47a070329e1ba4cf78752
+```
+
+Use this exact SHA for new base-model inference/evaluation work when no older run-specific `run_metadata.json` pin is required. This is the current HF revision at query time, not proof of the revision used by Baron's historical runs.
+
+## 2026-06-10: R7 GRPO K=2 hard/medium collapse
+
+Run root:
+- `/home/fredlawrence/tpu-runs/part-i/R7-grpo-k2-hardmedium-20260610_102859`
+
+Configuration:
+- `DATA_SOURCE=manifest`
+- `TRAIN_MANIFEST=/home/fredlawrence/tpu-runs/part-i/manifests/gsm8k_train_base_hard_medium.jsonl`
+- `ADV_ESTIMATOR=grpo`
+- `NUM_GENERATIONS=2`
+- `RUN_SEED=0`, `EVAL_SEED=0`
+- `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`
+- Metadata `max_steps=3452`, expected from `NUM_BATCHES=3836` and `TRAIN_FRACTION=0.9`.
+
+Outcome:
+- Training completed normally and saved final checkpoint `ckpts/actor/3452`.
+- No fatal error, traceback, OOM, or killed process was found.
+- The failure was model/training collapse: generated completions became empty/immediate-EOS.
+
+TensorBoard evidence:
+- First zero-length train completion at step `457`.
+- First persistent run of zero-length train completions began at step `518`.
+- Final train metrics: `completions/train/mean_length=0`, `rewards/train/score/mean=-2.5`, `rewards/train/mean=-0.625`, `actor/train/grad_norm=0`, `actor/train/kl=0`, `actor/train/loss=0`.
+- Eval was healthy only early: strongest scalar region around steps `192-448`; sharp degradation around step `512`; fully collapsed by step `2240`.
+- Final eval at step `3392`: `completions/eval/mean_length=0`, `rewards/eval/score/mean=-2.5`, `rewards/eval/mean=-0.625`.
+- `train.log` tail confirms blank `Response:` fields with `Extracted: None`.
+
+Interpretation:
+- This is not an infrastructure failure. K=2 GRPO on the hard/medium manifest appears too unstable: high-variance group-relative advantages pushed the policy toward EOS-at-first-token. Once both sibling rollouts are empty/equally bad, GRPO has no useful contrast and gradients go to zero.
+- Best salvage checkpoint is likely `ckpts/actor/250`; step `500` is already degrading and `750+` is mostly unusable.
+- W&B final eval display is unreliable for this run because final eval metrics were repeatedly logged at step `0` after current step `3452`; TensorBoard is the source of truth.
+
+Recommendation:
+- A hard/medium K=8 retry is worth running if TPU time permits. Prior D4/R5 K=8 evidence shows much better stability and no empty-response collapse, so K=8 directly targets the R7 failure mode.
+- Keep checkpoint retention high (`SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`) and evaluate retained checkpoints. Add an early stop/review gate if mean completion length collapses or empty responses appear by step `500`.
+- Frame any K=8 hard/medium rerun as a stability ablation, not as guaranteed improvement over R5.
+
+## 2026-06-11: Corrected R7/R8 hard/medium held-out evals
+
+Eval split:
+- Normal held-out manifest: `/home/fredlawrence/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl`.
+- This is separate from the hard/medium training manifest.
+
+Base/no-restore evals:
+- `/home/fredlawrence/tpu-runs/part-i/R7-grpo-k2-hardmedium-20260610_102859/eval/r7_best_greedy.csv`
+- `/home/fredlawrence/tpu-runs/part-i/R8-grpo-k8-hardmedium-20260610_131135/eval/best_greedy.csv`
+- These two CSVs are byte-identical and have `restored_step` empty with `requested_ckpt_dir=/tmp/content/ckpts/`.
+- Their logs say `Skipping checkpoint restore — evaluating base model.`
+- Metrics: `31/64` exact (`48.44%`), `31/64` partial (`48.44%`), `1/64` format (`1.56%`), `0/64` empty, mean length about `143.7` words.
+- Do not report either file as a trained R7 or trained R8 result.
+
+R8 trained final eval:
+- CSV: `/home/fredlawrence/tpu-runs/part-i/R8-grpo-k8-hardmedium-20260610_131135/eval/r8_step3452_greedy.csv`
+- Log: `/home/fredlawrence/tpu-runs/part-i/R8-grpo-k8-hardmedium-20260610_131135/logs/eval_r8_step3452_greedy.log`
+- Restored checkpoint: `/home/fredlawrence/tpu-runs/part-i/R8-grpo-k8-hardmedium-20260610_131135/ckpts/actor`, step `3452`.
+- Metrics: `30/64` exact (`46.88%`), `32/64` partial (`50.00%`), `60/64` format (`93.75%`), `0/64` empty, mean length about `180.5` words.
+- Interpretation: K=8 avoided the R7 empty-response collapse at final step, but the final trained checkpoint is not better than base on exact accuracy for this 64-prompt held-out manifest. It mainly improves format compliance.
+
+Open eval gap:
+- If a trained R7 salvage result is needed, rerun R7 with a real checkpoint restore, probably `--ckpt-dir /home/fredlawrence/tpu-runs/part-i/R7-grpo-k2-hardmedium-20260610_102859/ckpts --step 250`.
+
 ## 2026-06-09: Hard-example curriculum idea
 
 Idea:
