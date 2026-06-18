@@ -1,0 +1,15 @@
+step,n,correct,acc,partial_correct,format_correct,path
+250,64,28,0.4375,30,59,/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step250_n64.csv
+500,64,30,0.46875,32,50,/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step500_n64.csv
+750,64,28,0.4375,30,3,/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step750_n64.csv
+1000,64,28,0.4375,28,59,/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step1000_n64.csv
+1250,64,30,0.46875,33,55,/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step1250_n64.csv
+1500,64,21,0.328125,23,51,/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step1500_n64.csv
+1750,64,26,0.40625,31,47,/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step1750_n64.csv
+2000,64,24,0.375,26,28,/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step2000_n64.csv
+2250,64,19,0.296875,22,25,/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step2250_n64.csv
+2500,64,11,0.171875,11,23,/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step2500_n64.csv
+2750,64,7,0.109375,7,25,/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step2750_n64.csv
+3000,64,8,0.125,8,16,/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step3000_n64.csv
+3250,64,13,0.203125,13,19,/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step3250_n64.csv
+3364,64,12,0.1875,12,23,/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step3364_n64.csv

@@ -1,0 +1,16 @@
+kind,step,n,exact,partial,format,empty,restored_step,eval_manifest,path
+base,,64,31,31,1,0,,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/base_greedy.csv
+checkpoint,1000,64,29,29,49,0,1000,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/H-grpo-k4-full-s0-20260614_step1000_greedy.csv
+checkpoint,1250,64,28,28,58,0,1250,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/H-grpo-k4-full-s0-20260614_step1250_greedy.csv
+checkpoint,1500,64,30,32,53,0,1500,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/H-grpo-k4-full-s0-20260614_step1500_greedy.csv
+checkpoint,1750,64,26,27,51,0,1750,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/H-grpo-k4-full-s0-20260614_step1750_greedy.csv
+checkpoint,2000,64,27,30,49,0,2000,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/H-grpo-k4-full-s0-20260614_step2000_greedy.csv
+checkpoint,2250,64,27,29,49,0,2250,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/H-grpo-k4-full-s0-20260614_step2250_greedy.csv
+checkpoint,2500,64,30,30,49,0,2500,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/H-grpo-k4-full-s0-20260614_step2500_greedy.csv
+checkpoint,250,64,26,26,54,0,250,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/H-grpo-k4-full-s0-20260614_step250_greedy.csv
+checkpoint,2750,64,37,37,51,0,2750,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/H-grpo-k4-full-s0-20260614_step2750_greedy.csv
+checkpoint,3000,64,33,34,51,0,3000,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/H-grpo-k4-full-s0-20260614_step3000_greedy.csv
+checkpoint,3250,64,34,35,52,0,3250,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/H-grpo-k4-full-s0-20260614_step3250_greedy.csv
+checkpoint,3364,64,28,29,49,0,3364,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/H-grpo-k4-full-s0-20260614_step3364_greedy.csv
+checkpoint,500,64,29,32,53,0,500,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/H-grpo-k4-full-s0-20260614_step500_greedy.csv
+checkpoint,750,64,26,27,51,0,750,/home/harvey/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl,/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/H-grpo-k4-full-s0-20260614_step750_greedy.csv

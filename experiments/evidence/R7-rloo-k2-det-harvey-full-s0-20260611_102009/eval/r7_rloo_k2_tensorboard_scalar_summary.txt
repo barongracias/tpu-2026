@@ -1,0 +1,52 @@
+R7 deterministic RLOO K=2 TensorBoard scalar export
+Event file: /home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/tensorboard/events.out.tfevents.1781173397.t1v-n-6e5e72ce-w-0
+Scalar CSV: /home/harvey/tpu-runs/part-i/R7-rloo-k2-det-harvey-full-s0-20260611_102009/eval/r7_rloo_k2_tensorboard_scalars.csv
+Scalar rows: 102874
+
+Tags:
+- jax/core/compile/jaxpr_trace_duration: 98 points, first_step=0, last_step=0, last_value=1781176704.0
+- jax/core/compile/jaxpr_to_mlir_module_duration: 98 points, first_step=0, last_step=0, last_value=1781176704.0
+- jax/core/compile/backend_compile_duration: 98 points, first_step=0, last_step=0, last_value=1781176704.0
+- actor/eval/loss: 53 points, first_step=0, last_step=3328, last_value=0.030045093968510628
+- actor/eval/perplexity: 53 points, first_step=0, last_step=3328, last_value=1.0305010080337524
+- actor/eval/kl: 53 points, first_step=0, last_step=3328, last_value=0.37400180101394653
+- actor/eval/pg_clipfrac: 53 points, first_step=0, last_step=3328, last_value=0.0
+- jax/orbax/write/sharded_array_gb: 37590 points, first_step=0, last_step=0, last_value=3.725290298461914e-09
+- jax/orbax/write/blocking_gbytes_per_sec: 30 points, first_step=0, last_step=0, last_value=0.21097387373447418
+- jax/checkpoint/write/old_steps_examined_count: 15 points, first_step=0, last_step=0, last_value=15.0
+- jax/orbax/write/gbytes_per_sec: 30 points, first_step=0, last_step=0, last_value=0.13858945667743683
+- jax/orbax/write/gbytes: 30 points, first_step=0, last_step=0, last_value=0.3745117485523224
+- rewards/train/sum: 3364 points, first_step=0, last_step=3363, last_value=1.5
+- rewards/train/mean: 3364 points, first_step=0, last_step=3363, last_value=0.375
+- rewards/train/min: 3364 points, first_step=0, last_step=3363, last_value=-1.0
+- rewards/train/max: 3364 points, first_step=0, last_step=3363, last_value=3.0
+- rewards/train/match_format_exactly: 3364 points, first_step=0, last_step=3363, last_value=1.5
+- rewards/train/match_format_approximately: 3364 points, first_step=0, last_step=3363, last_value=0.5
+- rewards/train/check_answer: 3364 points, first_step=0, last_step=3363, last_value=-0.5
+- rewards/train/check_numbers: 3364 points, first_step=0, last_step=3363, last_value=0.0
+- rewards/train/score/mean: 3364 points, first_step=0, last_step=3363, last_value=1.5
+- rewards/train/score/max: 3364 points, first_step=0, last_step=3363, last_value=3.5
+- rewards/train/score/min: 3364 points, first_step=0, last_step=3363, last_value=-0.5
+- completions/train/mean_length: 3364 points, first_step=0, last_step=3363, last_value=376.0
+- completions/train/max_length: 3364 points, first_step=0, last_step=3363, last_value=456.0
+- completions/train/min_length: 3364 points, first_step=0, last_step=3363, last_value=296.0
+- rewards/eval/sum: 53 points, first_step=0, last_step=3328, last_value=3.7733957767486572
+- rewards/eval/mean: 53 points, first_step=0, last_step=3328, last_value=0.9433489441871643
+- rewards/eval/min: 53 points, first_step=0, last_step=3328, last_value=-2.5
+- rewards/eval/max: 53 points, first_step=0, last_step=3328, last_value=3.0
+- rewards/eval/match_format_exactly: 53 points, first_step=0, last_step=3328, last_value=2.077540159225464
+- rewards/eval/match_format_approximately: 53 points, first_step=0, last_step=3328, last_value=0.509358286857605
+- rewards/eval/check_answer: 53 points, first_step=0, last_step=3328, last_value=0.6510695219039917
+- rewards/eval/check_numbers: 53 points, first_step=0, last_step=3328, last_value=0.5354278087615967
+- rewards/eval/score/mean: 53 points, first_step=0, last_step=3328, last_value=3.7733957767486572
+- rewards/eval/score/max: 53 points, first_step=0, last_step=3328, last_value=9.0
+- rewards/eval/score/min: 53 points, first_step=0, last_step=3328, last_value=-2.5
+- completions/eval/mean_length: 53 points, first_step=0, last_step=3328, last_value=295.45587158203125
+- completions/eval/max_length: 53 points, first_step=0, last_step=3328, last_value=768.0
+- completions/eval/min_length: 53 points, first_step=0, last_step=3328, last_value=0.0
+- jax/checkpoint/write/async/commit_future_count: 15 points, first_step=0, last_step=0, last_value=4.0
+- actor/train/loss: 3364 points, first_step=1, last_step=3364, last_value=0.02884441241621971
+- actor/train/perplexity: 3364 points, first_step=1, last_step=3364, last_value=1.0292643308639526
+- actor/train/grad_norm: 3364 points, first_step=1, last_step=3364, last_value=28.25
+- actor/train/kl: 3364 points, first_step=1, last_step=3364, last_value=0.36904892325401306
+- actor/train/pg_clipfrac: 3364 points, first_step=1, last_step=3364, last_value=0.0

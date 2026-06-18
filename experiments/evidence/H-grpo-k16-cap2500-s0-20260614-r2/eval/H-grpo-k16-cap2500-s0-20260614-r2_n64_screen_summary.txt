@@ -1,0 +1,10 @@
+n64 screening summary for H-grpo-k16-cap2500-s0-20260614-r2
+
+| Step | Exact | Partial | Format | Empty | restored_step |
+|---:|---:|---:|---:|---:|---|
+| base | 31/64 | 31/64 | 1/64 | 0/64 | base |
+| 250 | 30/64 | 33/64 | 56/64 | 0/64 | 250 |
+| 500 | 31/64 | 32/64 | 47/64 | 0/64 | 500 |
+
+Selected best retained checkpoint: step 500 (31/64 exact on n64).
+Final / last-good checkpoint: step 500.

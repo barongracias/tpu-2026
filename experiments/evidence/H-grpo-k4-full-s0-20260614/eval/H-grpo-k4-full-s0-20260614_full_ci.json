@@ -1,0 +1,73 @@
+{
+  "metric": "correct",
+  "seed": 12345,
+  "resamples": 10000,
+  "shared_prompts": 1319,
+  "per_model": [
+    {
+      "label": "base",
+      "n": 1319,
+      "correct": 625,
+      "acc": 0.47384382107657314,
+      "ci_low": 0.447289613343442,
+      "ci_high": 0.5011372251705838,
+      "restored_step": "",
+      "path": "/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/base_full.csv"
+    },
+    {
+      "label": "k4_best",
+      "n": 1319,
+      "correct": 682,
+      "acc": 0.5170583775587566,
+      "ci_low": 0.49052312357846856,
+      "ci_high": 0.5435936315390447,
+      "restored_step": "2750",
+      "path": "/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/H-grpo-k4-full-s0-20260614_step2750_full.csv"
+    },
+    {
+      "label": "k4_final",
+      "n": 1319,
+      "correct": 681,
+      "acc": 0.5163002274450341,
+      "ci_low": 0.49052312357846856,
+      "ci_high": 0.5435936315390447,
+      "restored_step": "3364",
+      "path": "/home/harvey/tpu-runs/part-i/H-grpo-k4-full-s0-20260614/eval/H-grpo-k4-full-s0-20260614_step3364_full.csv"
+    }
+  ],
+  "comparisons": [
+    {
+      "a": "k4_best",
+      "b": "k4_final",
+      "n": 1319,
+      "delta_acc": 0.000758150113722517,
+      "ci_low": -0.019711902956785488,
+      "ci_high": 0.020470053070507976,
+      "prob_gt0": 0.5148,
+      "p_two_sided": 0.9704,
+      "ci_excludes_zero": false
+    },
+    {
+      "a": "k4_best",
+      "b": "base",
+      "n": 1319,
+      "delta_acc": 0.043214556482183475,
+      "ci_low": 0.013646702047005299,
+      "ci_high": 0.07202426080363905,
+      "prob_gt0": 0.9982,
+      "p_two_sided": 0.0036,
+      "ci_excludes_zero": true
+    },
+    {
+      "a": "k4_final",
+      "b": "base",
+      "n": 1319,
+      "delta_acc": 0.04245640636846096,
+      "ci_low": 0.016679302501895366,
+      "ci_high": 0.06899166034874904,
+      "prob_gt0": 0.9991,
+      "p_two_sided": 0.0018,
+      "ci_excludes_zero": true
+    }
+  ]
+}
