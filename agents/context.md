@@ -358,3 +358,49 @@ Interpretation:
 - R8 hard/medium final did not show the empty-output collapse seen in R7; the training log tail contains normal formatted responses and `Training finished.`
 - R8 final strongly learned the required XML-style format but did not improve exact accuracy over the base eval on this 64-prompt manifest (`30/64` vs base `31/64`).
 - R7 still needs a properly restored trained-checkpoint eval, likely step `250`, if a salvage/early-stopped R7 number is needed. The existing `r7_best_greedy.csv` must not be reported as trained R7.
+
+## 2026-06-17: Final follow-up integration (full-test n=1319) — collated from baron, baron-reward-rebalance-k8, harvey-grpo-k8-rerun
+
+The three final follow-ups completed and the team moved from the 64-prompt screen to a **full GSM8K test eval (n=1319)** with paired bootstrap CIs. These results are not on the `fred` branch's own runs; they are collated here from teammates' branches and committed `experiments/team_evidence/` + `experiments/evidence/` artefacts. W&B runtimes below were queried live on 2026-06-17 (`/tmp/wbexport` venv, entity `barongracias-university-of-cambridge`, project `agentic-ai-coursework`).
+
+Run-alias mapping (the new runs renamed to the Rx convention for the report; the long ids remain the canonical artefact names):
+- **R10** = `H-grpo-k4-full-s0-20260614` (Harvey, GRPO K=4).
+- **R11** = `H-grpo-k16-cap2500-s0-20260614-r2` (Harvey, GRPO K=16, capped/OOM).
+- **R12** = `B-grpo-k8-rewardrebalance-s0-20260614` (Baron, GRPO K=8 reward-rebalance).
+
+Report-only relabel (does NOT match W&B): the report's I.3 table calls the deterministic RLOO **K=2 run R6** and the **K=8 run R7**. In W&B both are `R7-rloo-k{2,8}-det-harvey-*` (i.e. both "R7"); W&B's own `R6-rloo-*` are the earlier *non-deterministic* sweep, which is not used in the report. The report carries a caption note flagging this mismatch. Canonical run-ids in this file are unchanged.
+
+Eval protocol:
+- Full-test manifest `experiments/manifests/gsm8k_test_seed0_full.jsonl`, SHA-256 `07f0f0fc10580dee941b6f921a3986854a8b0b74529d9bb952662d5daaea6bb2`, 1319 rows. Built with `scripts/build_full_test_manifest.py --eval-seed 0`; verified against the n=64 manifest (`9aa1814e…`) by `question_sha256` prefix.
+- All deltas are paired bootstrap, 10000 resamples, seed 12345, each model vs its own same-run base `--no-restore` eval on this manifest.
+- Shared base on this manifest: **625/1319 (47.38%), 95% CI [44.73%, 50.11%]**.
+
+Full-test results table (exact accuracy; "best/selected" was chosen on the n=64 screen before full-test confirmation):
+
+| Owner | Run | K | Method | Selected ckpt full-test | Final ckpt full-test | Δ final vs base | Empty (final) | W&B runtime | W&B state |
+| --- | --- | ---: | --- | --- | --- | --- | ---: | --- | --- |
+| Baron | R1-grpo-full-s0 (baseline) | 2 | GRPO | step 2000: 489/1319 (37.07%) | step 3364: 244/1319 (18.50%) | -28.9pp [-31.2,-25.6] (paired CI from teammate; per-prompt CSV not in repo) | n/a | 4h14m42s | finished |
+| Baron | R5-grpo-k8-full-s0-20260609_114832 | 8 | GRPO | step 3250: 740/1319 (56.10%), +8.72pp [+5.99,+11.37] | step 3364: 740/1319 (56.10%) | +8.72pp [+5.91,+11.45] | 0/1319 | 6h52m13s | finished |
+| Baron | R12 (B-grpo-k8-rewardrebalance-s0-20260614) | 8 | GRPO, reward fmt=0.3/ans=2.0/num=1.0 | step 500: 704/1319 (53.37%), +5.99pp [+3.26,+8.49] | step 3364: 704/1319 (53.37%) | +5.99pp [+3.03,+8.79] | 0/1319 | 9h08m49s | finished |
+| Harvey | R10 (H-grpo-k4-full-s0-20260614) | 4 | GRPO | step 2750: 682/1319 (51.71%), +4.32pp [+1.36,+7.20] | step 3364: 681/1319 (51.63%) | +4.25pp [+1.67,+6.90] | 0/1319 | 6h26m49s | failed* |
+| Harvey | R11 (H-grpo-k16-cap2500-s0-20260614-r2) | 16 | GRPO (capped) | step 500: 703/1319 (53.30%), +5.91pp [+3.18,+8.64] | step 500 last-good (OOM) | +5.91pp [+3.18,+8.64] | 0/1319 | 2h08m27s | failed/OOM |
+| Harvey | R7-rloo-k8-det-harvey-full-s0-20260611_105132 | 8 | RLOO | step 2000: 722/1319 (54.74%), +7.35pp [+4.62,+10.16] | step 3364: 742/1319 (56.25%) | +8.87pp [+6.14,+11.68] | 0/1319 | 7h30m53s | finished |
+| Harvey | R7-rloo-k2-det-harvey-full-s0-20260611_102009 | 2 | RLOO | step 500: 562/1319 (42.61%), -4.78pp [-7.66,-1.82] | step 3364: 59/1319 (4.47%) | -42.91pp [-45.72,-40.03] | 1111/1319 | 5h46m12s | finished |
+
+\* H-grpo-k4 W&B state is `failed` but `_step` reached 3364 and all retained checkpoints + evals exist; Harvey's handoff records it as a completed, non-capped, no-OOM run. Treat as completed training; the `failed` state is a post-training W&B/process artefact, not a training failure. Flag this if the run is cited.
+
+Per-experiment notes:
+- **Exp 1 = R12 (Baron reward-rebalance, the diagnosed-pathology "fix"):** GRPO K=8 with format down-weighted (0.3) and answer up-weighted (2.0). It beats base on the full test (+5.99pp) but **underperforms plain R5 GRPO K=8 (+8.72pp)**. Headline implication: increasing K did more than the targeted reward rebalance, so frame Exp 1 as "a reward fix that helps but does not beat simply raising K", not as "we fixed the pathology". n=64: best 34/64 @500, final 32/64. W&B run id `B-grpo-k8-rewardrebalance-s0-20260614`, commit `74b648a`.
+- **Exp 2 = R10 (K=4) + R11 (K=16) (Harvey group-size sweep) is complete**, giving a 4-point K∈{2,4,8,16} test of the I.4 Q1 `K_eff=K-1` result. K=2 is *below* base; K=4/8/16 are all *above* base with CIs excluding zero. R10 (K=4) completed full (3364 steps); R11 (K=16) hit JAX/XLA `RESOURCE_EXHAUSTED` after scalar step 678 (last-good = step 500) and must be labelled capped/early-stopped/OOM, not compute-matched. Launch branch `harvey-ksweep`, commit `57c6409`, beta=0.08, epsilon=0.2.
+- **Harvey deterministic RLOO K=2 vs K=8:** confirms K stabilises RLOO too. K=8 final 742/1319 (+8.87pp) is the single strongest full-test result, narrowly beating Baron R5. K=2 collapses to 1111/1319 empty by the final step. Commits: K=2 `71aab87`, K=8 `e3d69a1` (both descended from deterministic `57c6409`).
+- **Critical: the n=64 screen under-ranks final checkpoints.** Harvey RLOO K=8 final scored 26/64 on n=64 but 742/1319 on full test. Separate checkpoint-selection policy from final full-test confirmation in the report.
+
+Not report-usable (training done, evidence missing):
+- `R6-grpo-k2-baseline-s0-20260609_212708` (Baron, deterministic K=2 baseline): finished training, but no eval CSVs and the referenced manifest dir is empty locally.
+- `R6-rloo-k8-full-s0-20260609_212314` and `R6-rloo-k2-full-s0-20260609_220042` (Harvey): launched from non-deterministic `harvey` branch (`8a0f7f2`), no retained-checkpoint evals and no `run_metadata.json`. Superseded by the deterministic R7 pair.
+
+R1 full-test update (2026-06-17): the GRPO K=2 baseline R1 now also has a full-test (n=1319) eval — best/selected checkpoint (step 2000) **489/1319 (37.07%)** and final (step 3364) **244/1319 (18.50%)**, both well below base 625/1319. Paired Δ final vs base = **−28.9pp, 95% CI [−31.2, −25.6]** (computed by a teammate; R1's per-prompt full-test CSV is not in the repo, so we cannot recompute it locally). This supersedes the earlier "R1 has no full-test run" note: R1 is now a full-test K=2 GRPO negative point alongside R6 (RLOO K=2).
+
+Provenance caveat (carried forward): the harvested R1/R3/R5/D4 n=64 CSVs are Baron's seed-0-draw sample (empty `EVAL_MANIFEST`). They are valid only for the historical seed-0-draw paired base-vs-R5 test; do not pool them with the committed n=64 (`9aa1814e…`) or full-test (`07f0f0fc…`) manifests.
+
+External-collaborator coverage (Basia KL/length/empty penalties, Funmi LoRA/LR, Rowan K-sweep/reward-reweight) is catalogued in the team experiment register on the teammate branches; treat as supporting context only until eval protocol/provenance is reconciled.
