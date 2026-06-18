@@ -54,6 +54,9 @@ from config import (
     NUM_ITERATIONS,
     NUM_TEST_BATCHES,
     QWIX_REF,
+    REWARD_ANSWER_WEIGHT,
+    REWARD_FORMAT_WEIGHT,
+    REWARD_NUMBER_WEIGHT,
     RUN_SEED,
     SAVE_INTERVAL_STEPS,
     TEMPERATURE,
@@ -106,6 +109,11 @@ def save_run_metadata(run_id: str | None, ckpt_dir: str) -> str:
             "flax": FLAX_REF,
         },
         "advantage_estimator": ADV_ESTIMATOR,
+        "reward_weights": {
+            "format": REWARD_FORMAT_WEIGHT,
+            "answer": REWARD_ANSWER_WEIGHT,
+            "number": REWARD_NUMBER_WEIGHT,
+        },
         "run_seed": RUN_SEED,
         "eval_seed": EVAL_SEED,
         "eval_manifest": EVAL_MANIFEST,
@@ -239,6 +247,11 @@ def main():
     optimizer = build_optimizer()
     cluster_cfg = build_cluster_config(mesh, optimizer, eos_tokens)
     print(f"  ADV_ESTIMATOR={ADV_ESTIMATOR}")
+    print(
+        f"  REWARD_FORMAT_WEIGHT={REWARD_FORMAT_WEIGHT}\n"
+        f"  REWARD_ANSWER_WEIGHT={REWARD_ANSWER_WEIGHT}\n"
+        f"  REWARD_NUMBER_WEIGHT={REWARD_NUMBER_WEIGHT}"
+    )
     grpo_cfg = GRPOConfig(
         num_generations=NUM_GENERATIONS,
         num_iterations=NUM_ITERATIONS,
@@ -269,6 +282,9 @@ def main():
         f"  EVAL_MANIFEST={EVAL_MANIFEST}\n"
         f"  MODEL_REVISION={MODEL_REVISION}\n"
         f"  NUM_GENERATIONS={NUM_GENERATIONS}\n"
+        f"  REWARD_FORMAT_WEIGHT={REWARD_FORMAT_WEIGHT}\n"
+        f"  REWARD_ANSWER_WEIGHT={REWARD_ANSWER_WEIGHT}\n"
+        f"  REWARD_NUMBER_WEIGHT={REWARD_NUMBER_WEIGHT}\n"
         f"  BETA={BETA}\n"
         f"  EPSILON={EPSILON}\n"
         f"  TEMPERATURE={TEMPERATURE}\n"

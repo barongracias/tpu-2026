@@ -1,0 +1,20 @@
+r3_rloo_step2000_greedy.csv
+  rows=64
+  correct=1/64 acc=1.56%
+  partial=1/64 partial_acc=1.56%
+  format=10/64 format_acc=15.62%
+r3_rloo_step2500_greedy.csv
+  rows=64
+  correct=6/64 acc=9.38%
+  partial=7/64 partial_acc=10.94%
+  format=16/64 format_acc=25.00%
+r3_rloo_step3000_greedy.csv
+  rows=64
+  correct=1/64 acc=1.56%
+  partial=2/64 partial_acc=3.12%
+  format=4/64 format_acc=6.25%
+r3_rloo_step3364_greedy.csv
+  rows=64
+  correct=1/64 acc=1.56%
+  partial=1/64 partial_acc=1.56%
+  format=5/64 format_acc=7.81%
