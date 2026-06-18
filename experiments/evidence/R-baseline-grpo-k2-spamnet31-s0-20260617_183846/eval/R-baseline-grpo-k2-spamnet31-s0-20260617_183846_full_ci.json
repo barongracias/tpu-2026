@@ -1,0 +1,62 @@
+{
+  "metric": "correct",
+  "seed": 12345,
+  "resamples": 10000,
+  "shared_prompts": 1319,
+  "per_model": [
+    {
+      "label": "base",
+      "n": 1319,
+      "correct": 625,
+      "acc": 0.47384382107657314,
+      "ci_low": 0.447289613343442,
+      "ci_high": 0.5011372251705838,
+      "restored_step": "",
+      "path": "/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/base_full.csv"
+    },
+    {
+      "label": "baseline_best",
+      "n": 1319,
+      "correct": 656,
+      "acc": 0.4973464746019712,
+      "ci_low": 0.4700530705079606,
+      "ci_high": 0.5239006823351021,
+      "restored_step": "500",
+      "path": "/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step500_full.csv"
+    },
+    {
+      "label": "baseline_final",
+      "n": 1319,
+      "correct": 218,
+      "acc": 0.1652767247915087,
+      "ci_low": 0.14556482183472327,
+      "ci_high": 0.18498862774829417,
+      "restored_step": "3364",
+      "path": "/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/eval/R-baseline-grpo-k2-spamnet31-s0-20260617_183846_step3364_full.csv"
+    }
+  ],
+  "comparisons": [
+    {
+      "a": "baseline_best",
+      "b": "base",
+      "n": 1319,
+      "delta_acc": 0.02350265352539803,
+      "ci_low": -0.0030326004548900665,
+      "ci_high": 0.05003790750568615,
+      "prob_gt0": 0.9558,
+      "p_two_sided": 0.0884,
+      "ci_excludes_zero": false
+    },
+    {
+      "a": "baseline_final",
+      "b": "base",
+      "n": 1319,
+      "delta_acc": -0.30856709628506446,
+      "ci_low": -0.34040940106141016,
+      "ci_high": -0.27824109173616374,
+      "prob_gt0": 0.0,
+      "p_two_sided": 0.0,
+      "ci_excludes_zero": true
+    }
+  ]
+}

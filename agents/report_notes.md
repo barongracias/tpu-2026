@@ -2,6 +2,14 @@
 
 ## Current Headline State
 
+As of 2026-06-18 UTC, the deterministic coursework GRPO K=2 baseline
+reproduction is trained and fully evaluated on the same manifest protocol as the
+later Harvey full-test evidence. The report-ready markdown summary is
+`experiments/evidence/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/README.md`,
+and the rollup rows are in
+`experiments/team_evidence/evidence_harvey_full_eval_20260614.md` and
+`agents/team_experiment_register.md`.
+
 The `coursework` branch contains the P0-P6 preparation patches for Part I TPU usage and was aligned with `origin/coursework` at `820fad6` for earlier runs. D1/D2, R1/R3, D3/D4, and R5 have completed. R6 RLOO K=8 and chained RLOO K=2 full training were launched from non-deterministic branch `harvey` at W&B-recorded commit `8a0f7f266552cb2666710ac589cb6bda5cd40121`; the later note-time checkout was `harvey-grpo-k8-rerun`. The R6 runs still need retained-checkpoint evaluation before they are used as performance evidence. R7 is the deterministic rerun: K=2 is running on the separate Harvey VM from `harvey-grpo-k8-rerun` commit `71aab87dee2d2c78256384d084d063d8b40c9e0c`, and K=8 is running on this shared Boris VM from `harvey-grpo-k8-rerun` commit `e3d69a1938fe8e8a2a67a3c84a03331133ed46f1`.
 
 Local run notes, diagnostics, manifests, and runbooks for the current TPU work are now tracked under `experiments/`. Start with `experiments/README.md`, then use `experiments/baseline/`, `experiments/variants/`, and `experiments/diagnostics/` for run-specific summaries; TPU-side raw logs/CSVs remain under each `$RUN_ROOT`.

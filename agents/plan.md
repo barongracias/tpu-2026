@@ -467,3 +467,32 @@ Next:
 - After both deterministic runs complete, run retained-checkpoint evals using the shared eval manifest before comparing K=8 vs K=2.
 - Collate lightweight eval evidence on one collector VM under `$HOME/tpu-runs/part-i/report_diagnostics/r7_rloo_k_sweep_det_20260611/{k2,k8}/`: copy `eval/*_greedy.csv`, eval summaries, eval logs, `train.log`, `ckpts/run_metadata.json`, and the shared eval manifest. Leave the large `ckpts/actor/` trees in the original run roots unless eval must be rerun.
 - Do not update shared rollup files until both exact run IDs and W&B URLs are available and both runs finish.
+
+## Milestone 5.15: Deterministic GRPO K=2 Baseline Reproduction
+
+Status: complete and recorded.
+
+Run:
+- Run id: `R-baseline-grpo-k2-spamnet31-s0-20260617_183846`.
+- Run root: `/home/harvey/tpu-runs/part-i/R-baseline-grpo-k2-spamnet31-s0-20260617_183846`.
+- Branch / commit: `harvey-grpo-k8-rerun` / `7a77bce3a79783d5caa4ff782c1746012e4defe7`.
+- Config: GRPO, `NUM_GENERATIONS=2`, seed `0`, full `3364` steps, `SAVE_INTERVAL_STEPS=250`, `MAX_TO_KEEP=20`.
+- Deterministic eval manifests: full manifest SHA-256 `07f0f0fc10580dee941b6f921a3986854a8b0b74529d9bb952662d5daaea6bb2`; n=64 screen manifest SHA-256 `9aa1814e295e155f4735c9302a7f9c28c6aaa2319074e053a5888e3f3b2448b0`.
+
+Results:
+| Model / checkpoint | Exact | Partial | Format | Empty |
+| --- | ---: | ---: | ---: | ---: |
+| Base greedy | 625/1319 (47.38%) | 659/1319 (49.96%) | 53/1319 (4.02%) | 0/1319 |
+| Baseline GRPO K=2 step 500 | 656/1319 (49.73%) | 688/1319 (52.16%) | 1038/1319 (78.70%) | 0/1319 |
+| Baseline GRPO K=2 step 3364 | 218/1319 (16.53%) | 240/1319 (18.20%) | 469/1319 (35.56%) | 0/1319 |
+
+Bootstrap:
+| Comparison | Delta exact | 95% CI | Result |
+| --- | ---: | ---: | --- |
+| Baseline step 500 vs base | +2.35 pp | [-0.30 pp, +5.00 pp] | CI includes 0 |
+| Baseline step 3364 vs base | -30.86 pp | [-34.04 pp, -27.82 pp] | CI excludes 0 |
+
+Evidence:
+- Per-run markdown: `experiments/evidence/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/README.md`.
+- Rollup markdown: `experiments/team_evidence/evidence_harvey_full_eval_20260614.md`.
+- Register row: `agents/team_experiment_register.md`.

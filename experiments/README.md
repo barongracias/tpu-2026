@@ -22,3 +22,4 @@ Recent run records:
 - `variants/r6_rloo_k_sweep_full_s0_20260609.md`: side-by-side record for the completed RLOO K=8 and chained RLOO K=2 full training runs; evaluation pending.
 - `variants/h_grpo_k4_full_s0_20260614.md`: completed Harvey GRPO K=4 full run and full-test confirmation eval.
 - `variants/h_grpo_k16_cap2500_s0_20260614_r2.md`: capped Harvey GRPO K=16 run, early-stopped with TPU memory exhaustion and evaluated to last-good checkpoint.
+- `evidence/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/README.md`: deterministic coursework GRPO K=2 baseline reproduction with n=64 checkpoint selection, full-test best/final evals, and paired bootstrap CIs.

@@ -1,0 +1,18 @@
+n64 checkpoint screen, greedy, exact-correct selection
+tie_break=lowest_step
+step=250 correct=28/64 acc=0.437500 partial=30 format=59
+step=500 correct=30/64 acc=0.468750 partial=32 format=50
+step=750 correct=28/64 acc=0.437500 partial=30 format=3
+step=1000 correct=28/64 acc=0.437500 partial=28 format=59
+step=1250 correct=30/64 acc=0.468750 partial=33 format=55
+step=1500 correct=21/64 acc=0.328125 partial=23 format=51
+step=1750 correct=26/64 acc=0.406250 partial=31 format=47
+step=2000 correct=24/64 acc=0.375000 partial=26 format=28
+step=2250 correct=19/64 acc=0.296875 partial=22 format=25
+step=2500 correct=11/64 acc=0.171875 partial=11 format=23
+step=2750 correct=7/64 acc=0.109375 partial=7 format=25
+step=3000 correct=8/64 acc=0.125000 partial=8 format=16
+step=3250 correct=13/64 acc=0.203125 partial=13 format=19
+step=3364 correct=12/64 acc=0.187500 partial=12 format=23
+BEST_STEP=500
+BEST_CORRECT=30
