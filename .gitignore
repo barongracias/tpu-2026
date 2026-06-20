@@ -33,3 +33,6 @@ scripts/*.log
 .idea/
 *.swp
 .DS_Store
+
+# local agent/helper notes (not part of submission)
+agents/
