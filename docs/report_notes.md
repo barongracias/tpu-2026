@@ -8,7 +8,7 @@ later Harvey full-test evidence. The report-ready markdown summary is
 `experiments/evidence/R-baseline-grpo-k2-spamnet31-s0-20260617_183846/README.md`,
 and the rollup rows are in
 `experiments/team_evidence/evidence_harvey_full_eval_20260614.md` and
-`agents/team_experiment_register.md`.
+`docs/team_experiment_register.md`.
 
 The `coursework` branch contains the P0-P6 preparation patches for Part I TPU usage and was aligned with `origin/coursework` at `820fad6` for earlier runs. D1/D2, R1/R3, D3/D4, and R5 have completed. R6 RLOO K=8 and chained RLOO K=2 full training were launched from non-deterministic branch `harvey` at W&B-recorded commit `8a0f7f266552cb2666710ac589cb6bda5cd40121`; the later note-time checkout was `harvey-grpo-k8-rerun`. The R6 runs still need retained-checkpoint evaluation before they are used as performance evidence. R7 is the deterministic rerun: K=2 is running on the separate Harvey VM from `harvey-grpo-k8-rerun` commit `71aab87dee2d2c78256384d084d063d8b40c9e0c`, and K=8 is running on this shared Boris VM from `harvey-grpo-k8-rerun` commit `e3d69a1938fe8e8a2a67a3c84a03331133ed46f1`.
 
@@ -693,4 +693,4 @@ Notes hygiene:
 - Do not update shared rollup files until both current R7 runs finish and both exact run IDs/W&B URLs are used.
 - After both R7 runs finish, choose one collector VM and copy only lightweight eval evidence into `$HOME/tpu-runs/part-i/report_diagnostics/r7_rloo_k_sweep_det_20260611/{k2,k8}/`; leave large checkpoint trees in the original run roots.
 - The required files to collate are `eval/*_greedy.csv`, `eval/*summary*.txt`, `logs/eval_*.log`, `logs/train.log`, `ckpts/run_metadata.json`, and the shared manifest `$HOME/tpu-runs/part-i/manifests/gsm8k_test_seed0_n64.jsonl`.
-- If one VM creates the eval manifest first, copy the exact JSONL to the other VM before evaluation so the K=2 and K=8 per-prompt CSVs are row-aligned. Detailed copy commands are recorded in `agents/context.md` under "R7 post-run lightweight eval collation".
+- If one VM creates the eval manifest first, copy the exact JSONL to the other VM before evaluation so the K=2 and K=8 per-prompt CSVs are row-aligned. Detailed copy commands are recorded in `docs/overview.md` under "R7 post-run lightweight eval collation".

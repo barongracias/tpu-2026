@@ -151,8 +151,8 @@ a Tunix bug where init-during-cluster-construction sometimes hangs). The
 project + entity are read from `config.py`:
 
 ```python
-WANDB_PROJECT = "tunix"
-WANDB_ENTITY  = "milindsarkaryt-iiser-mohali"
+WANDB_PROJECT = "agentic-ai-coursework"
+WANDB_ENTITY  = "barongracias-university-of-cambridge"
 ```
 
 To **resume** an existing run, pass its id (`./run_tmux.sh resume` does this

@@ -270,7 +270,7 @@ Artefacts/caveats:
 
 Hard-question mining was not used for the R7 K=2 or K=8 runs.
 
-- mining method: none used. Notes under `agents/context.md` and `agents/report_notes.md` discuss hard-example mining as a future inference-only probe, not as an executed run for these experiments.
+- mining method: none used. Notes under `docs/overview.md` and `docs/report_notes.md` discuss hard-example mining as a future inference-only probe, not as an executed run for these experiments.
 - source baseline: none for R7; no hard-mined source baseline was found.
 - manifest path: no hard-question manifest found. The only manifest used by R7 is the shared GSM8K eval manifest `gsm8k_test_seed0_n64.jsonl`.
 - number of questions: not applicable.

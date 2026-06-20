@@ -13,15 +13,12 @@ This register collates the submitted evidence files under `experiments/team_evid
 | `evidence_harvey_k4_full_eval_20260614.md` | Harvey | Full GSM8K confirmation eval for completed GRPO K=4 best-retained and final checkpoints, with paired bootstrap CIs. |
 | `evidence_harvey_k16_full_eval_20260615.md` | Harvey | Full GSM8K confirmation eval for capped GRPO K=16 last-good checkpoint; training stopped early with `RESOURCE_EXHAUSTED`. |
 | `baron_results_handoff_20260615.md` | Harvey | Compact response to Baron's 2026-06-15 handoff ask: GRPO K=4/K=16 status, provenance, scalar/eval artefact map, and optional RLOO full-test evidence. |
-| `evidence_basia_20260612.md` | Basia/Barbara | External collaborator evidence for KL, length, empty-penalty, and G8+microbatch diagnostics. |
-| `evidence_funmi_20260612` | Funmi | External collaborator evidence. File contains repeated pasted audits; the fuller middle section is treated as canonical for variant runs. |
-| `evidence_rowan_20260612.md` | Rowan | External collaborator K sweep/reward-reweight evidence. Includes K=16 partial run and pending reward-reweight eval opportunity. |
 
 ## Executive summary
 
 The strongest supported internal story is that K=2 training is unstable for this setup, while larger K materially improves stability and format adherence. The gains in exact GSM8K accuracy are modest on the 64-question greedy evaluation set: Baron R5 GRPO K=8 reaches 35/64 at its best retained checkpoint and 32/64 at the final checkpoint, against a base reference of 31/64. Harvey's deterministic RLOO K=8 reaches 35/64 at its best retained checkpoint on the 64-question screen, `722/1319` at that selected step on the full test set, and `742/1319` at the final checkpoint. The full-test final beats base by `+8.87` percentage points with a paired bootstrap 95% CI of `[+6.14, +11.68]` points. Harvey's GRPO K=4 run also beats base at both selected and final checkpoints, while the capped GRPO K=16 run reaches `703/1319` at its last-good checkpoint but stops early from TPU memory exhaustion. The deterministic GRPO K=2 baseline reproduction reaches `656/1319` at its selected checkpoint step `500`, but the paired CI versus base includes zero, and the final checkpoint falls to `218/1319`. In contrast, Baron/Harvey RLOO K=2 and Baron/Harvey GRPO K=2 degrade badly by the end of training, with RLOO K=2 showing severe empty-response collapse.
 
-Fred's hard-question mining is valuable for method coverage and dataset provenance, but the completed K=8 hard-medium run does not beat the base exact score at final evaluation. External collaborators add useful coverage: KL, length, empty-penalty, LoRA, learning-rate, K=4/K=16, and reward-reweight attempts. These should be used as supporting context unless their evaluation protocol and provenance are reconciled with the internal runs.
+Fred's hard-question mining is valuable for method coverage and dataset provenance, but the completed K=8 hard-medium run does not beat the base exact score at final evaluation.
 
 ## Status labels
 
@@ -55,25 +52,6 @@ Fred's hard-question mining is valuable for method coverage and dataset provenan
 | Harvey | Deterministic GRPO K=2 baseline | `7a77bce` | GRPO | 2 | 0 | full base + step 500 + step 3364 eval complete; retained checkpoints restored on 64-prompt screen | 656/1319 at step 500 full eval | 218/1319 at 3364 full eval | 0/1319 at step 500 and step 3364 full evals | Report-ready deterministic coursework baseline reproduction; selected checkpoint CI vs base includes 0, final checkpoint collapses. |
 | Harvey | Older R6 RLOO variants | `8a0f7f2` | RLOO | 2/8 | unclear | no eval found | missing | missing | missing | Not usable. |
 
-## External collaborator runs
-
-| Owner | Run / W&B ID | Branch / commit | Method | K | Seed | Eval status | Best / final exact | Use |
-|---|---|---|---|---:|---:|---|---|---|
-| Basia | `8rmv0hgg` KL beta 1e-6 | `kl-control-bk` / `5e7d8f5` | GRPO, beta 1e-6 | 2 | 42 | final restored | final 33/64, base 33/64, format 0/64 | Report-ready external context: accuracy maintained but format collapses. |
-| Basia | `oet2tfjd` KL beta 0.32 | `kl-control-bk` / `5e7d8f5`, dirty unknown | GRPO, beta 0.32 | 2 | 42 | final restored | final 0/64 | Report-ready external context: high-beta setting fails completely. |
-| Basia | `jcp0b5cy` length penalty G2 | `reward-length-bk` / `f50d731`, dirty unknown | GRPO + length penalty | 2 | 42 | final restored | final 3/64 | Report-ready external context: length penalty alone does not rescue K=2. |
-| Basia | `cyay16mj` length penalty G8 bs1 | `reward-length-on-g8-bk` / `89cde30` | GRPO + length penalty | 8 | 42 | step/final evals restored | final 32/64; control step 500 38/64 | Report-ready external context, but microbatch changed so comparison is not clean. |
-| Basia | `dsi65u1z` empty penalty G2 | `empty-penalty-bk` / `2dac639`, dirty unknown | GRPO + empty penalty | 2 | 42 | step/final JSONLs committed | final 9/64; step 2000 4/64 | Context/report-ready with caveat: helps empty collapse but still weak exact accuracy. |
-| Funmi | `jgs4c6kl` baseline seed42 | `baseline-fls` / `7e696c4` | GRPO | 2 | 42 | retained checkpoints restored | best 18/64 at 2000; final 2/64 | Report-ready external negative baseline for K=2 collapse. |
-| Funmi | `hozux9t6` lr1e5 seed42 | `learning-rate-fls` / `99059ce7` | GRPO, LR variant, K provenance uncertain | probably 8 | 42 | retained checkpoints restored | best 20/64; final 19/64 | Context only until K/config provenance is settled. |
-| Funmi | `aoz8dtkp` LoRA rank128 alpha128 | `lora-rank128-alpha128-fls` / `99059ce7` | GRPO + LoRA capacity | 8 | 42 | W&B final metrics only | restored exact missing | Not report-ready for accuracy. |
-| Funmi | `v5cvlwkm` LoRA rank128 alpha128 G2 | `lora-rank128-alpha128-fls` / `762bb69` | GRPO + LoRA capacity | 2 | 42 | final restored | final 21/64, base 34/64 | Report-ready external context: capacity change does not prevent degradation. |
-| Rowan | `dvsaxxyh` K=8 baseline | inferred `n-generations-8`, commit missing | GRPO | 8 | 42 | no local eval/checkpoint | formal eval missing | Context only; may duplicate `kosfzg6t`. |
-| Rowan | `kosfzg6t` intended K=16 but actually K=8 | commit missing | GRPO | 8 | 42 | no local eval/checkpoint | formal eval missing | Context only; byte-identical to `dvsaxxyh`. |
-| Rowan | `x4j7yhdp` K=4 | `n-generations-4` / `1db3d25` | GRPO | 4 | 42 | checkpoint deleted, no eval | missing | Not usable except W&B reward trend. |
-| Rowan | `xqbl406c` K=16 | `n-generations-16` / `17c90d5` | GRPO | 16 | 42 | step 2500 restored before OOM | 36/64 at step 2500 | Partial report-ready external context: promising but failed/OOM before final. |
-| Rowan | `smuzmoal` reward reweight | `reward-reweight` / `24583db` plus reward change `37847c1` | GRPO, reweighted reward | 8 | 42 | checkpoints retained; no accuracy eval yet | pending | Pending: high-priority eval candidate. |
-
 ## Best-supported comparisons
 
 ### Internal comparisons
@@ -88,15 +66,6 @@ Fred's hard-question mining is valuable for method coverage and dataset provenan
 | RLOO K=8 vs RLOO K=2 | Harvey R7 K=8 vs K=2 | Increasing K stabilises RLOO: K=8 reaches 722/1319 at the selected step 2000 and 742/1319 at final step 3364 with no empty collapse, while K=2 step 500 is 562/1319 and K=2 final has 1111/1319 empty responses. | The n=64 screen under-ranked the K=8 final checkpoint, so checkpoint-selection and final-checkpoint reporting should be separated. |
 | Hard/medium mining | Fred mining + R8 | Mining produced a reproducible hard/medium manifest, but R8 final 30/64 does not beat the base 31/64. | R7 trained eval missing; R8 retained-checkpoint eval missing. |
 
-### External coverage comparisons
-
-| Theme | Evidence | What it adds | Caveat |
-|---|---|---|---|
-| KL sensitivity | Basia beta 1e-6 and 0.32 | Shows regularisation strength can preserve base-level exact with format collapse or destroy accuracy entirely. | Need curves and careful explanation of beta effects before using strongly. |
-| Reward shaping | Basia length/empty penalty, Rowan reward reweight pending | Reward changes can change format/empty behaviour but do not automatically improve exact reasoning. | Some dirty status unknown; reward-reweight accuracy still pending. |
-| K sweep | Baron/Harvey K=4/K=8/K=16, Rowan K=16/K=4 | Larger K improves stability relative to K=2 in the internal evidence. Harvey GRPO K=4 and capped K=16 now both have full-test evals above base; Harvey/Baron K=8 remains the strongest practical completed setting. | K=16 is early-stopped/OOM and not compute-matched to full-budget K=4/K=8. |
-| LoRA/LR variants | Funmi | Larger LoRA capacity and LR changes do not solve the main issue by themselves. | LR K provenance uncertain; one LoRA run lacks restored exact eval. |
-
 ## Candidate report claims
 
 The following are the safest claims to draft around, subject to final paired/bootstrap analysis:
@@ -108,15 +77,12 @@ The following are the safest claims to draft around, subject to final paired/boo
 5. The exact-accuracy improvement from K=8 is checkpoint-dependent but positive for both Harvey full-test checkpoints evaluated. Harvey RLOO K=8 step `2000` improves over the full-test base by `+7.35` points with paired 95% CI `[+4.62, +10.16]`; final step `3364` improves by `+8.87` points with paired 95% CI `[+6.14, +11.68]`. The report should distinguish the n=64 checkpoint-selection result from the full-test final result.
 6. GRPO K=16 is promising but memory-limited in this setup: Harvey's capped run reaches `703/1319` at step `500`, but stops before the `2500` cap with `RESOURCE_EXHAUSTED`. Use it as feasibility and last-good evidence, not as a completed full-budget result.
 7. Hard-question mining produced a clean hard/medium training subset, but Fred R8 does not yet show a final exact-accuracy improvement over base. It is useful as an attempted improvement and negative result.
-8. External collaborator runs broaden the failure-mode map: KL strength, reward shaping, LoRA capacity, learning rate, and larger K all affect stability, but none is a simple guaranteed fix.
 
 ## Claims to avoid or qualify
 
 - Do not generalise the Harvey/Baron K=8 improvements to every K=8 setup without matching branch, seed, checkpoint policy, and eval manifest. The effect remains checkpoint- and run-dependent.
-- Do not compare external-team percentages as if every run used the same code, branch, seed, checkpoint policy, and eval manifest unless those are reconciled.
-- Do not treat any K=16 evidence as a completed full run unless it actually reached the planned final step. Rowan K=16 failed/OOMed after step 2991, and Harvey GRPO K=16 stopped before its 2500-step cap with last-good checkpoint step 500.
+- Do not treat any K=16 evidence as a completed full run unless it actually reached the planned final step. Harvey GRPO K=16 stopped before its 2500-step cap with last-good checkpoint step 500.
 - Do not use Fred R7 accuracy until a trained-checkpoint eval is recovered. The copied CSV appears to be base/mixup rather than R7-trained.
-- Do not use Funmi `lr1e5_seed42` as a pure learning-rate ablation until the K/config provenance is resolved.
 - Do not use `baron_k8` as a separate branch provenance claim unless the exact pushed branch/run link is verified.
 
 ## Missing artefacts and follow-ups
@@ -127,7 +93,6 @@ The following are the safest claims to draft around, subject to final paired/boo
 2. Decide fixed-step vs best-checkpoint reporting. If using best checkpoint, state that checkpoint selection used the retained validation/eval sweep and report final checkpoint separately.
 3. Export or collect the scalar curves needed for figures: reward components, KL, completion length, empty counts if available, and exact/format eval by checkpoint.
 4. Build one clean results table for the report with only report-ready rows.
-5. Verify whether external collaborator results can be cited in the team report and how to phrase them without implying ownership of their runs.
 
 ### Owner-specific gaps
 
@@ -136,9 +101,6 @@ The following are the safest claims to draft around, subject to final paired/boo
 | Baron | Bootstrap CIs for R5; TensorBoard scalar export for R5; clarify `baron_k8` branch provenance; locate R6 eval or mark unusable. |
 | Fred | Recover R7 trained eval if possible; eval R8 retained checkpoints; export TensorBoard scalars; record R9 stage-2 failure clearly. |
 | Harvey | Original K=2 run root/logs if still available; decide whether to compute cross-run paired CIs among K=4/K=8/K=16 beyond the base comparisons. |
-| Basia | Provide missing baseline `jgs4c6kl` and G8-rerun `4i8lcitv` JSONLs if used for bootstrap; resolve dirty statuses. |
-| Funmi | Resolve K provenance for `lr1e5_seed42`; recover restored exact eval for `aoz8dtkp`; provide metadata/events if available. |
-| Rowan | Evaluate `smuzmoal` retained checkpoints; verify if K=16 checkpoint/eval files still exist; avoid using K=4 for accuracy. |
 
 ## Recommended report table subset
 
@@ -155,7 +117,6 @@ For the main report, keep the table compact and favour the internally controlled
 | Harvey GRPO K=16 last-good full-test | Positive high-K feasibility result, clearly labelled early-stopped/OOM. |
 | Harvey RLOO K=8 selected/full and final/full | Cross-check that K=8 also stabilises RLOO on the full test set. |
 | Fred R8 hard-medium final | Negative result for hard-question mining. |
-| Optional external rows: Basia KL/length, Rowan K=16 step2500, Funmi baseline | Use only if space allows and caveats are clear. |
 
 ## Figure candidates
 
@@ -163,7 +124,6 @@ For the main report, keep the table compact and favour the internally controlled
 2. Empty-response count by checkpoint for RLOO K=2 vs K=8.
 3. Reward-component/KL traces for Baron R1 vs R5, if scalar exports are available.
 4. Hard-mining composition bar: easy/medium/hard counts from Fred's base mining pass.
-5. Optional external coverage heatmap: intervention vs final/best exact score, with caveat markers for failed or incomplete runs.
 
 ## Immediate next analysis task
 

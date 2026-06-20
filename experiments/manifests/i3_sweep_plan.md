@@ -1,6 +1,6 @@
 # I.1 / I.3 run plan (LOCK before the TPU window opens 2026-06-08)
 
-Supersession note (2026-06-09): this file records the pre-TPU plan. The actual run sequence pivoted after R1/R3 diagnostics: R1 GRPO K=2 and R3 RLOO K=2 exposed reward/control failures, D3/D4 tested GRPO K=8, and R5 became the full GRPO K=8 seed-0 run. Current results and decisions live in `agents/report_notes.md` and the per-run notes under `experiments/`.
+Supersession note (2026-06-09): this file records the pre-TPU plan. The actual run sequence pivoted after R1/R3 diagnostics: R1 GRPO K=2 and R3 RLOO K=2 exposed reward/control failures, D3/D4 tested GRPO K=8, and R5 became the full GRPO K=8 seed-0 run. Current results and decisions live in `docs/report_notes.md` and the per-run notes under `experiments/`.
 
 Status: SUPERSEDED DRAFT. Original status was draft to lock with the team. Team-shared v6e-1 TPU, window Mon 8 - Mon 15 Jun 2026.
 Baseline: `tpu-2026` @ `324abbe`; Tunix git HEAD (`external/tunix` @ `683256d`), installed via `bootstrap.sh` (NOT PyPI `google-tunix`).

@@ -138,35 +138,6 @@ Diagnosis:
 - Qualitative rows: base is correct while both final trained models are wrong on 23 prompts; R1 often uses tags but makes arithmetic/interpretation errors, while R3 frequently emits empty responses.
 - D3 K=8 debug recommendation: justified as a cheap diagnostic only, not a full run. It should first expose/configure `NUM_GENERATIONS=8`, run a short debug with fresh eval caches and empty-response checks, and be reviewed before any K=8 full run.
 
-## What To Read First
-
-1. `agents/context.md` in this repository.
-2. `agents/plan.md` in this repository.
-3. `agents/report_notes.md` in this repository.
-4. `experiments/README.md`, then the relevant `experiments/baseline/`, `experiments/variants/`, `experiments/diagnostics/`, `experiments/manifests/`, or `experiments/runbooks/` file.
-5. Main coursework repo: `../agentic-ai-coursework/agents/context.md`.
-6. Main coursework repo: `../agentic-ai-coursework/experiments/runbooks/tpu_day1_runbook.md`.
-7. Patched code: `scripts/config.py`, `scripts/train.py`, `scripts/evaluate.py`, `scripts/data.py`, `bootstrap.sh`.
-
-## Safe Useful Commands
-
-```bash
-git status --short --branch
-git log --oneline --decorate --max-count=12
-git diff --check
-env PYTHONPYCACHEPREFIX=/tmp/tpu2026-pycache python3 -m py_compile scripts/config.py scripts/data.py scripts/train.py scripts/evaluate.py
-```
-
-On a TPU VM after setup, use the main coursework runbook before any full run.
-
-## Things Not To Do
-
-- Do not push from an automated session unless Baron explicitly asks for a notes/code handoff commit.
-- Do not edit Tunix unless a TPU/debug failure proves the pinned Tunix API itself is wrong.
-- Do not start R4/R2 or any new full/debug run without explicit approval.
-- Do not store checkpoints or TensorBoard logs only under `/tmp`.
-- Do not claim numerical results until there are saved logs and per-prompt evaluation outputs.
-
 ## Open Checks Before Full Runs
 
 - JAX backend reports TPU.
