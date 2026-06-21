@@ -133,11 +133,11 @@ Two pieces of state need to be resumed independently:
    makes the trainer restart from the latest one. For coursework runs,
    `CKPT_DIR` should be under `$RUN_ROOT/ckpts`, not `/tmp`.
 
-2. **W&B run** — to keep the same plots, pass the existing run id. Yours is
-   `bnh9ttlt`:
+2. **W&B run** — to keep the same plots, export the existing run id before
+   resuming:
    ```bash
+   export WANDB_RUN_ID="<existing-run-id>"
    ./run_tmux.sh resume
-   # equivalent to:  WANDB_RUN_ID=bnh9ttlt python train.py --wandb-run-id bnh9ttlt
    ```
 
 ## 7. Monitoring
@@ -151,15 +151,14 @@ a Tunix bug where init-during-cluster-construction sometimes hangs). The
 project + entity are read from `config.py`:
 
 ```python
-WANDB_PROJECT = "tunix"
-WANDB_ENTITY  = "milindsarkaryt-iiser-mohali"
+WANDB_PROJECT = "agentic-ai-coursework"
+WANDB_ENTITY  = "barongracias-university-of-cambridge"
 ```
 
-To **resume** an existing run, pass its id (`./run_tmux.sh resume` does this
-for you with `WANDB_RUN_ID=bnh9ttlt`). To start a fresh run instead, just
-launch with no run id. The `entity` and `project` must match the existing
-run, otherwise wandb will say "run does not exist" — that's the bug we hit
-the first time.
+To **resume** an existing run, export its id and call
+`./run_tmux.sh resume`. To start a fresh run instead, launch with no existing
+run id. The `entity` and `project` must match the existing run, otherwise W&B
+will report that the run does not exist.
 
 ### 7b. TensorBoard (running on a remote TPU VM)
 

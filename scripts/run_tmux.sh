@@ -3,7 +3,7 @@
 # NOT kill the run. Re-run this script and it just attaches to the session.
 #
 #   ./run_tmux.sh                # start (or attach)
-#   ./run_tmux.sh resume         # resume the wandb run id below
+#   ./run_tmux.sh resume         # resume the WANDB_RUN_ID from the environment
 #   tmux attach -t tunix         # reattach manually
 #   tmux kill-session -t tunix   # stop everything
 

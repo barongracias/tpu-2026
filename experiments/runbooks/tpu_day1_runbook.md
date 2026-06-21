@@ -41,8 +41,8 @@ Minimum secrets/environment values:
 ```bash
 export HF_TOKEN="<huggingface token>"
 export WANDB_API_KEY="<wandb token>"
-export WANDB_ENTITY="<team or personal entity>"
-export WANDB_PROJECT="mas-agentic-ai-tpu-2026"
+export WANDB_ENTITY="barongracias-university-of-cambridge"
+export WANDB_PROJECT="agentic-ai-coursework"
 ```
 
 Minimum reproducibility pins:

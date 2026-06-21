@@ -107,13 +107,13 @@ Early stopping helps explain R1 but is not sufficient as the main improvement cl
 
 ## Recommended Next Plan
 
-Local Codex:
+Local follow-up:
 
 - Keep static audit notes current.
 - If TPU-side proposes patches, review them before commit: `NUM_GENERATIONS` env override, metadata logging, reward sanity checks, and any true-base eval change.
 - Start report-side plotting/data extraction only after TPU diagnostic artefacts are copied or made accessible.
 
-TPU Codex:
+TPU follow-up:
 
 - Finish D3/D4 diagnostics and report whether K=8 stays stable beyond 50 steps.
 - Run reward sanity checks in the TPU environment.

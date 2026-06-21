@@ -89,8 +89,8 @@ Backup options: distribution of A_hat_i over training; response length / entropy
 2. Access: connect via VSCode SSH; run everything under TMUX (long runs survive disconnects).
 3. CHECKPOINTS OFF /tmp: `config.py:67-69` points `CKPT_DIR`/`INTERMEDIATE_CKPT_DIR`/`TENSORBOARD_DIR` at
    `/tmp/content/...` and warns /tmp is VOLATILE. Repoint to persistent storage before any long run, or lose checkpoints.
-4. W&B: `config.py:85-86` defaults `WANDB_ENTITY="milindsarkaryt-iiser-mohali"` (NOT our team). Set our own
-   `WANDB_PROJECT`/`WANDB_ENTITY` + `WANDB_API_KEY`; confirm reward/KL/aux metrics log.
+4. W&B: `config.py` defaults to the shared team project and entity. Set `WANDB_API_KEY`, override
+   `WANDB_PROJECT`/`WANDB_ENTITY` only deliberately, and confirm reward/KL/aux metrics log.
 5. Secrets: `HF_TOKEN` for the gemma-3-1b-it download; confirm model + GSM8K (`DATA_SOURCE`) load.
 6. Debug run: `MAX_STEPS ~= 50`, end-to-end (train -> checkpoint -> `evaluate.py` on base + ckpt -> accuracy ->
    W&B). Time it to extrapolate the full-run wall-clock and confirm it fits ~5 h.

@@ -221,7 +221,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--source", default=DATA_SOURCE, choices=["tfds", "kaggle"])
     ap.add_argument("--wandb-run-id", default=WANDB_RUN_ID,
-                    help="Pass an existing run id (e.g. bnh9ttlt) to resume.")
+                    help="Pass an existing W&B run id to resume.")
     args = ap.parse_args()
 
     login_services()

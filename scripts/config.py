@@ -106,8 +106,8 @@ GENERATION_CONFIGS = {
 }
 
 # ====== W&B ======
-# Set WANDB_RUN_ID in env to resume an existing run (e.g. "bnh9ttlt").
+# Set WANDB_RUN_ID in the environment to resume an existing run.
 # Project + entity must match the existing run, otherwise wandb won't find it.
-WANDB_PROJECT = os.environ.get("WANDB_PROJECT", "tunix")
-WANDB_ENTITY = os.environ.get("WANDB_ENTITY", "milindsarkaryt-iiser-mohali")
+WANDB_PROJECT = os.environ.get("WANDB_PROJECT", "agentic-ai-coursework")
+WANDB_ENTITY = os.environ.get("WANDB_ENTITY", "barongracias-university-of-cambridge")
 WANDB_RUN_ID = os.environ.get("WANDB_RUN_ID", None)
